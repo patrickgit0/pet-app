@@ -53,7 +53,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       <section className="card grid gap-3 p-5 text-sm sm:grid-cols-2">
         <Info k={t('Celular')} v={c?.phone ? <a href={`tel:${c.phone}`} className="font-bold text-brand underline">{formatPhone(c.phone.replace(/^\+55/, ''))}</a> : '—'} />
-        <Info k={t('Verificação')} v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> {t('CPF verificado')}</> : t('Incompleta')}</span>} />
+        <Info k={t('Verificação')} v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> {t('CPF válido')}</> : t('Incompleta')}</span>} />
         <Info k={t('Bairro')} v={`${c?.neighborhood ?? '—'}${c?.distance_km != null ? ` · ${t('{d} da ONG', { d: formatDistance(Number(c.distance_km), lang) })}` : ''}`} />
         <Info k={t('Moradia')} v={c?.home_type ? t(HOME_LABEL[c.home_type]) : '—'} />
         <Info k={t('Quintal')} v={c?.has_yard == null ? '—' : c.has_yard ? t('Sim') : t('Não')} />

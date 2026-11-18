@@ -28,7 +28,7 @@ export default async function Page() {
       <h2>Com quem compartilhamos</h2>
       <ul>
         <li>A ONG vê seu nome, bairro, distância e perfil de moradia quando você conversa ou faz um pedido.</li>
-        <li>Seu <strong>CPF nunca é mostrado</strong> à ONG — ela vê apenas &quot;CPF verificado&quot;.</li>
+        <li>Seu <strong>CPF nunca é mostrado</strong> à ONG — ela vê apenas &quot;CPF válido&quot;.</li>
         <li>Celular e endereço completo só são liberados para a ONG <strong>depois que ela aprova</strong> seu pedido.</li>
         <li>Não vendemos seus dados.</li>
       </ul>
@@ -67,7 +67,7 @@ function PrivacyEn() {
       <h2>Who we share it with</h2>
       <ul>
         <li>The shelter sees your name, neighborhood, distance and home profile when you message them or make a request.</li>
-        <li>Your <strong>CPF is never shown</strong> to the shelter — it only sees &quot;CPF verified&quot;.</li>
+        <li>Your <strong>CPF is never shown</strong> to the shelter — it only sees &quot;Valid CPF&quot;.</li>
         <li>Your phone number and full address are only released to the shelter <strong>after it approves</strong> your request.</li>
         <li>We do not sell your data.</li>
       </ul>

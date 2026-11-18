@@ -19,8 +19,8 @@ async function deleteAccount() {
   redirect('/?conta=excluida');
 }
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ salvo?: string }> }) {
-  const { salvo } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Promise<{ salvo?: string; senha?: string }> }) {
+  const { salvo, senha } = await searchParams;
   const { supabase, user, profile } = await getSession();
   const { t } = await getI18n();
   const [{ data: complete }, { data: priv }] = await Promise.all([
@@ -38,6 +38,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
 
   return (
     <main className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-6 sm:py-10">
+      {senha && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">{t('Senha alterada.')}</p>}
       {salvo && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">{t('Perfil salvo.')}</p>}
 
       <section className="card flex items-center gap-4 p-5">

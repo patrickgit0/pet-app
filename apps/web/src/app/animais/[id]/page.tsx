@@ -1,3 +1,4 @@
+import { ShareAnimal } from '@/components/share-animal';
 import { NgoContact } from '@/components/ngo-contact';
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
@@ -152,6 +153,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
             </form>
           </div>
         )}
+        {a.status === 'available' && <ShareAnimal animalId={a.id} name={a.name} />}
         {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}
       </section>
     </main>

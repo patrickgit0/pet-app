@@ -35,6 +35,7 @@ export function AuthForm({ mode, next }: { mode: 'signin' | 'signup'; next?: str
         <input name="password" type="password" required minLength={isSignup ? 8 : undefined}
           autoComplete={isSignup ? 'new-password' : 'current-password'} className="field" />
         {isSignup && <span className="text-xs text-muted">{t('Pelo menos 8 caracteres.')}</span>}
+        {!isSignup && <Link href="/esqueci-senha" className="self-end text-xs font-semibold text-brand">{t('Esqueci minha senha')}</Link>}
       </label>
       {state?.error && <p role="alert" className="text-sm font-semibold text-red-700">{t(state.error)}</p>}
       <button disabled={pending} className="btn-primary h-12 text-base">

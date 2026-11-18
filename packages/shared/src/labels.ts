@@ -95,6 +95,7 @@ export const RPC_ERROR_MESSAGE: Record<string, string> = {
   NGO_CANNOT_START_CONVERSATION: 'A ONG não pode iniciar conversas.',
   FORBIDDEN: 'Você não tem permissão para isso.',
   NOT_APPROVED: 'O pedido ainda não foi aprovado.',
+  RATE_LIMIT: 'Muitas ações em pouco tempo. Aguarde um pouco e tente de novo.',
 };
 
 export function rpcErrorMessage(message: string | undefined): string {

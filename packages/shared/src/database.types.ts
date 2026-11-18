@@ -283,6 +283,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"notifications": {
+                  Row: {
+                    "created_at": string,"data": NonNullable<Json>,"emailed_at": string | null,"id": string,"kind": string,"link": string,"read_at": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"data"?: NonNullable<Json>,"emailed_at"?: string | null,"id"?: string,"kind": string,"link": string,"read_at"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"data"?: NonNullable<Json>,"emailed_at"?: string | null,"id"?: string,"kind"?: string,"link"?: string,"read_at"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notifications_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"profile_private": {
                   Row: {
                     "cep": string | null,"complement": string | null,"cpf": string | null,"cpf_verified_at": string | null,"id": string,"lgpd_consent_at": string | null,"phone": string | null,"phone_verified_at": string | null,"street": string | null,"updated_at": string
@@ -477,6 +497,15 @@ isOneToOne: false
                            },
 "mark_checkin_followed_up":
 { Args: { "p_checkin_id": string }; Returns: undefined
+                           },
+"notify":
+{ Args: { "p_data": Json,"p_kind": string,"p_link": string,"p_user": string }; Returns: undefined
+                           },
+"notify_due_checkins":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"notify_ngo":
+{ Args: { "p_data": Json,"p_except"?: string,"p_kind": string,"p_link": string,"p_ngo": string }; Returns: undefined
                            },
 "recompute_ngo_rating":
 { Args: { "p_ngo_id": string }; Returns: number
