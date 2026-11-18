@@ -17,7 +17,7 @@ export default function Page() {
       <h2>Para que usamos</h2>
       <ul>
         <li>Conectar você às ONGs e permitir a análise responsável dos pedidos de adoção.</li>
-        <li>Evitar fraudes e proteger os animais (por isso pedimos CPF e celular verificado).</li>
+        <li>Evitar fraudes e proteger os animais (por isso pedimos CPF e celular).</li>
         <li>Acompanhar o bem-estar do animal depois da adoção.</li>
       </ul>
 

@@ -49,7 +49,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{erro}</p>}
 
       <section className="card grid gap-3 p-5 text-sm sm:grid-cols-2">
-        <Info k="Verificação" v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified && c.phone_verified ? <><CheckIcon size={14} /> CPF e celular verificados</> : 'Incompleta'}</span>} />
+        <Info k="Verificação" v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> CPF verificado · celular informado</> : 'Incompleta'}</span>} />
         <Info k="Bairro" v={`${c?.neighborhood ?? '—'}${c?.distance_km != null ? ` · ${formatDistance(Number(c.distance_km))} da ONG` : ''}`} />
         <Info k="Moradia" v={c?.home_type ? HOME_LABEL[c.home_type] : '—'} />
         <Info k="Quintal" v={c?.has_yard == null ? '—' : c.has_yard ? 'Sim' : 'Não'} />

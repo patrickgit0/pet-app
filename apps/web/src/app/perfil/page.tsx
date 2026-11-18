@@ -52,7 +52,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
       {isAdopter && (
         <section className="card divide-y divide-line px-5 text-sm">
           <Row k="CPF" v={priv?.cpf ? `•••.•••.•••-${priv.cpf.slice(-2)}` : null} ok={Boolean(priv?.cpf_verified_at)} />
-          <Row k="Celular" v={priv?.phone ? formatPhone(priv.phone.replace(/^\+55/, '')) : null} ok={Boolean(priv?.phone_verified_at)} />
+          <Row k="Celular" v={priv?.phone ? formatPhone(priv.phone.replace(/^\+55/, '')) : null} />
           <Row k="Endereço" v={priv?.street ? [priv.street, priv.complement].filter(Boolean).join(' · ') : null} />
           <Row k="Bairro" v={[profile?.neighborhood, profile?.city].filter(Boolean).join(', ') || null} />
           <Row k="Moradia" v={profile?.home_type ? HOME_LABEL[profile.home_type] : null} />

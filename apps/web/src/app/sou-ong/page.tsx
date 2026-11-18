@@ -15,7 +15,7 @@ export default async function Page() {
     <main className="mx-auto grid max-w-5xl gap-8 px-6 py-10 md:grid-cols-2">
       <section className="flex flex-col gap-4">
         <h1 className="text-3xl font-extrabold">Sua ONG no Adotaí</h1>
-        <p className="text-ink-2">Divulgue seus animais para quem está perto, receba candidatos com CPF e celular verificados e acompanhe cada adoção depois da entrega. É gratuito.</p>
+        <p className="text-ink-2">Divulgue seus animais para quem está perto, receba candidatos com CPF verificado e acompanhe cada adoção depois da entrega. É gratuito.</p>
         <ul className="flex flex-col gap-2 text-sm">
           <li>✓ Anúncios com fotos, saúde e temperamento</li>
           <li>✓ Painel de candidatos e chat com a equipe</li>

@@ -9,15 +9,13 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { Button, C, Field, s } from '@/lib/ui';
 
-/** Etapa 2: CPF, celular (SMS), CEP → cidade/bairro, endereço e complemento, moradia. */
+/** Etapa 2: CPF, celular (validado, sem SMS), CEP → cidade/bairro, endereço e complemento, moradia. */
+const validPhone = (v: string) => /^\+55[1-9][1-9]9\d{8}$/.test(toE164Phone(v) ?? '');
 export default function CompleteProfile() {
   const { animal, name } = useLocalSearchParams<{ animal?: string; name?: string }>();
   const { session, profile, refreshProfile } = useAuth();
   const [cpf, setCpf] = useState('');
   const [phone, setPhone] = useState('');
-  const [phoneVerified, setPhoneVerified] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
-  const [code, setCode] = useState('');
   const [cep, setCep] = useState('');
   const [addr, setAddr] = useState<CepResult | null>(null);
   const [street, setStreet] = useState('');
@@ -27,7 +25,6 @@ export default function CompleteProfile() {
   const [kids, setKids] = useState(Boolean(profile?.has_children));
   const [pets, setPets] = useState(profile?.other_pets ?? '');
   const [consent, setConsent] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -37,7 +34,6 @@ export default function CompleteProfile() {
       if (!data) return;
       if (data.cpf) setCpf(formatCpf(data.cpf));
       if (data.phone) setPhone(formatPhone(data.phone.replace(/^\+55/, '')));
-      setPhoneVerified(Boolean(data.phone_verified_at));
       if (data.cep) onCep(data.cep);
       if (data.street) setStreet(data.street);
       if (data.complement) setComplement(data.complement);
@@ -56,27 +52,10 @@ export default function CompleteProfile() {
     }
   }
 
-  async function sendCode() {
-    const e164 = toE164Phone(phone);
-    if (!e164) return setMsg('Celular inválido.');
-    const { error } = await supabase.auth.updateUser({ phone: e164 });
-    if (error) return setMsg('Não foi possível enviar o SMS agora.');
-    setCodeSent(true);
-    setMsg('Enviamos um código por SMS.');
-  }
-
-  async function verify() {
-    const { error } = await supabase.auth.verifyOtp({ phone: toE164Phone(phone)!, token: code.trim(), type: 'phone_change' });
-    if (error) return setMsg('Código incorreto ou expirado.');
-    await supabase.rpc('sync_phone_verification');
-    setPhoneVerified(true);
-    setMsg(null);
-  }
-
   async function save() {
     setError(null);
     if (!isValidCpf(cpf)) return setError('CPF inválido.');
-    if (!phoneVerified) return setError('Confirme seu celular com o código por SMS.');
+    if (!validPhone(phone)) return setError('Informe um celular válido com DDD, ex.: (16) 99123-4567.');
     if (!addr) return setError('Informe um CEP válido.');
     if (!street.trim()) return setError('Informe o endereço.');
     if (!home) return setError('Diga onde você mora.');
@@ -113,20 +92,8 @@ export default function CompleteProfile() {
         hint="A ONG vê apenas “CPF verificado”, nunca o número." />
 
       <View style={{ gap: 6 }}>
-        <Field label="Celular" value={phone} editable={!phoneVerified} onChangeText={(v) => { setPhone(formatPhone(v)); setCodeSent(false); }}
-          keyboardType="phone-pad" placeholder="(16) 90000-0000" hint="Só é compartilhado com a ONG depois que ela aprovar seu pedido." />
-        {phoneVerified ? (
-          <Text style={{ color: C.brandDark, fontWeight: '700' }}>✓ Celular verificado</Text>
-        ) : (
-          <Button title={codeSent ? 'Reenviar código' : 'Enviar código por SMS'} variant="outline" onPress={sendCode} />
-        )}
-        {codeSent && !phoneVerified && (
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
-            <View style={{ flex: 1 }}><Field label="Código" value={code} onChangeText={setCode} keyboardType="number-pad" placeholder="6 dígitos" /></View>
-            <Button title="Confirmar" onPress={verify} />
-          </View>
-        )}
-        {msg && <Text style={s.hint}>{msg}</Text>}
+        <Field label="Celular" value={phone} onChangeText={(v) => setPhone(formatPhone(v))}
+          keyboardType="phone-pad" placeholder="(16) 99123-4567" hint="Só é compartilhado com a ONG depois que ela aprovar seu pedido." />
       </View>
 
       <View style={{ gap: 6 }}>

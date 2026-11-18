@@ -80,6 +80,7 @@ export const RPC_ERROR_MESSAGE: Record<string, string> = {
   PROFILE_INCOMPLETE: 'Complete seu perfil para pedir a adoção.',
   INVALID_CPF: 'CPF inválido.',
   CPF_IN_USE: 'Este CPF já está cadastrado em outra conta.',
+  INVALID_PHONE: 'Celular inválido. Use DDD + número com 9 dígitos.',
   CPF_LOCKED: 'O CPF não pode ser alterado. Fale com o suporte.',
   INVALID_CEP: 'CEP inválido.',
   STREET_REQUIRED: 'Informe o endereço.',

@@ -8,7 +8,7 @@ import { CheckIcon } from '@/components/icons';
 import { requestAdoption } from '@/app/animais/[id]/actions';
 
 type Initial = {
-  fullName: string; cpf: string; phone: string; phoneVerified: boolean; cep: string; street: string; complement: string;
+  fullName: string; cpf: string; phone: string; cep: string; street: string; complement: string;
   homeType: HomeType | null; hasYard: boolean | null; hasChildren: boolean | null; otherPets: string; consented: boolean; isAdopter: boolean;
 };
 
@@ -26,9 +26,6 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
   const cpfLocked = Boolean(initial.cpf);
   const [cpf, setCpf] = useState(formatCpf(initial.cpf));
   const [phone, setPhone] = useState(formatPhone(initial.phone.replace(/^\+55/, '')));
-  const [phoneVerified, setPhoneVerified] = useState(initial.phoneVerified);
-  const [codeSent, setCodeSent] = useState(false);
-  const [code, setCode] = useState('');
   const [phoneMsg, setPhoneMsg] = useState<string | null>(null);
 
   const [cep, setCep] = useState(formatCep(initial.cep));
@@ -66,24 +63,8 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
     }
   }
 
-  async function sendCode() {
-    setPhoneMsg(null);
-    const e164 = toE164Phone(phone);
-    if (!e164) return setPhoneMsg('Celular inválido.');
-    const { error } = await supabase.auth.updateUser({ phone: e164 });
-    if (error) return setPhoneMsg('Não conseguimos enviar o SMS agora. Tente de novo em alguns minutos.');
-    setCodeSent(true);
-    setPhoneMsg('Enviamos um código por SMS.');
-  }
-
-  async function verifyCode() {
-    const e164 = toE164Phone(phone)!;
-    const { error } = await supabase.auth.verifyOtp({ phone: e164, token: code.trim(), type: 'phone_change' });
-    if (error) return setPhoneMsg('Código incorreto ou expirado.');
-    await supabase.rpc('sync_phone_verification');
-    setPhoneVerified(true);
-    setPhoneMsg(null);
-  }
+  // Sem SMS: o número só é validado (celular brasileiro: DDD + 9 dígitos começando com 9)
+  const validPhone = (v: string) => /^\+55[1-9][1-9]9\d{8}$/.test(toE164Phone(v) ?? '');
 
   const adoptionTouched = Boolean(animalId || (!cpfLocked && cpf) || phone || cep || street);
 
@@ -93,7 +74,7 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
     if (fullName.trim().split(/\s+/).length < 2) return setError('Informe seu nome completo.');
     if (adoptionTouched && initial.isAdopter) {
       if (!isValidCpf(cpf)) return setError('CPF inválido.');
-      if (!phoneVerified) return setError('Confirme seu celular com o código por SMS.');
+      if (!validPhone(phone)) return setError('Informe um celular válido com DDD, ex.: (16) 99123-4567.');
       if (!addr) return setError('Informe um CEP válido.');
       if (!street.trim()) return setError('Informe o endereço.');
       if (!homeType) return setError('Diga onde você mora.');
@@ -152,28 +133,15 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
             {cpfLocked && <span className="text-xs text-muted">O CPF não pode ser alterado. Precisa corrigir? Fale com o suporte.</span>}
           </label>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="cel" className="label">Celular</label>
-            <div className="flex gap-2">
-              <input id="cel" inputMode="tel" autoComplete="tel-national" value={phone} disabled={phoneVerified}
-                onChange={(e) => { setPhone(formatPhone(e.target.value)); setCodeSent(false); }}
-                placeholder="(16) 90000-0000" className="field min-w-0 flex-1 disabled:bg-field" />
-              {phoneVerified ? (
-                <button type="button" onClick={() => { setPhoneVerified(false); setCodeSent(false); }} className="btn-ghost shrink-0 bg-white">Trocar</button>
-              ) : (
-                <button type="button" onClick={sendCode} className="btn shrink-0 bg-brand-soft text-brand-dark">{codeSent ? 'Reenviar' : 'Enviar código'}</button>
-              )}
-            </div>
-            {phoneVerified && <span className="flex items-center gap-1 text-xs font-semibold text-brand-dark"><CheckIcon size={13} /> Celular verificado</span>}
-            {codeSent && !phoneVerified && (
-              <div className="flex gap-2">
-                <input aria-label="Código recebido por SMS" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)}
-                  placeholder="Código de 6 dígitos" className="field min-w-0 flex-1 tracking-[2px]" />
-                <button type="button" onClick={verifyCode} className="btn-primary shrink-0">Confirmar</button>
-              </div>
-            )}
-            {phoneMsg && <span className="text-xs text-muted">{phoneMsg}</span>}
-          </div>
+          <label className="flex flex-col gap-1.5">
+            <span className="label">Celular</span>
+            <input inputMode="tel" autoComplete="tel-national" value={phone}
+              onChange={(e) => { const v = formatPhone(e.target.value); setPhone(v); setPhoneMsg(null); }}
+              onBlur={() => setPhoneMsg(phone && !validPhone(phone) ? 'Confira o número: DDD + celular com 9 dígitos.' : null)}
+              placeholder="(16) 99123-4567" className="field" />
+            {phoneMsg ? <span className="text-xs text-red-700">{phoneMsg}</span>
+              : <span className="text-xs text-muted">A ONG só recebe seu celular depois de aprovar o pedido.</span>}
+          </label>
 
           <div className="grid grid-cols-[1fr_2fr] gap-2">
             <label className="flex min-w-0 flex-col gap-1.5">

@@ -29,7 +29,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
           fullName: profile?.full_name ?? '',
           cpf: priv?.cpf ?? '',
           phone: priv?.phone ?? '',
-          phoneVerified: Boolean(priv?.phone_verified_at),
           cep: priv?.cep ?? '',
           street: priv?.street ?? '',
           complement: priv?.complement ?? '',
