@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { isValidCpf, formatCpf, toE164Phone, formatPhone, isValidCnpj, formatCnpj } from './cpf.ts';
 import { formatCep, lookupCep } from './cep.ts';
+import { openNow, parseOpeningHours, visitSlots, whatsappLink } from './hours.ts';
 
 test('CPF válido e inválido', () => {
   assert.equal(isValidCpf('529.982.247-25'), true);
@@ -43,4 +44,16 @@ test('CNPJ', () => {
   assert.equal(isValidCnpj('11.222.333/0001-81'), true);
   assert.equal(isValidCnpj('11222333000182'), false);
   assert.equal(formatCnpj('11222333000181'), '11.222.333/0001-81');
+});
+
+test('horário da ONG e horários de visita', () => {
+  const oh = parseOpeningHours({ mon: { open: '09:00', close: '11:00' }, sun: null, tue: { open: '18:00', close: '09:00' } })!;
+  assert.equal(oh.tue, null); // abre depois de fechar: inválido
+  const monday = new Date(2026, 10, 16); // segunda
+  assert.deepEqual(visitSlots(oh, monday), ['09:00', '09:30', '10:00', '10:30']);
+  assert.deepEqual(visitSlots(oh, new Date(2026, 10, 15)), []); // domingo fechado
+  assert.equal(openNow(oh, new Date(2026, 10, 16, 10, 0))?.open, true);
+  assert.equal(openNow(oh, new Date(2026, 10, 16, 11, 0))?.open, false);
+  assert.equal(parseOpeningHours({}), null);
+  assert.equal(whatsappLink('55 16 99999-0000', 'Oi!'), 'https://wa.me/5516999990000?text=Oi!');
 });

@@ -1,3 +1,4 @@
+import { NgoContact } from '@/components/ngo-contact';
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
@@ -22,7 +23,7 @@ async function load(id: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from('animals')
-    .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood), animal_photos(storage_path, position)')
+    .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood, whatsapp, opening_hours), animal_photos(storage_path, position)')
     .eq('id', id)
     .maybeSingle();
   return data;
@@ -136,6 +137,8 @@ export default async function AnimalPage({ params, searchParams }: Params) {
             </span>
           </span>
         </Link>
+
+        <NgoContact ngo={ngo} loggedIn={Boolean(user)} animalName={a.name} next={`/animais/${a.id}`} />
 
         {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 

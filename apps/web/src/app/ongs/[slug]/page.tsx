@@ -1,3 +1,4 @@
+import { NgoContact } from '@/components/ngo-contact';
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
 import { formatRating } from '@adotai/shared';
@@ -9,6 +10,7 @@ import { AnimalCard } from '@/components/animal-card';
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   const { t, lang } = await getI18n();
   const { data: ngo } = await supabase.from('ngos').select('*').eq('slug', slug).maybeSingle();
   if (!ngo) notFound();
@@ -43,6 +45,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <Stat k={t('Responde em')} v={ngo.median_response_minutes == null ? '—' : ngo.median_response_minutes < 60 ? `${ngo.median_response_minutes} min` : `${Math.round(ngo.median_response_minutes / 60)} h`} />
         </div>
       </header>
+
+      <NgoContact ngo={ngo} loggedIn={Boolean(user)} next={`/ongs/${ngo.slug}`} />
 
       {ngo.pix_key && (
         <p className="rounded-xl bg-brand-soft p-4 text-sm">{t('Quer ajudar a {name}? Doe via Pix:', { name: ngo.name })} <strong className="select-all">{ngo.pix_key}</strong></p>

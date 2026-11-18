@@ -1,6 +1,7 @@
 export * from './cpf';
 export * from './cep';
 export * from './labels';
+export * from './hours';
 export type { Database } from './database.types';
 
 /** Bucket público das fotos dos animais. */

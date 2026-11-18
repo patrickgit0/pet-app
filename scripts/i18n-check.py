@@ -6,7 +6,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace(os.sep, '/') + '/'
 files = [f.replace('\\', '/') for f in glob.glob(root + 'apps/web/src/**/*.ts*', recursive=True)]
-files = [f for f in files if not f.endswith('/i18n/en.ts')] + [root + 'packages/shared/src/labels.ts']
+files = [f for f in files if not f.endswith('/i18n/en.ts')] + [root + 'packages/shared/src/labels.ts', root + 'packages/shared/src/hours.ts']
 
 SQ = r"'((?:[^'\\\n]|\\.)*)'"
 DQ = r'"((?:[^"\\\n]|\\.)*)"'
@@ -44,7 +44,7 @@ for m in re.finditer(r"^\s*(?:'((?:[^'\\]|\\.)*)'|\"((?:[^\"\\]|\\.)*)\"|([A-Za-
     k = m.group(1) or m.group(2) or m.group(3)
     en_keys.add(k.replace("\\'", "'"))
 # textos que não são de interface
-noise = re.compile(r'^(next/|use (client|server)|Enums|Tables|Row|America/|image/|currentColor|Enter|en-US|pt-BR|%s|role, ngos|card overflow|maplibre|Idioma / Language|noopener|\*, )|^[a-z_]+\(|^[a-z_]+, |profiles!|^\$\{')
+noise = re.compile(r'^(next/|use (client|server)|Enums|Tables|Row|America/|image/|currentColor|Enter|en-US|pt-BR|%s|role, ngos|card overflow|maplibre|Idioma / Language|noopener|M\d|\*, )|^[a-z_]+\(|^[a-z_]+, |profiles!|^\$\{')
 missing = [k for k, f in keys.items() if k not in en_keys and not noise.search(k)]
 # textos que já são em inglês (labels.ts tem as duas línguas)
 missing = [k for k in missing if k not in ('Age unknown', '1 month', '1 year', 'less than 1 km', 'Idade não informada', '1 mês', '1 ano', 'menos de 1 km', 'ótima', 'difícil')]  # valores internos
