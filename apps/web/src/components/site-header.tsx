@@ -20,12 +20,12 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-line bg-white">
-      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center gap-x-7 gap-y-3 px-6 py-3.5">
+      <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-x-7 gap-y-1 px-4 pt-3 sm:px-6 lg:flex-nowrap lg:py-3.5">
         <Link href="/" className="flex items-center gap-2 text-[22px] font-extrabold text-brand">
           <PawIcon size={28} />
           Adotaí
         </Link>
-        <nav className="flex flex-1 flex-wrap items-center gap-5 text-sm font-semibold">
+        <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] items-center gap-1 overflow-x-auto px-2 text-sm font-semibold whitespace-nowrap [scrollbar-width:none] sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-4 lg:order-none lg:mx-0 lg:w-auto lg:flex-1 lg:gap-5 lg:px-0 [&>a]:px-2 [&>a]:py-3 lg:[&>a]:p-0">
           <Link href="/">Adotar</Link>
           <Link href="/ongs">ONGs</Link>
           {user && (
@@ -55,8 +55,8 @@ export async function SiteHeader() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Link href="/entrar" className="btn-ghost">Entrar</Link>
-            <Link href="/criar-conta" className="btn-primary">Criar conta</Link>
+            <Link href="/entrar" className="btn-ghost px-3 sm:px-4">Entrar</Link>
+            <Link href="/criar-conta" className="btn-primary px-3 sm:px-4">Criar conta</Link>
           </div>
         )}
       </div>

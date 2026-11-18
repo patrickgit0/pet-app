@@ -11,3 +11,4 @@ build/
 supabase/.temp/
 supabase/.branches/
 coverage/
+apps/web/public/maplibre-gl-worker.mjs

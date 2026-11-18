@@ -5,6 +5,9 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MAP_STYLE_URL } from '@adotai/shared';
 
+// O worker do MapLibre é servido de /public (copiado no build): o bundler do Next quebra o caminho padrão.
+maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
+
 export type MapPin = { id: string; label: string; lat: number; lng: number };
 
 /**
@@ -24,6 +27,8 @@ export function MapView({ center, radiusKm, pins }: { center: { lat: number; lng
       attributionControl: { compact: true },
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+    // Créditos do OpenStreetMap ficam recolhidos no botão "i" (exigência da licença, sem tampar o mapa)
+    map.once('load', () => ref.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'));
 
     // Agrupa animais no mesmo ponto arredondado
     const groups = new Map<string, MapPin[]>();
@@ -50,5 +55,5 @@ export function MapView({ center, radiusKm, pins }: { center: { lat: number; lng
     };
   }, [center.lat, center.lng, radiusKm, pins]);
 
-  return <div ref={ref} role="region" aria-label="Mapa com a região dos animais" className="h-[560px] w-full overflow-hidden rounded-2xl border border-line-2 bg-[#E3E8E2]" />;
+  return <div ref={ref} role="region" aria-label="Mapa com a região dos animais" className="h-[220px] w-full sm:h-[320px] xl:h-[560px] overflow-hidden rounded-2xl border border-line-2 bg-[#E3E8E2]" />;
 }

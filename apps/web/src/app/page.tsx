@@ -9,6 +9,8 @@ import { AnimalCard } from '@/components/animal-card';
 import { MapView } from '@/components/map-view';
 import { LocateButton } from '@/components/locate-button';
 import { SearchIcon } from '@/components/icons';
+import { FilterPanel } from '@/components/filter-panel';
+import { AutoSubmitSelect } from '@/components/auto-submit-select';
 
 type SP = Record<string, string | string[] | undefined>;
 const list = (v: string | string[] | undefined) => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
@@ -62,6 +64,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     .filter((a) => a.approx_lat != null && a.approx_lng != null)
     .map((a) => ({ id: a.id, label: a.name, lat: Number(a.approx_lat), lng: Number(a.approx_lng) }));
 
+  const activeCount = species.length + sizes.length + ages.length +
+    ['castrado', 'criancas', 'caes', 'gatos', 'apartamento', 'verificadas'].filter((k) => sp[k] === '1').length + (sp.raio ? 1 : 0);
+
   const pageHref = (p: number) => {
     const u = new URLSearchParams();
     for (const [k, v] of Object.entries(sp)) list(v).forEach((x) => u.append(k, x));
@@ -70,18 +75,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   };
 
   return (
-    <div className="mx-auto flex max-w-[1360px] flex-wrap items-start gap-6 px-6 py-6">
-      <form method="get" className="card flex max-w-full flex-[1_1_240px] flex-col gap-5 p-5">
+    <div className="mx-auto flex max-w-[1360px] flex-col items-stretch gap-4 px-4 py-4 sm:px-6 sm:py-6 lg:flex-row lg:items-start lg:gap-6">
+      <form method="get" className="flex w-full flex-col gap-3 lg:card lg:w-[260px] lg:shrink-0 lg:gap-5 lg:p-5">
         {sp.lat && <input type="hidden" name="lat" value={String(sp.lat)} />}
         {sp.lng && <input type="hidden" name="lng" value={String(sp.lng)} />}
-        <div className="flex items-center justify-between">
+        <div className="hidden items-center justify-between lg:flex">
           <h2 className="text-base font-extrabold">Filtros</h2>
           <Link href="/" className="text-[13px] font-semibold text-brand">Limpar</Link>
         </div>
-        <label className="flex items-center gap-2 rounded-xl bg-field px-3.5">
+        <label className="flex items-center gap-2 rounded-xl bg-white px-3.5 ring-[1.5px] ring-line-2 ring-inset lg:bg-field lg:ring-0">
           <SearchIcon size={18} className="text-muted" />
-          <input name="q" defaultValue={q ?? ''} placeholder="Nome, raça ou ONG" className="h-11 flex-1 bg-transparent text-sm outline-none" />
+          <input name="q" type="search" enterKeyHint="search" defaultValue={q ?? ''} placeholder="Nome, raça ou ONG" className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none lg:h-11 lg:text-sm" />
         </label>
+        <FilterPanel activeCount={activeCount}>
+        <div className="card flex flex-col gap-5 p-4 lg:contents">
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted">Buscando perto de</span>
           <span className="text-sm font-bold">{center.label}</span>
@@ -107,12 +114,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <div className="border-t border-line pt-3">
           <Check name="verificadas" label="Só ONGs verificadas" checked={sp.verificadas === '1'} />
         </div>
-        <button className="btn-primary">Aplicar filtros</button>
+        <div className="flex gap-2">
+          <Link href="/" className="btn-ghost flex-1 lg:hidden">Limpar</Link>
+          <button className="btn-primary flex-[2]">Aplicar filtros</button>
+        </div>
+        </div>
+        </FilterPanel>
       </form>
 
-      <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-4">
+      <main className="flex min-w-0 flex-1 flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-[22px] font-extrabold">
+          <h1 className="text-lg font-extrabold sm:text-[22px]">
             {total} {total === 1 ? 'animal para adoção' : 'animais para adoção'} perto de você
           </h1>
           <form method="get" className="flex items-center gap-2">
@@ -120,17 +132,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <input key={`${k}${i}`} type="hidden" name={k} value={x} />
             )))}
             <label htmlFor="ordem" className="text-[13px] text-muted">Ordenar por</label>
-            <select id="ordem" name="ordem" defaultValue={sort} className="field h-10 w-auto">
+            <AutoSubmitSelect id="ordem" name="ordem" defaultValue={sort} className="field h-10 w-auto text-sm font-semibold">
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-            <button className="btn-ghost min-h-10">Ok</button>
+            </AutoSubmitSelect>
+            <noscript><button className="btn-ghost min-h-10">Ok</button></noscript>
           </form>
         </div>
 
         {error && <p className="card p-4 text-sm text-red-700">Não foi possível carregar os animais agora.</p>}
 
-        <div className="flex flex-wrap items-start gap-5">
-          <div id="resultados" className="grid min-w-0 flex-[999_1_420px] grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:gap-5">
+          <div id="resultados" className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4">
             {(animals ?? []).map((a) => <AnimalCard key={a.id} a={{ ...a, distance_km: Number(a.distance_km) }} />)}
             {!error && total === 0 && (
               <div className="card col-span-full p-8 text-center text-muted">
@@ -138,7 +150,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               </div>
             )}
           </div>
-          <div className="flex-[1_1_280px]">
+          <div className="order-first xl:sticky xl:top-4 xl:order-none xl:w-[340px] xl:shrink-0">
             <MapView center={center} radiusKm={radius} pins={pins} />
           </div>
         </div>
