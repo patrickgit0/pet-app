@@ -14,8 +14,8 @@ const QUICK_REPLIES = [
   'Seu pedido foi aprovado! Vamos combinar a entrega.',
 ];
 
-export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestId }: {
-  conversationId: string; me: string; isNgo: boolean; blocked: boolean; initial: Msg[]; requestId?: string;
+export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestId, readOnly = false }: {
+  conversationId: string; me: string; isNgo: boolean; blocked: boolean; initial: Msg[]; requestId?: string; readOnly?: boolean;
 }) {
   const supabase = createClient();
   const [msgs, setMsgs] = useState<Msg[]>(initial);
@@ -71,7 +71,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
                 {m.visit_place && <span className="text-xs text-muted">{m.visit_place}</span>}
                 {m.visit_confirmed_at ? (
                   <span className="rounded-lg bg-brand-soft py-2 text-center text-[13px] font-bold text-brand-dark">✓ Visita confirmada</span>
-                ) : !mine ? (
+                ) : !mine && !readOnly ? (
                   <button onClick={() => confirmVisit(m.id)} className="btn-primary min-h-10">Confirmar visita</button>
                 ) : (
                   <span className="text-xs text-muted">Aguardando confirmação</span>
@@ -94,7 +94,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
         <div ref={endRef} />
       </div>
 
-      {isNgo && !blocked && (
+      {isNgo && !blocked && !readOnly && (
         <div className="flex flex-wrap gap-2 border-t border-line bg-white px-3 pt-2">
           {QUICK_REPLIES.map((q) => (
             <button key={q} onClick={() => setDraft(q)} className="rounded-full bg-field px-3 py-1 text-xs font-semibold">{q.slice(0, 32)}…</button>
@@ -116,7 +116,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
         </form>
       )}
 
-      {blocked ? (
+      {readOnly ? null : blocked ? (
         <p className="border-t border-line bg-white p-4 text-center text-sm text-muted">Esta conversa foi bloqueada.</p>
       ) : (
         <form className="flex items-center gap-2 border-t border-line bg-white p-3" onSubmit={(e) => { e.preventDefault(); send(draft); setDraft(''); }}>

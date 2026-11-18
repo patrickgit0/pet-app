@@ -23,7 +23,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   // Centro da busca: ?lat/lng > localização do perfil > cidade piloto
   let center: { lat: number; lng: number; label: string } = { lat: PILOT_CITY.lat, lng: PILOT_CITY.lng, label: `${PILOT_CITY.name}, ${PILOT_CITY.state}` };
   if (sp.lat && sp.lng) {
-    center = { lat: Number(sp.lat), lng: Number(sp.lng), label: 'Sua localização' };
+    center = { lat: Number(sp.lat), lng: Number(sp.lng), label: typeof sp.local === 'string' && sp.local ? sp.local : 'Sua localização' };
   } else if (profile?.location) {
     const { data: loc } = await supabase.rpc('get_my_location');
     const row = loc?.[0];
@@ -79,6 +79,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <form method="get" className="flex w-full flex-col gap-3 lg:card lg:w-[260px] lg:shrink-0 lg:gap-5 lg:p-5">
         {sp.lat && <input type="hidden" name="lat" value={String(sp.lat)} />}
         {sp.lng && <input type="hidden" name="lng" value={String(sp.lng)} />}
+        {typeof sp.local === 'string' && <input type="hidden" name="local" value={sp.local} />}
         <div className="hidden items-center justify-between lg:flex">
           <h2 className="text-base font-extrabold">Filtros</h2>
           <Link href="/" className="text-[13px] font-semibold text-brand">Limpar</Link>

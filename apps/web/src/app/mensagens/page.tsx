@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
 import { initials, tintFor } from '@/lib/utils';
+import { myConversationsFilter } from '@/lib/conversations';
 
 export const metadata = { title: 'Mensagens' };
 
@@ -8,9 +9,11 @@ export default async function Page() {
   const { supabase, user, profile } = await getSession();
   const isNgo = profile?.role === 'ngo_member';
 
+  const { filter } = await myConversationsFilter(supabase, user!.id);
   const { data: convs } = await supabase
     .from('conversations')
     .select('id, last_message_at, adopter_id, animals(name), ngos(name), profiles!conversations_adopter_id_fkey(full_name), messages(body, kind, sender_id, read_at, created_at)')
+    .or(filter)
     .order('last_message_at', { ascending: false, nullsFirst: false })
     .order('created_at', { referencedTable: 'messages', ascending: false })
     .limit(1, { referencedTable: 'messages' });

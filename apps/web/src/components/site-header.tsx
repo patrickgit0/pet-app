@@ -2,18 +2,26 @@ import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
 import { PawIcon, UserIcon } from './icons';
 import { initials } from '@/lib/utils';
+import { myConversationsFilter } from '@/lib/conversations';
 
 export async function SiteHeader() {
   const { user, profile, supabase } = await getSession();
 
   let unread = 0;
   if (user) {
-    const { count } = await supabase
-      .from('messages')
-      .select('id', { count: 'exact', head: true })
-      .is('read_at', null)
-      .neq('sender_id', user.id);
-    unread = count ?? 0;
+    // Só conversas em que a pessoa participa (o admin enxerga todas pelo RLS)
+    const { filter } = await myConversationsFilter(supabase, user.id);
+    const { data: convs } = await supabase.from('conversations').select('id').or(filter);
+    const ids = (convs ?? []).map((c) => c.id);
+    if (ids.length) {
+      const { count } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .in('conversation_id', ids)
+        .is('read_at', null)
+        .neq('sender_id', user.id);
+      unread = count ?? 0;
+    }
   }
   const isNgo = profile?.role === 'ngo_member';
   const isAdmin = profile?.role === 'admin';
@@ -29,10 +37,10 @@ export async function SiteHeader() {
           <Link href="/">Adotar</Link>
           <Link href="/ongs">ONGs</Link>
           {user && (
-            <Link href="/mensagens" className="relative">
+            <Link href="/mensagens" className="inline-flex items-center">
               Mensagens
               {unread > 0 && (
-                <span className="ml-1 rounded-full bg-accent px-1.5 text-[10px] font-extrabold text-ink lg:absolute lg:-top-2 lg:-right-4 lg:ml-0">
+                <span className="ml-1 inline-flex min-w-5 justify-center rounded-full bg-accent px-1.5 text-[11px] leading-5 font-extrabold text-ink" aria-label={`${unread} não lidas`}>
                   {unread}
                 </span>
               )}

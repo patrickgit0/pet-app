@@ -2,44 +2,85 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { formatCep, lookupCep } from '@adotai/shared';
 import { PinIcon } from './icons';
 
-/** Usa a localização do navegador (com permissão) para centralizar a busca. */
+/**
+ * Centraliza a busca na localização do navegador (com permissão) ou num CEP digitado.
+ * O CEP é o plano B: no desktop a localização costuma falhar (Windows com localização desligada, sem Wi-Fi).
+ */
 export function LocateButton() {
   const router = useRouter();
   const params = useSearchParams();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [showCep, setShowCep] = useState(false);
+  const [cep, setCep] = useState('');
+
+  function go(lat: number, lng: number, label?: string) {
+    const p = new URLSearchParams(params.toString());
+    p.set('lat', lat.toFixed(4));
+    p.set('lng', lng.toFixed(4));
+    if (label) p.set('local', label); else p.delete('local');
+    p.delete('page');
+    router.push(`/?${p.toString()}`);
+  }
+
+  function locate() {
+    setErr(null);
+    if (!navigator.geolocation) {
+      setShowCep(true);
+      return setErr('Seu navegador não informa a localização. Use o CEP.');
+    }
+    setBusy(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setBusy(false);
+        go(pos.coords.latitude, pos.coords.longitude);
+      },
+      (e) => {
+        setBusy(false);
+        setShowCep(true);
+        setErr(
+          e.code === e.PERMISSION_DENIED
+            ? 'Localização bloqueada. Libere no cadeado ao lado do endereço do site, ou use o CEP.'
+            : e.code === e.TIMEOUT
+              ? 'Demorou demais para achar sua localização. Tente de novo ou use o CEP.'
+              : 'Não conseguimos sua localização (no computador, confira se a localização do sistema está ligada). Use o CEP.',
+        );
+      },
+      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 },
+    );
+  }
+
+  async function byCep(e?: { preventDefault(): void }) {
+    e?.preventDefault();
+    setErr(null);
+    if (cep.replace(/\D/g, '').length !== 8) return setErr('Digite os 8 números do CEP.');
+    setBusy(true);
+    const r = await lookupCep(cep);
+    setBusy(false);
+    if (!r || r.lat == null || r.lng == null) return setErr('Não encontramos esse CEP.');
+    go(r.lat, r.lng, [r.neighborhood, r.city].filter(Boolean).join(', '));
+  }
 
   return (
-    <div className="flex flex-col gap-1">
-      <button
-        type="button"
-        className="btn-ghost"
-        disabled={busy}
-        onClick={() => {
-          if (!navigator.geolocation) return setErr('Seu navegador não permite localização.');
-          setBusy(true);
-          navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              const p = new URLSearchParams(params.toString());
-              p.set('lat', pos.coords.latitude.toFixed(4));
-              p.set('lng', pos.coords.longitude.toFixed(4));
-              p.delete('page');
-              router.push(`/?${p.toString()}`);
-              setBusy(false);
-            },
-            () => {
-              setErr('Não conseguimos sua localização.');
-              setBusy(false);
-            },
-          );
-        }}
-      >
+    <div className="flex flex-col gap-2">
+      <button type="button" className="btn-ghost" disabled={busy} onClick={locate}>
         <PinIcon size={18} className="text-brand" />
         {busy ? 'Localizando…' : 'Usar minha localização'}
       </button>
-      {err && <span className="text-xs text-red-700">{err}</span>}
+      {showCep ? (
+        // div (não form): este componente fica dentro do formulário de filtros
+        <div className="flex gap-2">
+          <input value={cep} onChange={(e) => setCep(formatCep(e.target.value))} onKeyDown={(e) => { if (e.key === 'Enter') byCep(e); }}
+            inputMode="numeric" autoComplete="postal-code" placeholder="Seu CEP" aria-label="CEP" className="field h-11 min-w-0 flex-1 text-sm" />
+          <button type="button" onClick={byCep} disabled={busy} className="btn-primary min-h-11 px-3">Ok</button>
+        </div>
+      ) : (
+        <button type="button" onClick={() => setShowCep(true)} className="self-start text-xs font-semibold text-brand">Ou buscar por CEP</button>
+      )}
+      {err && <span role="alert" className="text-xs text-red-700">{err}</span>}
     </div>
   );
 }

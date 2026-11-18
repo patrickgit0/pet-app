@@ -5,6 +5,7 @@ import { getSession } from '@/lib/supabase/server';
 import { tintFor } from '@/lib/utils';
 import { BackIcon } from '@/components/icons';
 import { ChatRoom } from './chat-room';
+import { myConversationsFilter } from '@/lib/conversations';
 
 export const metadata = { title: 'Conversa' };
 
@@ -26,17 +27,25 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       .order('created_at', { ascending: false }).limit(1).maybeSingle(),
   ]);
 
-  // Marca como lidas as mensagens recebidas
-  await supabase.from('messages').update({ read_at: new Date().toISOString() })
-    .eq('conversation_id', id).neq('sender_id', user!.id).is('read_at', null);
+  // Admin pode abrir qualquer conversa (moderação), mas só para ler: não envia nem marca como lida
+  const { ngoIds } = await myConversationsFilter(supabase, user!.id);
+  const participant = conv.adopter_id === user!.id || ngoIds.includes(conv.ngo_id);
+  if (!participant && profile?.role !== 'admin') notFound();
 
-  const isNgo = profile?.role === 'ngo_member';
-  const title = isNgo ? conv.profiles?.full_name ?? 'Adotante' : conv.ngos?.name ?? 'ONG';
+  if (participant) {
+    await supabase.from('messages').update({ read_at: new Date().toISOString() })
+      .eq('conversation_id', id).neq('sender_id', user!.id).is('read_at', null);
+  }
+
+  const isNgo = participant && ngoIds.includes(conv.ngo_id);
+  const title = !participant
+    ? `${conv.profiles?.full_name ?? 'Adotante'} e ${conv.ngos?.name ?? 'ONG'}`
+    : isNgo ? conv.profiles?.full_name ?? 'Adotante' : conv.ngos?.name ?? 'ONG';
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-3 px-4 py-6">
       <div className="flex items-center gap-2">
-        <Link href="/mensagens" aria-label="Voltar" className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
+        <Link href={participant ? '/mensagens' : '/admin/adocoes'} aria-label="Voltar" className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
         <h1 className="text-lg font-extrabold">{title}</h1>
       </div>
       <Link href={`/animais/${conv.animal_id}`} className="card flex items-center gap-3 p-3">
@@ -52,9 +61,15 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           Pedido enviado! A ONG vai analisar seu perfil e responder por aqui.
         </p>
       )}
+      {!participant && (
+        <p role="status" className="rounded-xl bg-accent-soft p-3 text-sm text-accent-ink">
+          Você está vendo esta conversa como administrador. Só leitura: as mensagens do adotante ficam à direita.
+        </p>
+      )}
       <ChatRoom
         conversationId={id}
-        me={user!.id}
+        me={participant ? user!.id : conv.adopter_id}
+        readOnly={!participant}
         isNgo={isNgo}
         blocked={Boolean(conv.blocked_at)}
         initial={messages ?? []}
