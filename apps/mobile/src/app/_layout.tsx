@@ -1,18 +1,43 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
-
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { AuthProvider, useAuth } from '@/lib/auth';
+import { C } from '@/lib/ui';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function Root() {
+  const { loading } = useAuth();
+  useEffect(() => {
+    if (!loading) SplashScreen.hideAsync();
+  }, [loading]);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerTintColor: C.ink,
+          headerTitleStyle: { fontWeight: '700' },
+          contentStyle: { backgroundColor: C.ground },
+          headerBackButtonDisplayMode: 'minimal',
+        }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="animal/[id]" options={{ title: '' }} />
+        <Stack.Screen name="chat/[id]" options={{ title: 'Conversa' }} />
+        <Stack.Screen name="entrar" options={{ title: 'Entrar', presentation: 'modal' }} />
+        <Stack.Screen name="criar-conta" options={{ title: 'Criar conta', presentation: 'modal' }} />
+        <Stack.Screen name="completar-perfil" options={{ title: 'Completar perfil' }} />
+      </Stack>
+    </>
+  );
+}
+
+export default function Layout() {
+  return (
+    <AuthProvider>
+      <Root />
+    </AuthProvider>
   );
 }

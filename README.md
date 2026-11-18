@@ -53,8 +53,12 @@ O Adotaí junta três coisas que hoje ficam separadas:
 </table>
 
 <p align="center">
-  <img src="docs/screenshots/busca-mobile.png" alt="Busca no celular" width="260" />
-  <br/><sub>Site responsivo no celular. O app nativo (Expo) está em desenvolvimento.</sub>
+  <img src="docs/screenshots/app-animal.png" alt="App: página do animal" width="240" />
+  &nbsp;
+  <img src="docs/screenshots/app-criar-conta.png" alt="App: criar conta" width="240" />
+  &nbsp;
+  <img src="docs/screenshots/busca-mobile.png" alt="Site no celular" width="240" />
+  <br/><sub>App do adotante (Expo) — animal e cadastro — e o site responsivo no celular.</sub>
 </p>
 
 ## Como funciona
@@ -122,7 +126,7 @@ Tudo gratuito no início: mapas com **OpenFreeMap/OpenStreetMap** (sem chave), C
 app-pet/
 ├── apps/
 │   ├── web/          Next.js — site público, área do adotante, painel da ONG e admin
-│   └── mobile/       Expo — app do adotante (em desenvolvimento)
+│   └── mobile/       Expo — app do adotante (Android/iOS)
 ├── packages/
 │   └── shared/       Tipos do banco, validação de CPF/CNPJ, máscaras, CEP, rótulos pt-BR
 ├── supabase/
@@ -155,6 +159,20 @@ npm run dev:web             # http://localhost:3000
 
 No ambiente local o SMS é simulado: use o celular **(16) 99999-0000** e o código **123456**.
 
+### App mobile (Expo)
+
+O app fica fora dos workspaces (o Expo SDK 58 usa outra versão do React):
+
+```bash
+cd apps/mobile
+npm install
+cp .env.example .env   # use o IP da sua máquina na rede (ex.: http://192.168.0.10:54321), não 127.0.0.1
+npx expo start         # abra no Expo Go (Android/iOS) lendo o QR code
+```
+
+Telas: busca com filtros e "usar minha localização", animal, favoritos, chat em tempo real, perfil com pedidos,
+login, cadastro (etapa 1) e completar perfil (etapa 2, com SMS e CEP).
+
 Outros comandos:
 
 ```bash
@@ -171,7 +189,8 @@ node scripts/screenshots.mjs <id-de-um-animal>   # atualiza as imagens deste REA
 - [x] Plano, protótipo e decisões de produto
 - [x] Banco: schema, RLS, busca por raio, pedidos, chat, pós-adoção, ranking
 - [x] Web: busca com mapa, animal, ONG, cadastro em 2 etapas, chat em tempo real, painel da ONG, admin
-- [ ] App mobile (Expo) do adotante
+- [x] App mobile (Expo) do adotante — primeira versão (busca, animal, favoritos, chat, perfil, cadastro em 2 etapas)
+- [ ] App mobile: mapa (MapLibre nativo), notificações push, testes em aparelho
 - [ ] Projeto Supabase em produção + deploy da web
 - [ ] SMS real (provedor de SMS) e e-mails transacionais
 - [ ] Tarefas agendadas (check-ins atrasados, recálculo de notas) com `pg_cron`
