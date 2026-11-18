@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
-import { PawIcon } from './icons';
-import { signOut } from '@/app/(auth)/actions';
+import { PawIcon, UserIcon } from './icons';
+import { initials } from '@/lib/utils';
 
 export async function SiteHeader() {
   const { user, profile, supabase } = await getSession();
@@ -45,14 +45,12 @@ export async function SiteHeader() {
           {!user && <Link href="/sou-ong">Sou ONG</Link>}
         </nav>
         {user ? (
-          <div className="flex items-center gap-3 text-sm">
-            <Link href="/perfil" className="font-semibold">
-              {profile?.full_name?.split(' ')[0] ?? 'Perfil'}
-            </Link>
-            <form action={signOut}>
-              <button className="btn-ghost min-h-9 px-3">Sair</button>
-            </form>
-          </div>
+          <Link href="/perfil" aria-label="Meu perfil" title="Meu perfil" className="flex items-center gap-2 rounded-full py-1 pr-1 text-sm font-semibold hover:bg-field lg:pl-3">
+            <span className="hidden lg:inline">{profile?.full_name?.split(' ')[0]}</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-sm font-extrabold text-white">
+              {profile?.full_name ? initials(profile.full_name) : <UserIcon size={20} />}
+            </span>
+          </Link>
         ) : (
           <div className="flex items-center gap-2">
             <Link href="/entrar" className="btn-ghost px-3 sm:px-4">Entrar</Link>

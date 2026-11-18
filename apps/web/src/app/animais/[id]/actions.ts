@@ -23,7 +23,7 @@ export async function startChat(animalId: string) {
 export async function requestAdoption(animalId: string) {
   const { supabase } = await requireUser(`/animais/${animalId}`);
   const { data: complete } = await supabase.rpc('is_profile_complete');
-  if (!complete) redirect(`/perfil/completar?animal=${animalId}`);
+  if (!complete) redirect(`/perfil/editar?animal=${animalId}`);
 
   const { error } = await supabase.rpc('request_adoption', { p_animal_id: animalId });
   if (error) redirect(`/animais/${animalId}?erro=${encodeURIComponent(rpcErrorMessage(error.message))}`);
