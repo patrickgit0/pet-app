@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { ANIMAL_STATUS_LABEL, SIZE_LABEL, formatAge, sexLabel, type AnimalStatus } from '@adotai/shared';
@@ -56,9 +57,9 @@ export default async function AdminAnimals({ searchParams }: { searchParams: SP 
                 </p>
               </div>
               {a.status !== 'archived' ? (
-                <form action={setAnimalStatus.bind(null, a.id, 'archived')}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Arquivar anúncio')}</button></form>
+                <form action={setAnimalStatus.bind(null, a.id, 'archived')}><ConfirmSubmit title="Arquivar este anúncio?" message="Ele sai da busca e deixa de receber pedidos. Dá para reativar depois." confirmLabel="Arquivar" tone="danger" className="btn-ghost min-h-9 px-3 text-xs">{t('Arquivar anúncio')}</ConfirmSubmit></form>
               ) : (
-                <form action={setAnimalStatus.bind(null, a.id, 'available')}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Reativar')}</button></form>
+                <form action={setAnimalStatus.bind(null, a.id, 'available')}><ConfirmSubmit title="Reativar este anúncio?" message="Ele volta a aparecer na busca." confirmLabel="Reativar" className="btn-ghost min-h-9 px-3 text-xs">{t('Reativar')}</ConfirmSubmit></form>
               )}
             </li>
           );

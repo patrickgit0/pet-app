@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { LangSwitch } from '@/components/lang-switch';
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
@@ -76,7 +77,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
       </div>
 
       <form action={signOut}>
-        <button className="btn-ghost w-full bg-white">{t('Sair da conta')}</button>
+        <ConfirmSubmit title="Sair da conta?" message="Você vai precisar entrar de novo com e-mail e senha." confirmLabel="Sair" className="btn-ghost w-full bg-white">{t('Sair da conta')}</ConfirmSubmit>
       </form>
 
       <details className="px-1 text-sm">
@@ -86,7 +87,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
           <Link href="/privacidade" className="font-semibold text-brand underline">{t('Política de Privacidade')}</Link>
         </p>
         <form action={deleteAccount} className="mt-3">
-          <button className="btn text-red-700 ring-[1.5px] ring-red-200 ring-inset hover:bg-red-50">{t('Excluir minha conta')}</button>
+          <ConfirmSubmit title="Excluir sua conta?" message="Seus dados (CPF, celular, endereço, mensagens, favoritos e pedidos) serão apagados. Isso não pode ser desfeito." confirmLabel="Excluir conta" tone="danger" className="btn text-red-700 ring-[1.5px] ring-red-200 ring-inset hover:bg-red-50">{t('Excluir minha conta')}</ConfirmSubmit>
         </form>
       </details>
     </main>

@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -144,7 +145,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
               <button className="btn-outline h-13 px-5 text-[15px]"><ChatIcon /> {t('Conversar')}</button>
             </form>
             <form action={requestAdoption.bind(null, a.id)} className="flex-1">
-              <button className="btn-primary h-13 w-full text-base font-extrabold">{t('Quero adotar')}</button>
+              <ConfirmSubmit title="Pedir a adoção?" message="A ONG vai receber seu pedido com seu perfil e seu celular. O endereço completo só é liberado se ela aprovar." confirmLabel="Enviar pedido" className="btn-primary h-13 w-full text-base font-extrabold">{t('Quero adotar')}</ConfirmSubmit>
             </form>
           </div>
         )}

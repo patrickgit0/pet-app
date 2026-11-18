@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
@@ -33,7 +34,7 @@ export default async function AdminReports({ searchParams }: { searchParams: Pro
               <p className="text-xs text-muted">{t('Por {name} em {d}', { name: r.profiles?.full_name ?? '—', d: fmtDate(r.created_at, locale) })}</p>
             </div>
             {!r.resolved_at && (
-              <form action={resolveReport.bind(null, r.id)}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Marcar como resolvida')}</button></form>
+              <form action={resolveReport.bind(null, r.id)}><ConfirmSubmit title="Marcar denúncia como resolvida?" message="Ela sai da lista de denúncias abertas." confirmLabel="Marcar como resolvida" className="btn-ghost min-h-9 px-3 text-xs">{t('Marcar como resolvida')}</ConfirmSubmit></form>
             )}
           </li>
         ))}

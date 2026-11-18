@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
@@ -57,7 +58,7 @@ export default async function Page() {
               </label>
               <textarea name="comentario" rows={2} placeholder={t('Conte como estão as coisas')} className="field h-auto py-3" />
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="needs_help" className="h-5 w-5 accent-brand" /> {t('Estou com dificuldade e quero ajuda da ONG')}</label>
-              <button className="btn-primary self-start">{t('Enviar')}</button>
+              <ConfirmSubmit title="Enviar resposta do check-in?" message="A ONG vai ver sua resposta. Se marcou que está com dificuldade, ela entra em contato." confirmLabel="Enviar" className="btn-primary self-start">{t('Enviar')}</ConfirmSubmit>
             </form>
           ))}
         </section>
@@ -83,7 +84,7 @@ export default async function Page() {
                       {adopted ? t('Adotado') : t(REQUEST_STATUS_LABEL[r.status])}
                     </span>
                     {['sent', 'reviewing', 'visit_scheduled'].includes(r.status) && (
-                      <form action={cancel.bind(null, r.id)}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Cancelar')}</button></form>
+                      <form action={cancel.bind(null, r.id)}><ConfirmSubmit title="Cancelar este pedido?" message="A ONG será avisada e o pedido não poderá ser retomado. Você pode fazer um novo pedido depois." confirmLabel="Cancelar pedido" tone="danger" className="btn-ghost min-h-9 px-3 text-xs">{t('Cancelar')}</ConfirmSubmit></form>
                     )}
                   </div>
                 </div>

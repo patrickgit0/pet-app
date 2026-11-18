@@ -7,6 +7,7 @@ import { ENERGY_LABEL, SIZE_LABEL, type Database, type AnimalSize, type EnergyLe
 import { createClient } from '@/lib/supabase/client';
 import { photoUrl } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';
+import { useConfirm } from '@/components/confirm';
 
 type Animal = Database['public']['Tables']['animals']['Row'];
 type Photo = { id: string; storage_path: string; position: number };
@@ -26,6 +27,7 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [current, setCurrent] = useState<Photo[]>(photos);
+  const [confirm, confirmDialog] = useConfirm();
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
   const addFiles = (list: FileList | null) => {
@@ -84,6 +86,7 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   }
 
   async function removePhoto(p: Photo) {
+    if (!(await confirm({ title: 'Remover esta foto?', message: 'A foto é apagada do anúncio na hora. Não dá para desfazer.', confirmLabel: 'Remover foto', tone: 'danger' }))) return;
     await supabase.storage.from('animal-photos').remove([p.storage_path]);
     await supabase.from('animal_photos').delete().eq('id', p.id);
     setCurrent((c) => c.filter((x) => x.id !== p.id));
@@ -95,6 +98,7 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
 
   return (
     <form action={submit} className="card flex max-w-3xl flex-col gap-5 p-4 sm:p-6">
+      {confirmDialog}
       <div className="grid gap-4 sm:grid-cols-2">
         <F label="Nome"><input name="name" required defaultValue={animal?.name} className="field" /></F>
         <F label="Raça"><input name="breed" defaultValue={animal?.breed ?? 'SRD'} className="field" /></F>

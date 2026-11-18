@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { getSession } from '@/lib/supabase/server';
 import type { Database } from '@adotai/shared';
@@ -51,7 +52,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: SP })
                 <select name="role" defaultValue={u.role} aria-label={t('Papel de {name}', { name: u.full_name })} className="field h-9 w-auto text-xs">
                   <option value="adopter">{t('Adotante')}</option><option value="ngo_member">{t('ONG')}</option><option value="admin">{t('Admin')}</option>
                 </select>
-                <button className="btn-ghost min-h-9 px-3 text-xs">{t('Salvar')}</button>
+                <ConfirmSubmit title="Trocar o papel desta conta?" message="Admins enxergam tudo na plataforma. Confira antes de salvar." confirmLabel="Salvar" className="btn-ghost min-h-9 px-3 text-xs">{t('Salvar')}</ConfirmSubmit>
               </form>
             )}
           </li>

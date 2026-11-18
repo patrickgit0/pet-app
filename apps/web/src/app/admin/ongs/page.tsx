@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { formatCnpj, formatRating } from '@adotai/shared';
@@ -53,9 +54,14 @@ export default async function AdminNgos({ searchParams }: { searchParams: SP }) 
                 <div><dt className="text-muted">{t('Nota')}</dt><dd className="text-base font-extrabold">{n.completed_adoptions < 5 ? t('Nova') : formatRating(n.rating, lang)}</dd></div>
               </dl>
               <form action={verifyNgo.bind(null, n.id, !n.verified_at)}>
-                <button className={n.verified_at ? 'btn-ghost w-full min-h-10 px-3 text-xs sm:w-auto' : 'btn-primary w-full min-h-10 px-3 text-xs sm:w-auto'}>
+                <ConfirmSubmit
+                  title={n.verified_at ? 'Remover o selo desta ONG?' : 'Verificar esta ONG?'}
+                  message={n.verified_at ? 'Os adotantes deixam de ver o selo de ONG verificada.' : 'Confira o CNPJ antes. Os adotantes passam a ver o selo de ONG verificada.'}
+                  confirmLabel={n.verified_at ? 'Remover selo' : 'Verificar ONG'}
+                  tone={n.verified_at ? 'danger' : 'default'}
+                  className={n.verified_at ? 'btn-ghost w-full min-h-10 px-3 text-xs sm:w-auto' : 'btn-primary w-full min-h-10 px-3 text-xs sm:w-auto'}>
                   {n.verified_at ? t('Remover selo') : t('Verificar ONG')}
-                </button>
+                </ConfirmSubmit>
               </form>
             </li>
           );

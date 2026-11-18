@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
@@ -42,7 +43,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
                   {c.answers && <span className="text-xs">{Object.entries(c.answers as Record<string, string>).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span>}
                   {alert && (
                     <form action={markFollowedUp.bind(null, c.id)}>
-                      <button className="btn-ghost mt-1 min-h-9 px-3 text-xs">{t('Marcar como acompanhado')}</button>
+                      <ConfirmSubmit title="Marcar como acompanhado?" message="Use depois de falar com o adotante. O alerta some do painel." confirmLabel="Marcar como acompanhado" className="btn-ghost mt-1 min-h-9 px-3 text-xs">{t('Marcar como acompanhado')}</ConfirmSubmit>
                     </form>
                   )}
                 </div>

@@ -1,3 +1,4 @@
+import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -71,11 +72,11 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       <div className="flex flex-wrap gap-2">
         {conv && <Link href={`/mensagens/${conv.id}`} className="btn-ghost">{t('Abrir conversa')}</Link>}
-        {req.status === 'sent' && <form action={setStatus.bind(null, id, 'reviewing')}><button className="btn-ghost">{t('Marcar em análise')}</button></form>}
-        {open && <form action={setStatus.bind(null, id, 'visit_scheduled')}><button className="btn-ghost">{t('Visita marcada')}</button></form>}
-        {open && <form action={setStatus.bind(null, id, 'approved')}><button className="btn-primary">{t('Aprovar pedido')}</button></form>}
+        {req.status === 'sent' && <form action={setStatus.bind(null, id, 'reviewing')}><ConfirmSubmit title="Marcar pedido em análise?" message="O adotante vê que você está avaliando o pedido." confirmLabel="Marcar em análise" className="btn-ghost">{t('Marcar em análise')}</ConfirmSubmit></form>}
+        {open && <form action={setStatus.bind(null, id, 'visit_scheduled')}><ConfirmSubmit title="Marcar visita como combinada?" message="Use depois de combinar dia e local com o adotante (dá para propor pelo chat)." confirmLabel="Confirmar" className="btn-ghost">{t('Visita marcada')}</ConfirmSubmit></form>}
+        {open && <form action={setStatus.bind(null, id, 'approved')}><ConfirmSubmit title="Aprovar este pedido?" message="O animal fica reservado para este adotante e você passa a ver o endereço completo dele." confirmLabel="Aprovar pedido" className="btn-primary">{t('Aprovar pedido')}</ConfirmSubmit></form>}
         {req.status === 'approved' && !adoption && (
-          <form action={completeAdoption.bind(null, id)}><button className="btn-primary">{t('Confirmar adoção (animal entregue)')}</button></form>
+          <form action={completeAdoption.bind(null, id)}><ConfirmSubmit title="Confirmar que o animal foi entregue?" message="A adoção fica registrada e os check-ins de 7 e 30 dias são agendados. Não dá para desfazer." confirmLabel="Confirmar adoção" className="btn-primary">{t('Confirmar adoção (animal entregue)')}</ConfirmSubmit></form>
         )}
       </div>
       {open && (
@@ -83,7 +84,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <label className="label" htmlFor="reason">{t('Recusar pedido')}</label>
           <span className="text-xs text-muted">{t('O motivo é opcional. Se escrever, o adotante verá a mensagem.')}</span>
           <input id="reason" name="reason" placeholder={t('Motivo (opcional)')} className="field" />
-          <button className="btn self-start text-red-700 ring-[1.5px] ring-red-200 ring-inset">{t('Recusar')}</button>
+          <ConfirmSubmit title="Recusar este pedido?" message="O adotante será avisado. Se você escreveu um motivo, ele verá a mensagem. Não dá para desfazer." confirmLabel="Recusar pedido" tone="danger" className="btn self-start text-red-700 ring-[1.5px] ring-red-200 ring-inset">{t('Recusar')}</ConfirmSubmit>
         </form>
       )}
     </div>

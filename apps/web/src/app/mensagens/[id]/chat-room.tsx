@@ -1,5 +1,6 @@
 'use client';
 
+import { useConfirm } from '@/components/confirm';
 import { useI18n } from '@/i18n/client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -20,6 +21,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
 }) {
   const supabase = createClient();
   const { t, locale } = useI18n();
+  const [confirm, confirmDialog] = useConfirm();
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [draft, setDraft] = useState('');
   const [showVisit, setShowVisit] = useState(false);
@@ -57,6 +59,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
 
   return (
     <div className="card flex h-[65vh] min-h-[420px] flex-col overflow-hidden bg-ground">
+      {confirmDialog}
       <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-4">
         {msgs.map((m) => {
           const mine = m.sender_id === me;
@@ -72,7 +75,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
                 {m.visit_confirmed_at ? (
                   <span className="rounded-lg bg-brand-soft py-2 text-center text-[13px] font-bold text-brand-dark">✓ {t('Visita confirmada')}</span>
                 ) : !mine && !readOnly ? (
-                  <button onClick={() => confirmVisit(m.id)} className="btn-primary min-h-10">{t('Confirmar visita')}</button>
+                  <button onClick={async () => { if (await confirm({ title: 'Confirmar a visita?', message: 'A ONG verá que você confirmou o dia, o horário e o local.', confirmLabel: 'Confirmar visita' })) confirmVisit(m.id); }} className="btn-primary min-h-10">{t('Confirmar visita')}</button>
                 ) : (
                   <span className="text-xs text-muted">{t('Aguardando confirmação')}</span>
                 )}
@@ -108,6 +111,8 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
           defaultPlace={defaultPlace}
           onCancel={() => setShowVisit(false)}
           onSend={async (at, place) => {
+            const when = at.toLocaleString(locale, { weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+            if (!(await confirm({ title: 'Enviar proposta de visita?', message: `${when}${place ? ` · ${place}` : ''}`, confirmLabel: 'Enviar proposta' }))) return;
             await send('', { kind: 'visit_proposal', visit_at: at.toISOString(), visit_place: place || null });
             setShowVisit(false);
           }}
