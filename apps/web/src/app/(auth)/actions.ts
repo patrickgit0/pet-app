@@ -1,5 +1,6 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { safeNext } from '@/lib/utils';
@@ -25,10 +26,13 @@ export async function signUp(_: FormState, formData: FormData): Promise<FormStat
   if (password.length < 8) return { error: 'A senha precisa ter pelo menos 8 caracteres.' };
 
   const supabase = await createClient();
+  const h = await headers();
+  const origin = h.get('origin') ?? `https://${h.get('host')}`;
+  const next = safeNext(String(formData.get('next') ?? ''));
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: { data: { full_name: fullName }, emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
   });
   if (error) {
     return { error: error.message.includes('registered') ? 'Este e-mail já tem conta. Entre com ele.' : 'Não foi possível criar a conta.' };
