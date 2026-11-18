@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #0f6e5c;
+  --color-brand-dark: #0a4f42;
+  --color-brand-soft: #e6f2ee;
+  --color-accent: #e8833a;
+  --color-accent-soft: #fff3e8;
+  --color-accent-ink: #8a4a12;
+  --color-ink: #1b1f1d;
+  --color-ink-2: #3a413d;
+  --color-muted: #5b635f;
+  --color-line: #e4e7e3;
+  --color-line-2: #d5dad5;
+  --color-ground: #f6f7f5;
+  --color-field: #f0f2ef;
+  --color-panel: #0f3d35;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+}
+
+/* Componentes simples reutilizados (Tailwind v4: @utility) */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-primary {
+  @apply btn bg-brand text-white hover:bg-brand-dark;
+}
+@utility btn-outline {
+  @apply btn text-brand ring-[1.5px] ring-brand ring-inset hover:bg-brand-soft;
+}
+@utility btn-ghost {
+  @apply btn text-ink ring-[1.5px] ring-line-2 ring-inset hover:bg-field;
+}
+@utility field {
+  @apply h-12 w-full rounded-xl bg-white px-3.5 text-[15px] ring-[1.5px] ring-line-2 outline-none ring-inset focus:ring-brand;
+}
+@utility label {
+  @apply text-[13px] font-bold;
+}
+@utility card {
+  @apply rounded-2xl border border-line bg-white;
+}
+@utility chip {
+  @apply inline-flex items-center rounded-md bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-dark;
+}
