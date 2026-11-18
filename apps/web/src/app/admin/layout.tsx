@@ -1,8 +1,9 @@
+import { pageTitle } from '@/i18n/server';
 import { notFound } from 'next/navigation';
 import { getSession } from '@/lib/supabase/server';
 import { AdminNav } from './admin-nav';
 
-export const metadata = { title: 'Admin' };
+export const generateMetadata = pageTitle('Admin');
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await getSession();

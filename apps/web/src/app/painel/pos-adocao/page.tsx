@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getMyNgo } from '@/lib/ngo';
@@ -14,6 +15,7 @@ async function markFollowedUp(checkinId: string) {
 export default async function Page({ searchParams }: { searchParams: Promise<{ nova?: string }> }) {
   const { nova } = await searchParams;
   const { supabase, ngo } = await getMyNgo();
+  const { t, locale } = await getI18n();
   const { data: adoptions } = await supabase
     .from('adoptions')
     .select('id, adopted_at, status, animals(name), profiles!adoptions_adopter_id_fkey(full_name), checkins(id, due_day, due_at, status, needs_help, answers, answered_at, ngo_followed_up_at)')
@@ -21,26 +23,26 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-extrabold">Pós-adoção</h1>
-      {nova && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">Adoção registrada! Check-ins de 7 e 30 dias foram agendados.</p>}
+      <h1 className="text-2xl font-extrabold">{t('Pós-adoção')}</h1>
+      {nova && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">{t('Adoção registrada! Check-ins de 7 e 30 dias foram agendados.')}</p>}
       {(adoptions ?? []).map((a) => (
         <section key={a.id} className="card p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-extrabold">{a.animals?.name} · {a.profiles?.full_name}</h2>
-            <span className="text-xs text-muted">Adotado em {new Date(a.adopted_at).toLocaleDateString('pt-BR')}{a.status === 'returned' ? ' · Devolvido' : ''}</span>
+            <span className="text-xs text-muted">{t('Adotado em {d}', { d: new Date(a.adopted_at).toLocaleDateString(locale) })}{a.status === 'returned' ? ` · ${t('Devolvido')}` : ''}</span>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {[...(a.checkins ?? [])].sort((x, y) => x.due_day - y.due_day).map((c) => {
               const alert = (c.status === 'late' || c.needs_help) && !c.ngo_followed_up_at;
               return (
                 <div key={c.id} className={`flex flex-col gap-1 rounded-xl p-3 text-sm ${alert ? 'bg-accent-soft' : 'bg-ground'}`}>
-                  <span className="font-bold">Check-in de {c.due_day} dias · {STATUS[c.status]}</span>
-                  <span className="text-xs text-muted">Previsto para {new Date(c.due_at).toLocaleDateString('pt-BR')}</span>
-                  {c.needs_help && <span className="text-xs font-bold text-accent-ink">Adotante pediu ajuda</span>}
+                  <span className="font-bold">{t('Check-in de {n} dias', { n: c.due_day })} · {t(STATUS[c.status])}</span>
+                  <span className="text-xs text-muted">{t('Previsto para {d}', { d: new Date(c.due_at).toLocaleDateString(locale) })}</span>
+                  {c.needs_help && <span className="text-xs font-bold text-accent-ink">{t('Adotante pediu ajuda')}</span>}
                   {c.answers && <span className="text-xs">{Object.entries(c.answers as Record<string, string>).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span>}
                   {alert && (
                     <form action={markFollowedUp.bind(null, c.id)}>
-                      <button className="btn-ghost mt-1 min-h-9 px-3 text-xs">Marcar como acompanhado</button>
+                      <button className="btn-ghost mt-1 min-h-9 px-3 text-xs">{t('Marcar como acompanhado')}</button>
                     </form>
                   )}
                 </div>
@@ -49,7 +51,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
           </div>
         </section>
       ))}
-      {!adoptions?.length && <p className="card p-8 text-center text-muted">Nenhuma adoção registrada ainda.</p>}
+      {!adoptions?.length && <p className="card p-8 text-center text-muted">{t('Nenhuma adoção registrada ainda.')}</p>}
     </div>
   );
 }

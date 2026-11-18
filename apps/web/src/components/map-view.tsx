@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/i18n/client';
 import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -16,6 +17,7 @@ export type MapPin = { id: string; label: string; lat: number; lng: number };
  */
 export function MapView({ center, radiusKm, pins }: { center: { lat: number; lng: number }; radiusKm: number; pins: MapPin[] }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!ref.current) return;
@@ -55,5 +57,5 @@ export function MapView({ center, radiusKm, pins }: { center: { lat: number; lng
     };
   }, [center.lat, center.lng, radiusKm, pins]);
 
-  return <div ref={ref} role="region" aria-label="Mapa com a região dos animais" className="h-[220px] w-full sm:h-[320px] xl:h-[560px] overflow-hidden rounded-2xl border border-line-2 bg-[#E3E8E2]" />;
+  return <div ref={ref} role="region" aria-label={t('Mapa com a região dos animais')} className="h-[220px] w-full sm:h-[320px] xl:h-[560px] overflow-hidden rounded-2xl border border-line-2 bg-[#E3E8E2]" />;
 }

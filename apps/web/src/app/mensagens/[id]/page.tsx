@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { REQUEST_STATUS_LABEL } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
+import { getI18n, pageTitle } from '@/i18n/server';
 import { tintFor } from '@/lib/utils';
 import { BackIcon } from '@/components/icons';
 import { ChatRoom } from './chat-room';
 import { myConversationsFilter } from '@/lib/conversations';
 
-export const metadata = { title: 'Conversa' };
+export const generateMetadata = pageTitle('Conversa');
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ pedido?: string }> }) {
   const { id } = await params;
@@ -38,32 +39,33 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   }
 
   const isNgo = participant && ngoIds.includes(conv.ngo_id);
+  const { t } = await getI18n();
   const title = !participant
-    ? `${conv.profiles?.full_name ?? 'Adotante'} e ${conv.ngos?.name ?? 'ONG'}`
-    : isNgo ? conv.profiles?.full_name ?? 'Adotante' : conv.ngos?.name ?? 'ONG';
+    ? t('{a} e {b}', { a: conv.profiles?.full_name ?? t('Adotante'), b: conv.ngos?.name ?? t('ONG') })
+    : isNgo ? conv.profiles?.full_name ?? t('Adotante') : conv.ngos?.name ?? t('ONG');
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-3 px-4 py-6">
       <div className="flex items-center gap-2">
-        <Link href={participant ? '/mensagens' : '/admin/adocoes'} aria-label="Voltar" className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
+        <Link href={participant ? '/mensagens' : '/admin/adocoes'} aria-label={t('Voltar')} className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
         <h1 className="text-lg font-extrabold">{title}</h1>
       </div>
       <Link href={`/animais/${conv.animal_id}`} className="card flex items-center gap-3 p-3">
         <span className="h-11 w-11 rounded-xl" style={{ background: tintFor(conv.animals?.name ?? '') }} />
         <span className="flex flex-1 flex-col">
-          <span className="text-sm font-bold">{conv.animals?.name}{request ? ' · Pedido de adoção' : ''}</span>
-          {isNgo && request && <span className="text-xs font-semibold text-brand">Ver candidato no painel →</span>}
+          <span className="text-sm font-bold">{conv.animals?.name}{request ? ` · ${t('Pedido de adoção')}` : ''}</span>
+          {isNgo && request && <span className="text-xs font-semibold text-brand">{t('Ver candidato no painel →')}</span>}
         </span>
-        {request && <span className="rounded-lg bg-accent-soft px-2 py-1 text-[11px] font-bold text-accent-ink">{REQUEST_STATUS_LABEL[request.status]}</span>}
+        {request && <span className="rounded-lg bg-accent-soft px-2 py-1 text-[11px] font-bold text-accent-ink">{t(REQUEST_STATUS_LABEL[request.status])}</span>}
       </Link>
       {pedido === 'enviado' && (
         <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">
-          Pedido enviado! A ONG vai analisar seu perfil e responder por aqui.
+          {t('Pedido enviado! A ONG vai analisar seu perfil e responder por aqui.')}
         </p>
       )}
       {!participant && (
         <p role="status" className="rounded-xl bg-accent-soft p-3 text-sm text-accent-ink">
-          Você está vendo esta conversa como administrador. Só leitura: as mensagens do adotante ficam à direita.
+          {t('Você está vendo esta conversa como administrador. Só leitura: as mensagens do adotante ficam à direita.')}
         </p>
       )}
       <ChatRoom

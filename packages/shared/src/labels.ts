@@ -53,25 +53,31 @@ export type SortOption = (typeof SORT_OPTIONS)[number]['value'];
 
 export const RADIUS_OPTIONS_KM = [5, 10, 25, 50] as const;
 
-/** 24 -> "2 anos", 5 -> "5 meses", null -> "Idade não informada" */
-export function formatAge(months: number | null | undefined): string {
-  if (months === null || months === undefined) return 'Idade não informada';
-  if (months < 12) return months <= 1 ? '1 mês' : `${months} meses`;
+/** Idioma da interface. Textos de domínio ficam em pt-BR e são traduzidos na camada de UI. */
+export type Lang = 'pt' | 'en';
+
+/** 24 -> "2 anos", 5 -> "5 meses", null -> "Idade não informada" (ou em inglês com lang = 'en') */
+export function formatAge(months: number | null | undefined, lang: Lang = 'pt'): string {
+  const en = lang === 'en';
+  if (months === null || months === undefined) return en ? 'Age unknown' : 'Idade não informada';
+  if (months < 12) return months <= 1 ? (en ? '1 month' : '1 mês') : `${months} ${en ? 'months' : 'meses'}`;
   const years = Math.floor(months / 12);
-  return years === 1 ? '1 ano' : `${years} anos`;
+  return years === 1 ? (en ? '1 year' : '1 ano') : `${years} ${en ? 'years' : 'anos'}`;
 }
 
-/** 4.9 -> "4,9" */
-export function formatRating(rating: number | null | undefined): string | null {
+/** 4.9 -> "4,9" (pt) ou "4.9" (en) */
+export function formatRating(rating: number | null | undefined, lang: Lang = 'pt'): string | null {
   if (rating === null || rating === undefined) return null;
-  return rating.toFixed(1).replace('.', ',');
+  const v = Number(rating).toFixed(1);
+  return lang === 'en' ? v : v.replace('.', ',');
 }
 
 /** 1.234 -> "1,2 km"; abaixo de 1 km mostra "menos de 1 km" (não expõe localização exata) */
-export function formatDistance(km: number | null | undefined): string {
+export function formatDistance(km: number | null | undefined, lang: Lang = 'pt'): string {
   if (km === null || km === undefined) return '';
-  if (km < 1) return 'menos de 1 km';
-  return `${km.toFixed(1).replace('.', ',')} km`;
+  if (km < 1) return lang === 'en' ? 'less than 1 km' : 'menos de 1 km';
+  const v = km.toFixed(1);
+  return `${lang === 'en' ? v : v.replace('.', ',')} km`;
 }
 
 /** Mensagens amigáveis para os erros levantados pelas funções SQL. */

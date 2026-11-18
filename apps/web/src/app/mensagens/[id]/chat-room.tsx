@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/i18n/client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Database } from '@adotai/shared';
@@ -18,6 +19,7 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
   conversationId: string; me: string; isNgo: boolean; blocked: boolean; initial: Msg[]; requestId?: string; readOnly?: boolean;
 }) {
   const supabase = createClient();
+  const { t, locale } = useI18n();
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [draft, setDraft] = useState('');
   const [showVisit, setShowVisit] = useState(false);
@@ -32,13 +34,13 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
         (p) => {
           const m = p.new as Msg;
           setMsgs((cur) => (cur.some((x) => x.id === m.id) ? cur : [...cur, m]));
-          if (m.sender_id !== me) supabase.from('messages').update({ read_at: new Date().toISOString() }).eq('id', m.id).then();
+          if (!readOnly && m.sender_id !== me) supabase.from('messages').update({ read_at: new Date().toISOString() }).eq('id', m.id).then();
         })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
         (p) => setMsgs((cur) => cur.map((x) => (x.id === (p.new as Msg).id ? (p.new as Msg) : x))))
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [conversationId, me, supabase]);
+  }, [conversationId, me, supabase, readOnly]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs.length]);
 
@@ -66,15 +68,15 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
           if (m.kind === 'visit_proposal') {
             return (
               <div key={m.id} className={`flex w-[78%] max-w-sm flex-col gap-1.5 rounded-2xl border-[1.5px] border-brand bg-white p-3 ${mine ? 'self-end' : 'self-start'}`}>
-                <span className="flex items-center gap-1.5 text-xs font-bold text-brand"><CalendarIcon size={16} /> Proposta de visita</span>
-                <span className="text-sm font-bold">{m.visit_at && new Date(m.visit_at).toLocaleString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="flex items-center gap-1.5 text-xs font-bold text-brand"><CalendarIcon size={16} /> {t('Proposta de visita')}</span>
+                <span className="text-sm font-bold">{m.visit_at && new Date(m.visit_at).toLocaleString(locale, { weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                 {m.visit_place && <span className="text-xs text-muted">{m.visit_place}</span>}
                 {m.visit_confirmed_at ? (
-                  <span className="rounded-lg bg-brand-soft py-2 text-center text-[13px] font-bold text-brand-dark">✓ Visita confirmada</span>
+                  <span className="rounded-lg bg-brand-soft py-2 text-center text-[13px] font-bold text-brand-dark">✓ {t('Visita confirmada')}</span>
                 ) : !mine && !readOnly ? (
-                  <button onClick={() => confirmVisit(m.id)} className="btn-primary min-h-10">Confirmar visita</button>
+                  <button onClick={() => confirmVisit(m.id)} className="btn-primary min-h-10">{t('Confirmar visita')}</button>
                 ) : (
-                  <span className="text-xs text-muted">Aguardando confirmação</span>
+                  <span className="text-xs text-muted">{t('Aguardando confirmação')}</span>
                 )}
               </div>
             );
@@ -85,8 +87,8 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
                 {m.body}
               </div>
               <span className="text-[10px] text-muted">
-                {new Date(m.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                {mine && (m.read_at ? ' · lida' : ' · enviada')}
+                {new Date(m.created_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
+                {mine && (m.read_at ? ` · ${t('lida')}` : ` · ${t('enviada')}`)}
               </span>
             </div>
           );
@@ -97,10 +99,10 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
       {isNgo && !blocked && !readOnly && (
         <div className="flex flex-wrap gap-2 border-t border-line bg-white px-3 pt-2">
           {QUICK_REPLIES.map((q) => (
-            <button key={q} onClick={() => setDraft(q)} className="rounded-full bg-field px-3 py-1 text-xs font-semibold">{q.slice(0, 32)}…</button>
+            <button key={q} onClick={() => setDraft(t(q))} className="rounded-full bg-field px-3 py-1 text-xs font-semibold">{t(q).slice(0, 32)}…</button>
           ))}
-          <button onClick={() => setShowVisit((v) => !v)} className="rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand-dark">Propor visita</button>
-          {requestId && <Link href={`/painel/pedidos/${requestId}`} className="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold text-accent-ink">Analisar pedido</Link>}
+          <button onClick={() => setShowVisit((v) => !v)} className="rounded-full bg-brand-soft px-3 py-1 text-xs font-bold text-brand-dark">{t('Propor visita')}</button>
+          {requestId && <Link href={`/painel/pedidos/${requestId}`} className="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold text-accent-ink">{t('Analisar pedido')}</Link>}
         </div>
       )}
       {showVisit && (
@@ -110,18 +112,18 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
           await send('', { kind: 'visit_proposal', visit_at: new Date(visitAt).toISOString(), visit_place: visitPlace || null });
           setShowVisit(false); setVisitAt(''); setVisitPlace('');
         }}>
-          <input type="datetime-local" required value={visitAt} onChange={(e) => setVisitAt(e.target.value)} className="field h-11 w-auto" aria-label="Data e hora da visita" />
-          <input value={visitPlace} onChange={(e) => setVisitPlace(e.target.value)} placeholder="Local" className="field h-11 flex-1" aria-label="Local da visita" />
-          <button className="btn-primary">Enviar proposta</button>
+          <input type="datetime-local" required value={visitAt} onChange={(e) => setVisitAt(e.target.value)} className="field h-11 w-auto" aria-label={t('Data e hora da visita')} />
+          <input value={visitPlace} onChange={(e) => setVisitPlace(e.target.value)} placeholder={t('Local')} className="field h-11 flex-1" aria-label={t('Local da visita')} />
+          <button className="btn-primary">{t('Enviar proposta')}</button>
         </form>
       )}
 
       {readOnly ? null : blocked ? (
-        <p className="border-t border-line bg-white p-4 text-center text-sm text-muted">Esta conversa foi bloqueada.</p>
+        <p className="border-t border-line bg-white p-4 text-center text-sm text-muted">{t('Esta conversa foi bloqueada.')}</p>
       ) : (
         <form className="flex items-center gap-2 border-t border-line bg-white p-3" onSubmit={(e) => { e.preventDefault(); send(draft); setDraft(''); }}>
-          <input aria-label="Mensagem" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Escreva uma mensagem" className="h-11 flex-1 rounded-full bg-field px-4 text-sm outline-none" maxLength={4000} />
-          <button aria-label="Enviar" className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-white"><SendIcon /></button>
+          <input aria-label={t('Mensagem')} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={t('Escreva uma mensagem')} className="h-11 flex-1 rounded-full bg-field px-4 text-sm outline-none" maxLength={4000} />
+          <button aria-label={t('Enviar')} className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-white"><SendIcon /></button>
         </form>
       )}
     </div>

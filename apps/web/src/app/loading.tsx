@@ -1,7 +1,7 @@
 /** Mostrado na hora do clique enquanto a próxima página carrega (resposta imediata). */
 export default function Loading() {
   return (
-    <div className="mx-auto max-w-[1360px] px-4 py-6 sm:px-6" aria-busy="true" aria-label="Carregando">
+    <div className="mx-auto max-w-[1360px] px-4 py-6 sm:px-6" aria-busy="true" aria-label="…">
       <div className="mb-5 h-7 w-64 max-w-full animate-pulse rounded-lg bg-line" />
       <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
         {Array.from({ length: 8 }, (_, i) => (

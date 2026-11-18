@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
@@ -19,16 +20,17 @@ const PAGE_SIZE = 24;
 export default async function SearchPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const { supabase, profile } = await getSession();
+  const { t } = await getI18n();
 
   // Centro da busca: ?lat/lng > localização do perfil > cidade piloto
   let center: { lat: number; lng: number; label: string } = { lat: PILOT_CITY.lat, lng: PILOT_CITY.lng, label: `${PILOT_CITY.name}, ${PILOT_CITY.state}` };
   if (sp.lat && sp.lng) {
-    center = { lat: Number(sp.lat), lng: Number(sp.lng), label: typeof sp.local === 'string' && sp.local ? sp.local : 'Sua localização' };
+    center = { lat: Number(sp.lat), lng: Number(sp.lng), label: typeof sp.local === 'string' && sp.local ? sp.local : t('Sua localização') };
   } else if (profile?.location) {
     const { data: loc } = await supabase.rpc('get_my_location');
     const row = loc?.[0];
     if (row?.lat != null && row?.lng != null) {
-      center = { lat: row.lat, lng: row.lng, label: [profile.neighborhood, profile.city].filter(Boolean).join(', ') || 'Seu endereço' };
+      center = { lat: row.lat, lng: row.lng, label: [profile.neighborhood, profile.city].filter(Boolean).join(', ') || t('Seu endereço') };
     }
   }
 
@@ -81,43 +83,43 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         {sp.lng && <input type="hidden" name="lng" value={String(sp.lng)} />}
         {typeof sp.local === 'string' && <input type="hidden" name="local" value={sp.local} />}
         <div className="hidden items-center justify-between lg:flex">
-          <h2 className="text-base font-extrabold">Filtros</h2>
-          <Link href="/" className="text-[13px] font-semibold text-brand">Limpar</Link>
+          <h2 className="text-base font-extrabold">{t('Filtros')}</h2>
+          <Link href="/" className="text-[13px] font-semibold text-brand">{t('Limpar')}</Link>
         </div>
         <label className="flex items-center gap-2 rounded-xl bg-white px-3.5 ring-[1.5px] ring-line-2 ring-inset lg:bg-field lg:ring-0">
           <SearchIcon size={18} className="text-muted" />
-          <input name="q" type="search" enterKeyHint="search" defaultValue={q ?? ''} placeholder="Nome, raça ou ONG" className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none lg:h-11 lg:text-sm" />
+          <input name="q" type="search" enterKeyHint="search" defaultValue={q ?? ''} placeholder={t('Nome, raça ou ONG')} className="h-12 min-w-0 flex-1 bg-transparent text-base outline-none lg:h-11 lg:text-sm" />
         </label>
         <FilterPanel activeCount={activeCount}>
         <div className="card flex flex-col gap-5 p-4 lg:contents">
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted">Buscando perto de</span>
+          <span className="text-xs text-muted">{t('Buscando perto de')}</span>
           <span className="text-sm font-bold">{center.label}</span>
           <Suspense><LocateButton /></Suspense>
         </div>
         <label className="flex flex-col gap-2">
-          <span className="label">Distância</span>
+          <span className="label">{t('Distância')}</span>
           <select name="raio" defaultValue={String(radius)} className="field h-11">
-            {RADIUS_OPTIONS_KM.map((r) => <option key={r} value={r}>Até {r} km</option>)}
+            {RADIUS_OPTIONS_KM.map((r) => <option key={r} value={r}>{t('Até {r} km', { r })}</option>)}
           </select>
         </label>
-        <Group title="Espécie" name="especie" values={species} options={[{ value: 'dog', label: 'Cães' }, { value: 'cat', label: 'Gatos' }]} />
-        <Group title="Porte" name="porte" values={sizes} options={(Object.keys(SIZE_LABEL) as AnimalSize[]).map((s) => ({ value: s, label: SIZE_LABEL[s] }))} />
-        <Group title="Idade" name="idade" values={ages} options={AGE_GROUPS.map((a) => ({ value: a.value, label: a.label }))} />
+        <Group title={t('Espécie')} name="especie" values={species} options={[{ value: 'dog', label: t('Cães') }, { value: 'cat', label: t('Gatos') }]} />
+        <Group title={t('Porte')} name="porte" values={sizes} options={(Object.keys(SIZE_LABEL) as AnimalSize[]).map((s) => ({ value: s, label: t(SIZE_LABEL[s]) }))} />
+        <Group title={t('Idade')} name="idade" values={ages} options={AGE_GROUPS.map((a) => ({ value: a.value, label: t(a.label) }))} />
         <fieldset className="flex flex-col gap-2">
-          <legend className="label mb-2">Saúde e convivência</legend>
-          <Check name="castrado" label="Castrado" checked={sp.castrado === '1'} />
-          <Check name="criancas" label="Ok com crianças" checked={sp.criancas === '1'} />
-          <Check name="caes" label="Ok com cães" checked={sp.caes === '1'} />
-          <Check name="gatos" label="Ok com gatos" checked={sp.gatos === '1'} />
-          <Check name="apartamento" label="Bom para apartamento" checked={sp.apartamento === '1'} />
+          <legend className="label mb-2">{t('Saúde e convivência')}</legend>
+          <Check name="castrado" label={t('Castrado')} checked={sp.castrado === '1'} />
+          <Check name="criancas" label={t('Ok com crianças')} checked={sp.criancas === '1'} />
+          <Check name="caes" label={t('Ok com cães')} checked={sp.caes === '1'} />
+          <Check name="gatos" label={t('Ok com gatos')} checked={sp.gatos === '1'} />
+          <Check name="apartamento" label={t('Bom para apartamento')} checked={sp.apartamento === '1'} />
         </fieldset>
         <div className="border-t border-line pt-3">
-          <Check name="verificadas" label="Só ONGs verificadas" checked={sp.verificadas === '1'} />
+          <Check name="verificadas" label={t('Só ONGs verificadas')} checked={sp.verificadas === '1'} />
         </div>
         <div className="flex gap-2">
-          <Link href="/" className="btn-ghost flex-1 lg:hidden">Limpar</Link>
-          <button className="btn-primary flex-[2]">Aplicar filtros</button>
+          <Link href="/" className="btn-ghost flex-1 lg:hidden">{t('Limpar')}</Link>
+          <button className="btn-primary flex-[2]">{t('Aplicar filtros')}</button>
         </div>
         </div>
         </FilterPanel>
@@ -126,28 +128,28 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <main className="flex min-w-0 flex-1 flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-lg font-extrabold sm:text-[22px]">
-            {total} {total === 1 ? 'animal para adoção' : 'animais para adoção'} perto de você
+            {total === 1 ? t('1 animal para adoção perto de você') : t('{n} animais para adoção perto de você', { n: total })}
           </h1>
           <form method="get" className="flex items-center gap-2">
             {Object.entries(sp).filter(([k]) => k !== 'ordem' && k !== 'page').flatMap(([k, v]) => list(v).map((x, i) => (
               <input key={`${k}${i}`} type="hidden" name={k} value={x} />
             )))}
-            <label htmlFor="ordem" className="text-[13px] text-muted">Ordenar por</label>
+            <label htmlFor="ordem" className="text-[13px] text-muted">{t('Ordenar por')}</label>
             <AutoSubmitSelect id="ordem" name="ordem" defaultValue={sort} className="field h-10 w-auto text-sm font-semibold">
-              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{t(o.label)}</option>)}
             </AutoSubmitSelect>
             <noscript><button className="btn-ghost min-h-10">Ok</button></noscript>
           </form>
         </div>
 
-        {error && <p className="card p-4 text-sm text-red-700">Não foi possível carregar os animais agora.</p>}
+        {error && <p className="card p-4 text-sm text-red-700">{t('Não foi possível carregar os animais agora.')}</p>}
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:gap-5">
           <div id="resultados" className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4">
             {(animals ?? []).map((a) => <AnimalCard key={a.id} a={{ ...a, distance_km: Number(a.distance_km) }} />)}
             {!error && total === 0 && (
               <div className="card col-span-full p-8 text-center text-muted">
-                Nenhum animal com esses filtros. Tente aumentar a distância ou limpar os filtros.
+                {t('Nenhum animal com esses filtros. Tente aumentar a distância ou limpar os filtros.')}
               </div>
             )}
           </div>
@@ -157,10 +159,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </div>
 
         {total > PAGE_SIZE && (
-          <nav className="flex justify-center gap-2" aria-label="Paginação">
-            {page > 1 && <Link className="btn-ghost" href={pageHref(page - 1)}>Anterior</Link>}
-            <span className="btn">Página {page} de {Math.ceil(total / PAGE_SIZE)}</span>
-            {page * PAGE_SIZE < total && <Link className="btn-ghost" href={pageHref(page + 1)}>Próxima</Link>}
+          <nav className="flex justify-center gap-2" aria-label={t('Paginação')}>
+            {page > 1 && <Link className="btn-ghost" href={pageHref(page - 1)}>{t('Anterior')}</Link>}
+            <span className="btn">{t('Página {p} de {n}', { p: page, n: Math.ceil(total / PAGE_SIZE) })}</span>
+            {page * PAGE_SIZE < total && <Link className="btn-ghost" href={pageHref(page + 1)}>{t('Próxima')}</Link>}
           </nav>
         )}
       </main>

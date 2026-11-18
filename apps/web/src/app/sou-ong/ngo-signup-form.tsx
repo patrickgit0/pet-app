@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/i18n/client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatCep, formatCnpj, isValidCnpj, lookupCep, type CepResult } from '@adotai/shared';
@@ -16,10 +17,11 @@ export function NgoSignupForm() {
   const [cnpj, setCnpj] = useState('');
   const [cep, setCep] = useState('');
   const [addr, setAddr] = useState<CepResult | null>(null);
+  const { t } = useI18n();
 
   return (
     <form
-      className="card flex flex-col gap-4 p-6"
+      className="card flex flex-col gap-4 p-5 sm:p-6"
       action={(fd) => {
         setError(null);
         if (!isValidCnpj(cnpj)) return setError('CNPJ inválido. No momento aceitamos apenas ONGs com CNPJ.');
@@ -39,26 +41,26 @@ export function NgoSignupForm() {
         });
       }}
     >
-      <label className="flex flex-col gap-1.5"><span className="label">Nome da ONG</span><input name="name" required className="field" /></label>
-      <label className="flex flex-col gap-1.5"><span className="label">CNPJ</span>
+      <label className="flex flex-col gap-1.5"><span className="label">{t('Nome da ONG')}</span><input name="name" required className="field" /></label>
+      <label className="flex flex-col gap-1.5"><span className="label">{t('CNPJ')}</span>
         <input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} inputMode="numeric" placeholder="00.000.000/0000-00" className="field" required />
       </label>
-      <label className="flex flex-col gap-1.5"><span className="label">CEP da sede ou do abrigo</span>
+      <label className="flex flex-col gap-1.5"><span className="label">{t('CEP da sede ou do abrigo')}</span>
         <input value={cep} inputMode="numeric" placeholder="00000-000" className="field" required onChange={async (e) => {
           const v = formatCep(e.target.value); setCep(v); setAddr(null);
           if (v.length === 9) setAddr(await lookupCep(v));
         }} />
         {addr && <span className="text-xs font-semibold text-brand-dark">{[addr.neighborhood, `${addr.city}/${addr.state}`].filter(Boolean).join(' · ')}</span>}
       </label>
-      <label className="flex flex-col gap-1.5"><span className="label">Endereço (não aparece publicamente)</span><input name="address" className="field" /></label>
+      <label className="flex flex-col gap-1.5"><span className="label">{t('Endereço (não aparece publicamente)')}</span><input name="address" className="field" /></label>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5"><span className="label">E-mail de contato</span><input name="email" type="email" className="field" /></label>
-        <label className="flex flex-col gap-1.5"><span className="label">Telefone</span><input name="phone" className="field" /></label>
+        <label className="flex flex-col gap-1.5"><span className="label">{t('E-mail de contato')}</span><input name="email" type="email" className="field" /></label>
+        <label className="flex flex-col gap-1.5"><span className="label">{t('Telefone')}</span><input name="phone" className="field" /></label>
       </div>
-      <label className="flex flex-col gap-1.5"><span className="label">Sobre a ONG</span><textarea name="description" rows={3} className="field h-auto py-3" /></label>
-      {error && <p role="alert" className="text-sm font-semibold text-red-700">{error}</p>}
-      <button disabled={pending} className="btn-primary h-12">{pending ? 'Cadastrando…' : 'Cadastrar ONG'}</button>
-      <p className="text-xs text-muted">Depois do cadastro, nossa equipe verifica o CNPJ. Você já pode cadastrar animais enquanto isso.</p>
+      <label className="flex flex-col gap-1.5"><span className="label">{t('Sobre a ONG')}</span><textarea name="description" rows={3} className="field h-auto py-3" /></label>
+      {error && <p role="alert" className="text-sm font-semibold text-red-700">{t(error)}</p>}
+      <button disabled={pending} className="btn-primary h-12">{pending ? t('Cadastrando…') : t('Cadastrar ONG')}</button>
+      <p className="text-xs text-muted">{t('Depois do cadastro, nossa equipe verifica o CNPJ. Você já pode cadastrar animais enquanto isso.')}</p>
     </form>
   );
 }

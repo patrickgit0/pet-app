@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
 import { Badge, PageTitle, fmtDate } from '../ui';
@@ -7,6 +8,7 @@ type SP = Promise<{ filtro?: string }>;
 export default async function AdminAdoptions({ searchParams }: { searchParams: SP }) {
   const { filtro } = await searchParams;
   const { supabase } = await getSession();
+  const { t, locale } = await getI18n();
   const { data } = await supabase
     .from('adoptions')
     .select('id, adopted_at, status, returned_at, return_reason, term_accepted_at, animals(id, name), ngos(name, slug), profiles(full_name), checkins(due_day, due_at, status, needs_help, ngo_followed_up_at)')
@@ -21,16 +23,16 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
   });
   const list = filtro === 'ajuda' ? rows.filter((r) => r.help) : filtro === 'atrasado' ? rows.filter((r) => r.late > 0) : filtro === 'devolvido' ? rows.filter((r) => r.status === 'returned') : rows;
 
-  const tabs = [{ v: '', label: 'Todas' }, { v: 'ajuda', label: 'Pediram ajuda' }, { v: 'atrasado', label: 'Check-in atrasado' }, { v: 'devolvido', label: 'Devolvidas' }];
+  const tabs = [{ v: '', label: t('Todas') }, { v: 'ajuda', label: t('Pediram ajuda') }, { v: 'atrasado', label: t('Check-in atrasado') }, { v: 'devolvido', label: t('Devolvidas') }];
 
   return (
     <>
-      <PageTitle title="Adoções e pós-adoção" subtitle={`${list.length} adoções`} />
+      <PageTitle title={t('Adoções e pós-adoção')} subtitle={t('{n} adoções', { n: list.length })} />
       <nav className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
-        {tabs.map((t) => (
-          <Link key={t.v} href={t.v ? `/admin/adocoes?filtro=${t.v}` : '/admin/adocoes'}
-            className={`flex min-h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-semibold ${(filtro ?? '') === t.v ? 'bg-ink text-white' : 'bg-white ring-1 ring-line'}`}>
-            {t.label}
+        {tabs.map((x) => (
+          <Link key={x.v} href={x.v ? `/admin/adocoes?filtro=${x.v}` : '/admin/adocoes'}
+            className={`flex min-h-9 shrink-0 items-center rounded-full px-3.5 text-xs font-semibold ${(filtro ?? '') === x.v ? 'bg-ink text-white' : 'bg-white ring-1 ring-line'}`}>
+            {x.label}
           </Link>
         ))}
       </nav>
@@ -40,31 +42,31 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
             <div className="min-w-0 flex-1">
               <p>
                 <Link href={`/animais/${a.animals?.id}`} className="font-bold hover:text-brand">{a.animals?.name}</Link>
-                <span className="text-sm text-muted"> com {a.profiles?.full_name}</span>
+                <span className="text-sm text-muted"> {t('com {name}', { name: a.profiles?.full_name })}</span>
               </p>
               <p className="text-xs text-muted">
-                <Link href={`/ongs/${a.ngos?.slug}`} className="hover:text-brand">{a.ngos?.name}</Link> · adotado em {fmtDate(a.adopted_at)}
-                {!a.term_accepted_at && ' · termo ainda não aceito'}
-                {a.return_reason && ` · devolução: ${a.return_reason}`}
+                <Link href={`/ongs/${a.ngos?.slug}`} className="hover:text-brand">{a.ngos?.name}</Link> · {t('adotado em {d}', { d: fmtDate(a.adopted_at, locale) })}
+                {!a.term_accepted_at && ` · ${t('termo ainda não aceito')}`}
+                {a.return_reason && ` · ${t('devolução:')} ${a.return_reason}`}
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {a.checkins.sort((x, y) => x.due_day - y.due_day).map((c) => {
                   const isLate = c.status === 'late' || (c.status === 'pending' && new Date(c.due_at).getTime() < now);
                   return (
                     <Badge key={c.due_day} tone={c.status === 'answered' ? 'good' : isLate ? 'bad' : 'neutral'}>
-                      {c.due_day} dias: {c.status === 'answered' ? 'respondido' : isLate ? 'atrasado' : 'pendente'}
+                      {t('{n} dias', { n: c.due_day })}: {c.status === 'answered' ? t('respondido') : isLate ? t('atrasado') : t('pendente')}
                     </Badge>
                   );
                 })}
               </div>
             </div>
             <div className="flex gap-2">
-              {a.status === 'returned' && <Badge tone="bad">Devolvido</Badge>}
-              {a.help && <Badge tone="bad">Pediu ajuda</Badge>}
+              {a.status === 'returned' && <Badge tone="bad">{t('Devolvido')}</Badge>}
+              {a.help && <Badge tone="bad">{t('Pediu ajuda')}</Badge>}
             </div>
           </li>
         ))}
-        {!list.length && <li className="p-6 text-center text-sm text-muted">Nenhuma adoção aqui.</li>}
+        {!list.length && <li className="p-6 text-center text-sm text-muted">{t('Nenhuma adoção aqui.')}</li>}
       </ul>
     </>
   );

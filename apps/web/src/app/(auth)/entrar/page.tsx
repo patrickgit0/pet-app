@@ -1,6 +1,7 @@
+import { pageTitle } from '@/i18n/server';
 import { AuthForm } from '../auth-form';
 
-export const metadata = { title: 'Entrar' };
+export const generateMetadata = pageTitle('Entrar');
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;

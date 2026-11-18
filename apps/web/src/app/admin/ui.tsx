@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,27 +26,29 @@ export function Badge({ tone = 'neutral', children }: { tone?: 'neutral' | 'good
 }
 
 /** Barra de busca/filtros via GET (funciona sem JS). */
-export function SearchBar({ q, placeholder, children }: { q?: string; placeholder: string; children?: ReactNode }) {
+export async function SearchBar({ q, placeholder, children }: { q?: string; placeholder: string; children?: ReactNode }) {
+  const { t } = await getI18n();
   return (
     <form method="get" className="mb-4 flex flex-wrap gap-2">
-      <input name="q" type="search" defaultValue={q} placeholder={placeholder} className="field h-11 min-w-0 flex-[1_1_220px] text-sm" />
+      <input name="q" type="search" defaultValue={q} placeholder={t(placeholder)} className="field h-11 min-w-0 flex-[1_1_220px] text-sm" />
       {children}
-      <button className="btn-primary min-h-11">Buscar</button>
+      <button className="btn-primary min-h-11">{t('Buscar')}</button>
     </form>
   );
 }
 
-export function Pager({ page, total, size, href }: { page: number; total: number; size: number; href: (p: number) => string }) {
+export async function Pager({ page, total, size, href }: { page: number; total: number; size: number; href: (p: number) => string }) {
   const pages = Math.ceil(total / size);
   if (pages <= 1) return null;
+  const { t } = await getI18n();
   return (
-    <nav className="mt-4 flex items-center justify-center gap-2 text-sm" aria-label="Paginação">
-      {page > 1 && <Link className="btn-ghost min-h-10 bg-white" href={href(page - 1)}>Anterior</Link>}
-      <span className="text-muted">Página {page} de {pages}</span>
-      {page < pages && <Link className="btn-ghost min-h-10 bg-white" href={href(page + 1)}>Próxima</Link>}
+    <nav className="mt-4 flex items-center justify-center gap-2 text-sm" aria-label={t('Paginação')}>
+      {page > 1 && <Link className="btn-ghost min-h-10 bg-white" href={href(page - 1)}>{t('Anterior')}</Link>}
+      <span className="text-muted">{t('Página {p} de {n}', { p: page, n: pages })}</span>
+      {page < pages && <Link className="btn-ghost min-h-10 bg-white" href={href(page + 1)}>{t('Próxima')}</Link>}
     </nav>
   );
 }
 
-export const fmtDate = (d: string | null | undefined) => (d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—');
+export const fmtDate = (d: string | null | undefined, locale = 'pt-BR') => (d ? new Date(d).toLocaleDateString(locale, { timeZone: 'America/Sao_Paulo' }) : '—');
 export const daysSince = (d: string | null | undefined) => (d ? Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000) : null);

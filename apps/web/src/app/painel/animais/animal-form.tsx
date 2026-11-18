@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/i18n/client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ENERGY_LABEL, SIZE_LABEL, type Database, type AnimalSize, type EnergyLevel } from '@adotai/shared';
@@ -24,6 +25,7 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [current, setCurrent] = useState<Photo[]>(photos);
+  const { t } = useI18n();
 
   function submit(formData: FormData) {
     setError(null);
@@ -85,34 +87,34 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
     : 0;
 
   return (
-    <form action={submit} className="card flex max-w-3xl flex-col gap-5 p-6">
+    <form action={submit} className="card flex max-w-3xl flex-col gap-5 p-4 sm:p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <F label="Nome"><input name="name" required defaultValue={animal?.name} className="field" /></F>
         <F label="Raça"><input name="breed" defaultValue={animal?.breed ?? 'SRD'} className="field" /></F>
         <F label="Espécie">
-          <select name="species" defaultValue={animal?.species ?? 'dog'} className="field"><option value="dog">Cão</option><option value="cat">Gato</option></select>
+          <select name="species" defaultValue={animal?.species ?? 'dog'} className="field"><option value="dog">{t('Cão')}</option><option value="cat">{t('Gato')}</option></select>
         </F>
         <F label="Sexo">
-          <select name="sex" defaultValue={animal?.sex ?? 'female'} className="field"><option value="female">Fêmea</option><option value="male">Macho</option></select>
+          <select name="sex" defaultValue={animal?.sex ?? 'female'} className="field"><option value="female">{t('Fêmea')}</option><option value="male">{t('Macho')}</option></select>
         </F>
         <F label="Porte">
           <select name="size" defaultValue={animal?.size ?? 'small'} className="field">
-            {(Object.keys(SIZE_LABEL) as AnimalSize[]).map((s) => <option key={s} value={s}>{SIZE_LABEL[s]}</option>)}
+            {(Object.keys(SIZE_LABEL) as AnimalSize[]).map((s) => <option key={s} value={s}>{t(SIZE_LABEL[s])}</option>)}
           </select>
         </F>
         <F label="Idade aproximada">
           <div className="flex gap-2">
-            <input name="age_years" type="number" min={0} max={25} defaultValue={Math.floor(ageM / 12)} className="field" aria-label="Anos" />
-            <input name="age_months" type="number" min={0} max={11} defaultValue={ageM % 12} className="field" aria-label="Meses" />
+            <input name="age_years" type="number" min={0} max={25} defaultValue={Math.floor(ageM / 12)} className="field" aria-label={t('Anos')} />
+            <input name="age_months" type="number" min={0} max={11} defaultValue={ageM % 12} className="field" aria-label={t('Meses')} />
           </div>
         </F>
         <F label="Energia">
           <select name="energy" defaultValue={animal?.energy ?? ''} className="field">
-            <option value="">Não sei</option>
-            {(Object.keys(ENERGY_LABEL) as EnergyLevel[]).map((e) => <option key={e} value={e}>{ENERGY_LABEL[e]}</option>)}
+            <option value="">{t('Não sei')}</option>
+            {(Object.keys(ENERGY_LABEL) as EnergyLevel[]).map((e) => <option key={e} value={e}>{t(ENERGY_LABEL[e])}</option>)}
           </select>
         </F>
-        <F label="Cuidados especiais"><input name="special_needs" defaultValue={animal?.special_needs ?? ''} placeholder="Ex.: ração renal" className="field" /></F>
+        <F label="Cuidados especiais"><input name="special_needs" defaultValue={animal?.special_needs ?? ''} placeholder={t('Ex.: ração renal')} className="field" /></F>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-4">
@@ -122,7 +124,7 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
         ].map(([n, l]) => (
           <F key={n} label={l}>
             <select name={n} defaultValue={triStr(animal?.[n as keyof Animal] as boolean | null)} className="field h-11">
-              {TRI.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
+              {TRI.map((o) => <option key={o.v} value={o.v}>{t(o.l)}</option>)}
             </select>
           </F>
         ))}
@@ -133,33 +135,35 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
       </F>
 
       <div className="flex flex-col gap-2">
-        <span className="label">Fotos</span>
+        <span className="label">{t('Fotos')}</span>
         {current.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {current.map((p) => (
               <div key={p.id} className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl(p.storage_path)!} alt="" className="h-20 w-20 rounded-lg object-cover" />
-                <button type="button" onClick={() => removePhoto(p)} aria-label="Remover foto" className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white text-xs font-bold shadow">✕</button>
+                <button type="button" onClick={() => removePhoto(p)} aria-label={t('Remover foto')} className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white text-xs font-bold shadow">✕</button>
               </div>
             ))}
           </div>
         )}
         <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e) => setFiles(Array.from(e.target.files ?? []))} className="text-sm" />
-        <span className="text-xs text-muted">A primeira foto vira a capa do anúncio.</span>
+        <span className="text-xs text-muted">{t('A primeira foto vira a capa do anúncio.')}</span>
       </div>
 
       <label className="flex items-center gap-2.5 text-sm font-semibold">
         <input type="checkbox" name="publish" defaultChecked={!animal || animal.status === 'available'} className="h-5 w-5 accent-brand" />
-        Publicar agora (aparece na busca)
+        {t('Publicar agora (aparece na busca)')}
       </label>
 
-      {error && <p role="alert" className="text-sm font-semibold text-red-700">{error}</p>}
-      <button disabled={pending} className="btn-primary h-12 self-start px-6">{pending ? 'Salvando…' : 'Salvar'}</button>
+      {error && <p role="alert" className="text-sm font-semibold text-red-700">{t(error)}</p>}
+      <button disabled={pending} className="btn-primary h-12 self-start px-6">{pending ? t('Salvando…') : t('Salvar')}</button>
     </form>
   );
 }
 
+/** Campo com rótulo; o rótulo (em português) é traduzido aqui. */
 function F({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="flex flex-col gap-1.5"><span className="label">{label}</span>{children}</label>;
+  const { t } = useI18n();
+  return <label className="flex flex-col gap-1.5"><span className="label">{t(label)}</span>{children}</label>;
 }

@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -29,9 +30,10 @@ async function load(id: string) {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const a = await load((await params).id);
   if (!a) return {};
+  const { t } = await getI18n();
   return {
-    title: `${a.name} para adoção`,
-    description: `${SPECIES_LABEL[a.species]} ${sexLabel(a.sex).toLowerCase()}, porte ${SIZE_LABEL[a.size].toLowerCase()}, na ONG ${a.ngos?.name}. ${a.description ?? ''}`.slice(0, 160),
+    title: t('{name} para adoção', { name: a.name }),
+    description: `${t(SPECIES_LABEL[a.species])} · ${t(sexLabel(a.sex))} · ${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()} · ${a.ngos?.name}. ${a.description ?? ''}`.slice(0, 160),
   };
 }
 
@@ -41,6 +43,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
   const a = await load(id);
   if (!a || !a.ngos) notFound();
   const { supabase, user, profile } = await getSession();
+  const { t, lang } = await getI18n();
 
   let isFav = false;
   if (user) {
@@ -50,22 +53,22 @@ export default async function AnimalPage({ params, searchParams }: Params) {
   const isNgoMember = profile?.role === 'ngo_member';
   const photos = [...(a.animal_photos ?? [])].sort((x, y) => x.position - y.position);
   const ngo = a.ngos;
-  const rating = formatRating(ngo.rating);
+  const rating = formatRating(ngo.rating, lang);
 
   const compat = [
-    { ok: a.good_with_kids, label: 'Crianças' },
-    { ok: a.good_with_dogs, label: 'Outros cães' },
-    { ok: a.good_with_cats, label: 'Gatos' },
-    { ok: a.good_for_apartment, label: 'Apartamento' },
+    { ok: a.good_with_kids, label: t('Crianças') },
+    { ok: a.good_with_dogs, label: t('Outros cães') },
+    { ok: a.good_with_cats, label: t('Gatos') },
+    { ok: a.good_for_apartment, label: t('Apartamento') },
   ].filter((c) => c.ok !== null);
 
   return (
-    <main className="mx-auto grid max-w-[1100px] gap-8 px-6 py-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+    <main className="mx-auto grid max-w-[1100px] gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <section className="flex flex-col gap-3">
         <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl" style={{ background: tintFor(a.name) }}>
           {photos[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoUrl(photos[0].storage_path)!} alt={`Foto de ${a.name}`} className="h-full w-full object-cover" />
+            <img src={photoUrl(photos[0].storage_path)!} alt={t('Foto de {name}', { name: a.name })} className="h-full w-full object-cover" />
           ) : (
             <PawIcon size={72} className="text-ink/30" />
           )}
@@ -85,13 +88,13 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           <div>
             <h1 className="text-3xl font-extrabold">{a.name}</h1>
             <p className="text-muted">
-              {sexLabel(a.sex)} · {formatAge(ageMonths(a.birth_date_estimate))} · Porte {SIZE_LABEL[a.size].toLowerCase()} · {a.breed}
+              {t(sexLabel(a.sex))} · {formatAge(ageMonths(a.birth_date_estimate), lang)} · {t('Porte')} {t(SIZE_LABEL[a.size]).toLowerCase()} · {a.breed === 'SRD' ? t('SRD') : a.breed}
             </p>
-            {a.status === 'reserved' && <span className="mt-2 inline-block rounded-lg bg-accent-soft px-2 py-1 text-xs font-bold text-accent-ink">Reservado — adoção em andamento</span>}
+            {a.status === 'reserved' && <span className="mt-2 inline-block rounded-lg bg-accent-soft px-2 py-1 text-xs font-bold text-accent-ink">{t('Reservado — adoção em andamento')}</span>}
           </div>
           {!isNgoMember && (
             <form action={toggleFavorite.bind(null, a.id, isFav)}>
-              <button aria-label={isFav ? 'Remover dos favoritos' : 'Favoritar'} className="btn-ghost h-11 w-11 rounded-full p-0">
+              <button aria-label={isFav ? t('Remover dos favoritos') : t('Favoritar')} className="btn-ghost h-11 w-11 rounded-full p-0">
                 <HeartIcon filled={isFav} className={isFav ? 'text-accent' : ''} />
               </button>
             </form>
@@ -99,14 +102,14 @@ export default async function AnimalPage({ params, searchParams }: Params) {
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          <Fact k="Castração" v={a.neutered == null ? 'Não informado' : a.neutered ? 'Castrado' : 'Não castrado'} />
-          <Fact k="Vacinas" v={a.vaccinated == null ? 'Não informado' : a.vaccinated ? 'Em dia' : 'Pendentes'} />
-          <Fact k="Energia" v={a.energy ? ENERGY_LABEL[a.energy] : 'Não informado'} />
+          <Fact k={t('Castração')} v={a.neutered == null ? t('Não informado') : a.neutered ? t('Castrado') : t('Não castrado')} />
+          <Fact k={t('Vacinas')} v={a.vaccinated == null ? t('Não informado') : a.vaccinated ? t('Em dia') : t('Pendentes')} />
+          <Fact k={t('Energia')} v={a.energy ? t(ENERGY_LABEL[a.energy]) : t('Não informado')} />
         </div>
 
         {compat.length > 0 && (
           <div className="flex flex-col gap-2">
-            <h2 className="text-[15px] font-extrabold">Convivência</h2>
+            <h2 className="text-[15px] font-extrabold">{t('Convivência')}</h2>
             <div className="flex flex-wrap gap-2">
               {compat.map((c) => (
                 <span key={c.label} className={`rounded-full px-3 py-1.5 text-[13px] ring-1 ring-line-2 ring-inset ${c.ok ? '' : 'text-muted'}`}>
@@ -117,7 +120,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           </div>
         )}
 
-        {a.special_needs && <p className="rounded-xl bg-accent-soft p-3 text-sm text-accent-ink"><strong>Cuidados especiais:</strong> {a.special_needs}</p>}
+        {a.special_needs && <p className="rounded-xl bg-accent-soft p-3 text-sm text-accent-ink"><strong>{t('Cuidados especiais:')}</strong> {a.special_needs}</p>}
         {a.description && <p className="leading-relaxed text-ink-2">{a.description}</p>}
 
         <Link href={`/ongs/${ngo.slug}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-line ring-inset">
@@ -127,25 +130,25 @@ export default async function AnimalPage({ params, searchParams }: Params) {
               {ngo.name} {ngo.verified_at && <VerifiedIcon className="text-brand" />}
             </span>
             <span className="text-xs text-muted">
-              {rating ? `★ ${rating}` : 'Nova na plataforma'} · {ngo.completed_adoptions} adoções
-              {ngo.median_response_minutes != null && ` · responde em ~${ngo.median_response_minutes < 60 ? `${ngo.median_response_minutes} min` : `${Math.round(ngo.median_response_minutes / 60)} h`}`}
+              {rating ? `★ ${rating}` : t('Nova na plataforma')} · {t('{n} adoções', { n: ngo.completed_adoptions })}
+              {ngo.median_response_minutes != null && ` · ${t('responde em ~{time}', { time: ngo.median_response_minutes < 60 ? `${ngo.median_response_minutes} min` : `${Math.round(ngo.median_response_minutes / 60)} h` })}`}
             </span>
           </span>
         </Link>
 
-        {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{erro}</p>}
+        {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 
         {!isNgoMember && a.status === 'available' && (
           <div className="flex gap-3">
             <form action={startChat.bind(null, a.id)}>
-              <button className="btn-outline h-13 px-5 text-[15px]"><ChatIcon /> Conversar</button>
+              <button className="btn-outline h-13 px-5 text-[15px]"><ChatIcon /> {t('Conversar')}</button>
             </form>
             <form action={requestAdoption.bind(null, a.id)} className="flex-1">
-              <button className="btn-primary h-13 w-full text-base font-extrabold">Quero adotar</button>
+              <button className="btn-primary h-13 w-full text-base font-extrabold">{t('Quero adotar')}</button>
             </form>
           </div>
         )}
-        {!user && <p className="text-xs text-muted">Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).</p>}
+        {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}
       </section>
     </main>
   );

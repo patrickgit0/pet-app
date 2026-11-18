@@ -1,13 +1,15 @@
+import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
 import { initials, tintFor } from '@/lib/utils';
 import { myConversationsFilter } from '@/lib/conversations';
 
-export const metadata = { title: 'Mensagens' };
+export const generateMetadata = pageTitle('Mensagens');
 
 export default async function Page() {
   const { supabase, user, profile } = await getSession();
   const isNgo = profile?.role === 'ngo_member';
+  const { t } = await getI18n();
 
   const { filter } = await myConversationsFilter(supabase, user!.id);
   const { data: convs } = await supabase
@@ -20,11 +22,11 @@ export default async function Page() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-5 text-2xl font-extrabold">Mensagens</h1>
+      <h1 className="mb-5 text-2xl font-extrabold">{t('Mensagens')}</h1>
       <div className="card divide-y divide-line">
         {(convs ?? []).map((c) => {
           const last = c.messages?.[0];
-          const other = isNgo ? c.profiles?.full_name ?? 'Adotante' : c.ngos?.name ?? 'ONG';
+          const other = isNgo ? c.profiles?.full_name ?? t('Adotante') : c.ngos?.name ?? t('ONG');
           const unread = last && last.sender_id !== user!.id && !last.read_at;
           return (
             <Link key={c.id} href={`/mensagens/${c.id}`} className="flex items-center gap-3 p-4 hover:bg-ground">
@@ -33,13 +35,13 @@ export default async function Page() {
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className={`text-sm ${unread ? 'font-extrabold' : 'font-bold'}`}>{other} · {c.animals?.name}</span>
-                <span className="truncate text-[13px] text-muted">{last?.kind === 'visit_proposal' ? 'Proposta de visita' : last?.body ?? 'Conversa iniciada'}</span>
+                <span className="truncate text-[13px] text-muted">{last?.kind === 'visit_proposal' ? t('Proposta de visita') : last?.body ?? t('Conversa iniciada')}</span>
               </span>
-              {unread && <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-label="Não lida" />}
+              {unread && <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-label={t('Não lida')} />}
             </Link>
           );
         })}
-        {!convs?.length && <p className="p-8 text-center text-muted">Nenhuma conversa ainda. Abra um animal e toque em &quot;Conversar&quot;.</p>}
+        {!convs?.length && <p className="p-8 text-center text-muted">{t('Nenhuma conversa ainda. Abra um animal e toque em "Conversar".')}</p>}
       </div>
     </main>
   );

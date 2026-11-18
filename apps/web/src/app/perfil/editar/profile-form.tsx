@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/i18n/client';
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatCep, formatCpf, formatPhone, isValidCpf, lookupCep, rpcErrorMessage, toE164Phone, HOME_LABEL, type CepResult, type HomeType } from '@adotai/shared';
@@ -21,6 +22,7 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
   const [fullName, setFullName] = useState(initial.fullName);
   const cpfLocked = Boolean(initial.cpf);
@@ -107,14 +109,14 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
     <form onSubmit={submit} className="flex flex-col gap-4">
       {animalName && (
         <p className="rounded-xl bg-accent-soft p-3 text-sm text-ink-2">
-          Falta pouco para pedir a adoção de <strong>{animalName}</strong>. Esses dados protegem os animais e as ONGs.
+          {t('Falta pouco para pedir a adoção de')} <strong>{animalName}</strong>. {t('Esses dados protegem os animais e as ONGs.')}
         </p>
       )}
 
       <section className="card flex flex-col gap-4 p-5">
-        <h2 className="font-extrabold">Seus dados</h2>
+        <h2 className="font-extrabold">{t('Seus dados')}</h2>
         <label className="flex flex-col gap-1.5">
-          <span className="label">Nome completo</span>
+          <span className="label">{t('Nome completo')}</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" className="field" required />
         </label>
       </section>
@@ -122,82 +124,82 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
       {initial.isAdopter && (
         <section className="card flex flex-col gap-4 p-5">
           <div>
-            <h2 className="font-extrabold">Para adotar</h2>
-            <p className="text-xs text-muted">Só é obrigatório na hora de pedir uma adoção. A ONG nunca vê seu CPF.</p>
+            <h2 className="font-extrabold">{t('Para adotar')}</h2>
+            <p className="text-xs text-muted">{t('Só é obrigatório na hora de pedir uma adoção. A ONG nunca vê seu CPF.')}</p>
           </div>
 
           <label className="flex flex-col gap-1.5">
-            <span className="label">CPF</span>
+            <span className="label">{t('CPF')}</span>
             <input inputMode="numeric" value={cpfLocked ? `•••.•••.•••-${initial.cpf.slice(-2)}` : cpf} disabled={cpfLocked}
               onChange={(e) => setCpf(formatCpf(e.target.value))} placeholder="000.000.000-00" className="field disabled:bg-field disabled:text-muted" />
-            {cpfLocked && <span className="text-xs text-muted">O CPF não pode ser alterado. Precisa corrigir? Fale com o suporte.</span>}
+            {cpfLocked && <span className="text-xs text-muted">{t('O CPF não pode ser alterado. Precisa corrigir? Fale com o suporte.')}</span>}
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="label">Celular</span>
+            <span className="label">{t('Celular')}</span>
             <input inputMode="tel" autoComplete="tel-national" value={phone}
               onChange={(e) => { const v = formatPhone(e.target.value); setPhone(v); setPhoneMsg(null); }}
               onBlur={() => setPhoneMsg(phone && !validPhone(phone) ? 'Confira o número: DDD + celular com 9 dígitos.' : null)}
               placeholder="(16) 99123-4567" className="field" />
-            {phoneMsg ? <span className="text-xs text-red-700">{phoneMsg}</span>
-              : <span className="text-xs text-muted">A ONG só recebe seu celular depois de aprovar o pedido.</span>}
+            {phoneMsg ? <span className="text-xs text-red-700">{t(phoneMsg)}</span>
+              : <span className="text-xs text-muted">{t('A ONG só recebe seu celular depois de aprovar o pedido.')}</span>}
           </label>
 
           <div className="grid grid-cols-[1fr_2fr] gap-2">
             <label className="flex min-w-0 flex-col gap-1.5">
-              <span className="label">CEP</span>
+              <span className="label">{t('CEP')}</span>
               <input inputMode="numeric" autoComplete="postal-code" value={cep} onChange={(e) => onCep(e.target.value)} placeholder="00000-000" className="field" />
             </label>
             <div className="flex min-w-0 flex-col justify-end pb-3 text-xs">
               {addr ? (
                 <span className="flex items-center gap-1 font-semibold text-brand-dark"><CheckIcon size={13} /> {[addr.neighborhood, `${addr.city}/${addr.state}`].filter(Boolean).join(' · ')}</span>
-              ) : cepMsg && <span className="text-muted">{cepMsg}</span>}
+              ) : cepMsg && <span className="text-muted">{t(cepMsg)}</span>}
             </div>
           </div>
 
           <div className="grid grid-cols-[2fr_1fr] gap-2">
             <label className="flex min-w-0 flex-col gap-1.5">
-              <span className="label">Endereço</span>
-              <input value={street} onChange={(e) => setStreet(e.target.value)} autoComplete="address-line1" placeholder="Rua e número" className="field" />
+              <span className="label">{t('Endereço')}</span>
+              <input value={street} onChange={(e) => setStreet(e.target.value)} autoComplete="address-line1" placeholder={t('Rua e número')} className="field" />
             </label>
             <label className="flex min-w-0 flex-col gap-1.5">
-              <span className="label">Complemento</span>
-              <input value={complement} onChange={(e) => setComplement(e.target.value)} autoComplete="address-line2" placeholder="Apto" className="field" />
+              <span className="label">{t('Complemento')}</span>
+              <input value={complement} onChange={(e) => setComplement(e.target.value)} autoComplete="address-line2" placeholder={t('Apto')} className="field" />
             </label>
           </div>
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="label mb-2">Onde você mora?</legend>
+            <legend className="label mb-2">{t('Onde você mora?')}</legend>
             <div className="grid grid-cols-3 gap-2">
               {(Object.keys(HOME_LABEL) as HomeType[]).map((h) => (
                 <button key={h} type="button" aria-pressed={homeType === h} onClick={() => setHomeType(h)}
                   className={`btn px-2 ${homeType === h ? 'bg-brand text-white' : 'ring-[1.5px] ring-line-2 ring-inset'}`}>
-                  {HOME_LABEL[h]}
+                  {t(HOME_LABEL[h])}
                 </button>
               ))}
             </div>
           </fieldset>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <label className="flex min-h-8 items-center gap-2"><input type="checkbox" checked={hasYard} onChange={(e) => setHasYard(e.target.checked)} className="h-5 w-5 accent-brand" /> Tenho quintal</label>
-            <label className="flex min-h-8 items-center gap-2"><input type="checkbox" checked={hasChildren} onChange={(e) => setHasChildren(e.target.checked)} className="h-5 w-5 accent-brand" /> Crianças em casa</label>
+            <label className="flex min-h-8 items-center gap-2"><input type="checkbox" checked={hasYard} onChange={(e) => setHasYard(e.target.checked)} className="h-5 w-5 accent-brand" /> {t('Tenho quintal')}</label>
+            <label className="flex min-h-8 items-center gap-2"><input type="checkbox" checked={hasChildren} onChange={(e) => setHasChildren(e.target.checked)} className="h-5 w-5 accent-brand" /> {t('Crianças em casa')}</label>
           </div>
           <label className="flex flex-col gap-1.5">
-            <span className="label">Outros animais em casa</span>
-            <input value={otherPets} onChange={(e) => setOtherPets(e.target.value)} placeholder="Ex.: 1 gato castrado" className="field" />
+            <span className="label">{t('Outros animais em casa')}</span>
+            <input value={otherPets} onChange={(e) => setOtherPets(e.target.value)} placeholder={t('Ex.: 1 gato castrado')} className="field" />
           </label>
 
           {!initial.consented && (
             <label className="flex items-start gap-2.5 text-xs leading-relaxed text-ink-2">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-5 w-5 shrink-0 accent-brand" />
-              <span>Concordo com o uso dos meus dados para análise de adoção, conforme a <a href="/privacidade" target="_blank" className="font-bold text-brand underline">Política de Privacidade</a> (LGPD).</span>
+              <span>{t('Concordo com o uso dos meus dados para análise de adoção, conforme a')} <a href="/privacidade" target="_blank" className="font-bold text-brand underline">{t('Política de Privacidade')}</a> (LGPD).</span>
             </label>
           )}
         </section>
       )}
 
-      {error && <p role="alert" className="text-sm font-semibold text-red-700">{error}</p>}
+      {error && <p role="alert" className="text-sm font-semibold text-red-700">{t(error)}</p>}
       <button disabled={pending} className="btn-primary h-12 text-base">
-        {pending ? 'Salvando…' : animalId ? 'Salvar e enviar pedido' : 'Salvar'}
+        {pending ? t('Salvando…') : animalId ? t('Salvar e enviar pedido') : t('Salvar')}
       </button>
     </form>
   );

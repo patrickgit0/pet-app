@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { ANIMAL_STATUS_LABEL, SIZE_LABEL, formatAge, sexLabel, type AnimalStatus } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
@@ -13,6 +14,7 @@ export default async function AdminAnimals({ searchParams }: { searchParams: SP 
   const page = Math.max(1, Number(sp.page ?? 1));
   const noPhoto = sp.filtro === 'sem-foto';
   const { supabase } = await getSession();
+  const { t, lang } = await getI18n();
   let query = supabase
     .from('animals')
     .select('id, name, species, sex, size, status, birth_date_estimate, published_at, created_at, ngos(name, slug), animal_photos(id)', { count: 'exact' })
@@ -28,11 +30,11 @@ export default async function AdminAnimals({ searchParams }: { searchParams: SP 
 
   return (
     <>
-      <PageTitle title="Animais" subtitle={noPhoto ? 'Anúncios disponíveis sem foto.' : `${count ?? 0} anúncios`} />
+      <PageTitle title={t('Animais')} subtitle={noPhoto ? t('Anúncios disponíveis sem foto.') : t('{n} anúncios', { n: count ?? 0 })} />
       <SearchBar q={sp.q} placeholder="Nome do animal">
         <select name="status" defaultValue={sp.status ?? ''} className="field h-11 w-auto text-sm">
-          <option value="">Todos os status</option>
-          {(Object.keys(ANIMAL_STATUS_LABEL) as AnimalStatus[]).map((s) => <option key={s} value={s}>{ANIMAL_STATUS_LABEL[s]}</option>)}
+          <option value="">{t('Todos os status')}</option>
+          {(Object.keys(ANIMAL_STATUS_LABEL) as AnimalStatus[]).map((s) => <option key={s} value={s}>{t(ANIMAL_STATUS_LABEL[s])}</option>)}
         </select>
       </SearchBar>
       <ul className="card divide-y divide-line">
@@ -44,24 +46,24 @@ export default async function AdminAnimals({ searchParams }: { searchParams: SP 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Link href={`/animais/${a.id}`} className="font-bold hover:text-brand">{a.name}</Link>
-                  <Badge tone={TONE[a.status]}>{ANIMAL_STATUS_LABEL[a.status]}</Badge>
-                  {a.animal_photos.length === 0 && <Badge tone="warn">Sem foto</Badge>}
+                  <Badge tone={TONE[a.status]}>{t(ANIMAL_STATUS_LABEL[a.status])}</Badge>
+                  {a.animal_photos.length === 0 && <Badge tone="warn">{t('Sem foto')}</Badge>}
                 </div>
                 <p className="text-xs text-muted">
-                  {a.species === 'dog' ? 'Cão' : 'Gato'} · {sexLabel(a.sex)} · {formatAge(months)} · Porte {SIZE_LABEL[a.size].toLowerCase()} ·{' '}
+                  {a.species === 'dog' ? t('Cão') : t('Gato')} · {t(sexLabel(a.sex))} · {formatAge(months, lang)} · {t('Porte')} {t(SIZE_LABEL[a.size]).toLowerCase()} ·{' '}
                   <Link href={`/ongs/${a.ngos?.slug}`} className="hover:text-brand">{a.ngos?.name}</Link>
-                  {waiting != null && ` · esperando há ${waiting} dias`}
+                  {waiting != null && ` · ${t('esperando há {n} dias', { n: waiting })}`}
                 </p>
               </div>
               {a.status !== 'archived' ? (
-                <form action={setAnimalStatus.bind(null, a.id, 'archived')}><button className="btn-ghost min-h-9 px-3 text-xs">Arquivar anúncio</button></form>
+                <form action={setAnimalStatus.bind(null, a.id, 'archived')}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Arquivar anúncio')}</button></form>
               ) : (
-                <form action={setAnimalStatus.bind(null, a.id, 'available')}><button className="btn-ghost min-h-9 px-3 text-xs">Reativar</button></form>
+                <form action={setAnimalStatus.bind(null, a.id, 'available')}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Reativar')}</button></form>
               )}
             </li>
           );
         })}
-        {!animals.length && <li className="p-6 text-center text-sm text-muted">Nenhum animal encontrado.</li>}
+        {!animals.length && <li className="p-6 text-center text-sm text-muted">{t('Nenhum animal encontrado.')}</li>}
       </ul>
       {!noPhoto && <Pager page={page} total={count ?? 0} size={SIZE} href={href} />}
     </>

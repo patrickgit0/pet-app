@@ -1,3 +1,4 @@
+import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
@@ -28,6 +29,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const { id } = await params;
   const { erro } = await searchParams;
   const { supabase } = await getMyNgo();
+  const { t, lang } = await getI18n();
 
   const { data: req } = await supabase.from('adoption_requests').select('*, animals(id, name)').eq('id', id).maybeSingle();
   if (!req) notFound();
@@ -41,46 +43,46 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
-      <Link href="/painel/pedidos" className="text-sm font-semibold text-brand">← Candidatos</Link>
+      <Link href="/painel/pedidos" className="text-sm font-semibold text-brand">← {t('Candidatos')}</Link>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-extrabold">{c?.full_name} · {req.animals?.name}</h1>
-        <span className="rounded-lg bg-accent-soft px-2.5 py-1 text-sm font-bold text-accent-ink">{REQUEST_STATUS_LABEL[req.status]}</span>
+        <span className="rounded-lg bg-accent-soft px-2.5 py-1 text-sm font-bold text-accent-ink">{t(REQUEST_STATUS_LABEL[req.status])}</span>
       </div>
-      {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{erro}</p>}
+      {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 
       <section className="card grid gap-3 p-5 text-sm sm:grid-cols-2">
-        <Info k="Verificação" v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> CPF verificado · celular informado</> : 'Incompleta'}</span>} />
-        <Info k="Bairro" v={`${c?.neighborhood ?? '—'}${c?.distance_km != null ? ` · ${formatDistance(Number(c.distance_km))} da ONG` : ''}`} />
-        <Info k="Moradia" v={c?.home_type ? HOME_LABEL[c.home_type] : '—'} />
-        <Info k="Quintal" v={c?.has_yard == null ? '—' : c.has_yard ? 'Sim' : 'Não'} />
-        <Info k="Crianças em casa" v={c?.has_children == null ? '—' : c.has_children ? 'Sim' : 'Não'} />
-        <Info k="Outros animais" v={c?.other_pets || '—'} />
+        <Info k={t('Verificação')} v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> {t('CPF verificado · celular informado')}</> : t('Incompleta')}</span>} />
+        <Info k={t('Bairro')} v={`${c?.neighborhood ?? '—'}${c?.distance_km != null ? ` · ${t('{d} da ONG', { d: formatDistance(Number(c.distance_km), lang) })}` : ''}`} />
+        <Info k={t('Moradia')} v={c?.home_type ? t(HOME_LABEL[c.home_type]) : '—'} />
+        <Info k={t('Quintal')} v={c?.has_yard == null ? '—' : c.has_yard ? t('Sim') : t('Não')} />
+        <Info k={t('Crianças em casa')} v={c?.has_children == null ? '—' : c.has_children ? t('Sim') : t('Não')} />
+        <Info k={t('Outros animais')} v={c?.other_pets || '—'} />
       </section>
 
       {ct ? (
         <section className="card flex flex-col gap-1 border-brand p-5 text-sm">
-          <h2 className="mb-1 font-extrabold">Contato do adotante</h2>
-          <span>Celular: <strong>{ct.phone}</strong></span>
-          <span>Endereço: <strong>{ct.street}{ct.complement ? `, ${ct.complement}` : ''} — {ct.neighborhood}, {ct.city}/{ct.state} · CEP {ct.cep}</strong></span>
+          <h2 className="mb-1 font-extrabold">{t('Contato do adotante')}</h2>
+          <span>{t('Celular:')} <strong>{ct.phone}</strong></span>
+          <span>{t('Endereço:')} <strong>{ct.street}{ct.complement ? `, ${ct.complement}` : ''} — {ct.neighborhood}, {ct.city}/{ct.state} · CEP {ct.cep}</strong></span>
         </section>
       ) : (
-        <p className="text-xs text-muted">Celular e endereço completo aparecem aqui depois que você aprovar o pedido. O CPF nunca é exibido.</p>
+        <p className="text-xs text-muted">{t('Celular e endereço completo aparecem aqui depois que você aprovar o pedido. O CPF nunca é exibido.')}</p>
       )}
 
       <div className="flex flex-wrap gap-2">
-        {conv && <Link href={`/mensagens/${conv.id}`} className="btn-ghost">Abrir conversa</Link>}
-        {req.status === 'sent' && <form action={setStatus.bind(null, id, 'reviewing')}><button className="btn-ghost">Marcar em análise</button></form>}
-        {open && <form action={setStatus.bind(null, id, 'visit_scheduled')}><button className="btn-ghost">Visita marcada</button></form>}
-        {open && <form action={setStatus.bind(null, id, 'approved')}><button className="btn-primary">Aprovar pedido</button></form>}
+        {conv && <Link href={`/mensagens/${conv.id}`} className="btn-ghost">{t('Abrir conversa')}</Link>}
+        {req.status === 'sent' && <form action={setStatus.bind(null, id, 'reviewing')}><button className="btn-ghost">{t('Marcar em análise')}</button></form>}
+        {open && <form action={setStatus.bind(null, id, 'visit_scheduled')}><button className="btn-ghost">{t('Visita marcada')}</button></form>}
+        {open && <form action={setStatus.bind(null, id, 'approved')}><button className="btn-primary">{t('Aprovar pedido')}</button></form>}
         {req.status === 'approved' && !adoption && (
-          <form action={completeAdoption.bind(null, id)}><button className="btn-primary">Confirmar adoção (animal entregue)</button></form>
+          <form action={completeAdoption.bind(null, id)}><button className="btn-primary">{t('Confirmar adoção (animal entregue)')}</button></form>
         )}
       </div>
       {open && (
         <form action={setStatus.bind(null, id, 'rejected')} className="card flex flex-col gap-2 p-4">
-          <label className="label" htmlFor="reason">Recusar pedido</label>
-          <input id="reason" name="reason" placeholder="Motivo (o adotante verá esta mensagem)" className="field" required />
-          <button className="btn self-start text-red-700 ring-[1.5px] ring-red-200 ring-inset">Recusar</button>
+          <label className="label" htmlFor="reason">{t('Recusar pedido')}</label>
+          <input id="reason" name="reason" placeholder={t('Motivo (o adotante verá esta mensagem)')} className="field" required />
+          <button className="btn self-start text-red-700 ring-[1.5px] ring-red-200 ring-inset">{t('Recusar')}</button>
         </form>
       )}
     </div>
