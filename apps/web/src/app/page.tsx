@@ -6,6 +6,7 @@ import {
   type AnimalSize, type Species,
 } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
+import { readSearchLocation } from '@/lib/search-location';
 import { AnimalCard } from '@/components/animal-card';
 import { MapView } from '@/components/map-view';
 import { LocateButton } from '@/components/locate-button';
@@ -22,10 +23,11 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { supabase, profile } = await getSession();
   const { t } = await getI18n();
 
-  // Centro da busca: ?lat/lng > localização do perfil > cidade piloto
+  // Centro da busca: localização escolhida (cookie) > endereço do perfil > cidade piloto
   let center: { lat: number; lng: number; label: string } = { lat: PILOT_CITY.lat, lng: PILOT_CITY.lng, label: `${PILOT_CITY.name}, ${PILOT_CITY.state}` };
-  if (sp.lat && sp.lng) {
-    center = { lat: Number(sp.lat), lng: Number(sp.lng), label: typeof sp.local === 'string' && sp.local ? sp.local : t('Sua localização') };
+  const chosen = await readSearchLocation();
+  if (chosen) {
+    center = { lat: chosen.lat, lng: chosen.lng, label: chosen.label || t('Sua localização') };
   } else if (profile?.location) {
     const { data: loc } = await supabase.rpc('get_my_location');
     const row = loc?.[0];
@@ -79,9 +81,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   return (
     <div className="mx-auto flex max-w-[1360px] flex-col items-stretch gap-4 px-4 py-4 sm:px-6 sm:py-6 lg:flex-row lg:items-start lg:gap-6">
       <form method="get" className="flex w-full flex-col gap-3 lg:card lg:w-[260px] lg:shrink-0 lg:gap-5 lg:p-5">
-        {sp.lat && <input type="hidden" name="lat" value={String(sp.lat)} />}
-        {sp.lng && <input type="hidden" name="lng" value={String(sp.lng)} />}
-        {typeof sp.local === 'string' && <input type="hidden" name="local" value={sp.local} />}
         <div className="hidden items-center justify-between lg:flex">
           <h2 className="text-base font-extrabold">{t('Filtros')}</h2>
           <Link href="/" className="text-[13px] font-semibold text-brand">{t('Limpar')}</Link>

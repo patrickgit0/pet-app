@@ -1,10 +1,11 @@
 'use client';
 
 import { useI18n } from '@/i18n/client';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { formatCep, lookupCep } from '@adotai/shared';
 import { PinIcon } from './icons';
+import { SEARCH_LOCATION_COOKIE } from '@/lib/cookie-names';
 
 /**
  * Centraliza a busca na localização do navegador (com permissão) ou num CEP digitado.
@@ -12,20 +13,17 @@ import { PinIcon } from './icons';
  */
 export function LocateButton() {
   const router = useRouter();
-  const params = useSearchParams();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [showCep, setShowCep] = useState(false);
   const [cep, setCep] = useState('');
   const { t } = useI18n();
 
+  // Guarda o centro da busca num cookie (não na URL) e recarrega a busca no servidor
   function go(lat: number, lng: number, label?: string) {
-    const p = new URLSearchParams(params.toString());
-    p.set('lat', lat.toFixed(4));
-    p.set('lng', lng.toFixed(4));
-    if (label) p.set('local', label); else p.delete('local');
-    p.delete('page');
-    router.push(`/?${p.toString()}`);
+    const value = encodeURIComponent(JSON.stringify({ lat: Number(lat.toFixed(4)), lng: Number(lng.toFixed(4)), label: label ?? null }));
+    document.cookie = `${SEARCH_LOCATION_COOKIE}=${value}; path=/; max-age=2592000; samesite=lax`;
+    router.refresh();
   }
 
   function locate() {
