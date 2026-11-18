@@ -29,6 +29,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <h1 className="flex items-center gap-2 text-2xl font-extrabold">{ngo.name} {ngo.verified_at && <VerifiedIcon size={18} className="text-brand" />}</h1>
           <span className="text-sm text-muted">{ngo.neighborhood}, {ngo.city}/{ngo.state}</span>
           {ngo.description && <p className="max-w-2xl text-sm text-ink-2">{ngo.description}</p>}
+          {ngo.instagram && (
+            <a href={`https://instagram.com/${ngo.instagram}`} target="_blank" rel="noopener noreferrer"
+              className="mt-1 inline-flex min-h-9 items-center gap-1.5 self-start rounded-full bg-field px-3 text-sm font-semibold hover:bg-line">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" /></svg>
+              @{ngo.instagram}
+            </a>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-3 text-center">
           <Stat k={t('Nota')} v={rating ?? t('Nova')} />

@@ -15,16 +15,14 @@ const QUICK_REPLIES = [
   'Seu pedido foi aprovado! Vamos combinar a entrega.',
 ];
 
-export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestId, readOnly = false }: {
-  conversationId: string; me: string; isNgo: boolean; blocked: boolean; initial: Msg[]; requestId?: string; readOnly?: boolean;
+export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestId, readOnly = false, defaultPlace = '' }: {
+  conversationId: string; me: string; isNgo: boolean; blocked: boolean; initial: Msg[]; requestId?: string; readOnly?: boolean; defaultPlace?: string;
 }) {
   const supabase = createClient();
   const { t, locale } = useI18n();
   const [msgs, setMsgs] = useState<Msg[]>(initial);
   const [draft, setDraft] = useState('');
   const [showVisit, setShowVisit] = useState(false);
-  const [visitAt, setVisitAt] = useState('');
-  const [visitPlace, setVisitPlace] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,16 +104,14 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
         </div>
       )}
       {showVisit && (
-        <form className="flex flex-wrap gap-2 border-t border-line bg-white p-3" onSubmit={async (e) => {
-          e.preventDefault();
-          if (!visitAt) return;
-          await send('', { kind: 'visit_proposal', visit_at: new Date(visitAt).toISOString(), visit_place: visitPlace || null });
-          setShowVisit(false); setVisitAt(''); setVisitPlace('');
-        }}>
-          <input type="datetime-local" required value={visitAt} onChange={(e) => setVisitAt(e.target.value)} className="field h-11 w-auto" aria-label={t('Data e hora da visita')} />
-          <input value={visitPlace} onChange={(e) => setVisitPlace(e.target.value)} placeholder={t('Local')} className="field h-11 flex-1" aria-label={t('Local da visita')} />
-          <button className="btn-primary">{t('Enviar proposta')}</button>
-        </form>
+        <VisitPicker
+          defaultPlace={defaultPlace}
+          onCancel={() => setShowVisit(false)}
+          onSend={async (at, place) => {
+            await send('', { kind: 'visit_proposal', visit_at: at.toISOString(), visit_place: place || null });
+            setShowVisit(false);
+          }}
+        />
       )}
 
       {readOnly ? null : blocked ? (
@@ -127,5 +123,57 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
         </form>
       )}
     </div>
+  );
+}
+
+const TIMES = Array.from({ length: 24 }, (_, i) => `${String(8 + Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`); // 08:00–19:30
+
+/** Proposta de visita: próximos 14 dias como botões + horário de 30 em 30 min + local (endereço da ONG por padrão). */
+function VisitPicker({ defaultPlace, onSend, onCancel }: { defaultPlace: string; onSend: (at: Date, place: string) => Promise<void>; onCancel: () => void }) {
+  const { t, locale } = useI18n();
+  const [days] = useState(() => Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + i); return d; }));
+  const [day, setDay] = useState<number | null>(null);
+  const [time, setTime] = useState('10:00');
+  const [place, setPlace] = useState(defaultPlace);
+  const [busy, setBusy] = useState(false);
+
+  const label = (d: Date, i: number) =>
+    i === 0 ? t('Hoje') : i === 1 ? t('Amanhã') : d.toLocaleDateString(locale, { weekday: 'short' }).replace('.', '');
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (day === null) return;
+    const [h, m] = time.split(':').map(Number);
+    const at = new Date(days[day]);
+    at.setHours(h, m, 0, 0);
+    setBusy(true);
+    await onSend(at, place.trim());
+    setBusy(false);
+  }
+
+  return (
+    <form onSubmit={submit} className="flex flex-col gap-3 border-t border-line bg-white p-3">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-1.5 text-sm font-extrabold"><CalendarIcon size={18} className="text-brand" /> {t('Propor visita')}</span>
+        <button type="button" onClick={onCancel} className="text-xs font-semibold text-muted hover:text-ink">{t('Cancelar')}</button>
+      </div>
+      <div role="radiogroup" aria-label={t('Dia da visita')} className="-mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
+        {days.map((d, i) => (
+          <button key={i} type="button" role="radio" aria-checked={day === i} onClick={() => setDay(i)}
+            className={`flex min-w-[58px] shrink-0 flex-col items-center rounded-xl px-2 py-2 text-xs ring-[1.5px] ring-inset ${day === i ? 'bg-brand text-white ring-brand' : 'bg-white ring-line-2 hover:bg-field'}`}>
+            <span className="font-semibold capitalize">{label(d, i)}</span>
+            <span className="text-base font-extrabold">{d.getDate()}</span>
+            <span className={day === i ? 'text-white/80' : 'text-muted'}>{d.toLocaleDateString(locale, { month: 'short' }).replace('.', '')}</span>
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <select value={time} onChange={(e) => setTime(e.target.value)} aria-label={t('Horário')} className="field h-11 w-auto text-sm font-semibold">
+          {TIMES.map((x) => <option key={x} value={x}>{x}</option>)}
+        </select>
+        <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder={t('Local')} aria-label={t('Local da visita')} className="field h-11 min-w-0 flex-[1_1_200px] text-sm" />
+      </div>
+      <button disabled={day === null || busy} className="btn-primary">{day === null ? t('Escolha o dia') : t('Enviar proposta')}</button>
+    </form>
   );
 }

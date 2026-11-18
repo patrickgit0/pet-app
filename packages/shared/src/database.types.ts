@@ -271,14 +271,14 @@ isOneToOne: false
                   ]
                 },"ngos": {
                   Row: {
-                    "address_text": string | null,"city": string,"cnpj": string,"completed_adoptions": number,"created_at": string,"description": string | null,"email": string | null,"id": string,"location": unknown,"logo_url": string | null,"median_response_minutes": number | null,"name": string,"neighborhood": string | null,"phone": string | null,"pix_key": string | null,"rating": number | null,"rating_count": number,"slug": string,"state": string,"updated_at": string,"verified_at": string | null
+                    "address_text": string | null,"city": string,"cnpj": string,"completed_adoptions": number,"created_at": string,"description": string | null,"email": string | null,"id": string,"instagram": string | null,"location": unknown,"logo_url": string | null,"median_response_minutes": number | null,"name": string,"neighborhood": string | null,"phone": string | null,"pix_key": string | null,"rating": number | null,"rating_count": number,"slug": string,"state": string,"updated_at": string,"verified_at": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "address_text"?: string | null,"city": string,"cnpj": string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"location": unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name": string,"neighborhood"?: string | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug": string,"state": string,"updated_at"?: string,"verified_at"?: string | null
+                    "address_text"?: string | null,"city": string,"cnpj": string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location": unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name": string,"neighborhood"?: string | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug": string,"state": string,"updated_at"?: string,"verified_at"?: string | null
                   }
                   Update: {
-                    "address_text"?: string | null,"city"?: string,"cnpj"?: string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"location"?: unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name"?: string,"neighborhood"?: string | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug"?: string,"state"?: string,"updated_at"?: string,"verified_at"?: string | null
+                    "address_text"?: string | null,"city"?: string,"cnpj"?: string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location"?: unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name"?: string,"neighborhood"?: string | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug"?: string,"state"?: string,"updated_at"?: string,"verified_at"?: string | null
                   }
                   Relationships: [
                     
@@ -443,7 +443,7 @@ isOneToOne: false
                            },
 "get_candidate_summary":
 { Args: { "p_request_id": string }; Returns: {
-              "adopter_id": string,"city": string,"cpf_verified": boolean,"distance_km": number,"full_name": string,"has_children": boolean,"has_yard": boolean,"home_type": Database["public"]['Enums']["home_type"],"neighborhood": string,"other_pets": string,"phone_verified": boolean
+              "adopter_id": string,"city": string,"cpf_verified": boolean,"distance_km": number,"full_name": string,"has_children": boolean,"has_yard": boolean,"home_type": Database["public"]['Enums']["home_type"],"neighborhood": string,"other_pets": string,"phone": string,"phone_verified": boolean
             }[]
                            },
 "get_my_location":
@@ -459,6 +459,9 @@ isOneToOne: false
                            },
 "is_conversation_participant":
 { Args: { "p_conversation_id": string }; Returns: boolean
+                           },
+"is_my_requested_animal":
+{ Args: { "p_animal_id": string }; Returns: boolean
                            },
 "is_ngo_member":
 { Args: { "p_ngo_id": string }; Returns: boolean

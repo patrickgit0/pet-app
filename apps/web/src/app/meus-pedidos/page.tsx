@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { REQUEST_STATUS_LABEL } from '@adotai/shared';
 import { createClient, getSession } from '@/lib/supabase/server';
+import { CalendarIcon } from '@/components/icons';
 
 export const generateMetadata = pageTitle('Meus pedidos');
 
@@ -27,12 +28,18 @@ async function answerCheckin(id: string, formData: FormData) {
 export default async function Page() {
   const { supabase, user } = await getSession();
   const { t, locale } = await getI18n();
-  const [{ data: requests }, { data: checkins }] = await Promise.all([
-    supabase.from('adoption_requests').select('id, status, rejection_reason, created_at, animals(id, name), ngos(name)')
+  const [{ data: requests }, { data: checkins }, { data: convs }] = await Promise.all([
+    supabase.from('adoption_requests').select('id, status, rejection_reason, created_at, animal_id, animals(id, name), ngos(name), adoptions(id)')
       .eq('adopter_id', user!.id).order('created_at', { ascending: false }),
     supabase.from('checkins').select('id, due_day, due_at, status, adoptions!inner(adopter_id, animals(name))')
       .eq('adoptions.adopter_id', user!.id).in('status', ['pending', 'late']).lte('due_at', new Date(Date.now() + 864e5).toISOString()),
+    // Última proposta de visita de cada conversa (para mostrar quando e onde é a visita)
+    supabase.from('conversations').select('id, animal_id, messages(visit_at, visit_place, visit_confirmed_at, created_at)')
+      .eq('adopter_id', user!.id).eq('messages.kind', 'visit_proposal')
+      .order('created_at', { referencedTable: 'messages', ascending: false }).limit(1, { referencedTable: 'messages' }),
   ]);
+  const visitByAnimal = new Map((convs ?? []).map((c) => [c.animal_id, { conv: c.id, visit: c.messages?.[0] }]));
+  const fmtVisit = (iso: string) => new Date(iso).toLocaleString(locale, { weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8">
@@ -59,21 +66,40 @@ export default async function Page() {
       <section>
         <h1 className="mb-4 text-2xl font-extrabold">{t('Meus pedidos')}</h1>
         <div className="card divide-y divide-line">
-          {(requests ?? []).map((r) => (
-            <div key={r.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <div className="flex flex-col">
-                <Link href={`/animais/${r.animals?.id}`} className="font-bold">{r.animals?.name}</Link>
-                <span className="text-xs text-muted">{r.ngos?.name} · {new Date(r.created_at).toLocaleDateString(locale)}</span>
-                {r.status === 'rejected' && r.rejection_reason && <span className="text-xs text-muted">{t('Motivo:')} {r.rejection_reason}</span>}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-md bg-accent-soft px-2 py-1 text-xs font-bold text-accent-ink">{t(REQUEST_STATUS_LABEL[r.status])}</span>
-                {['sent', 'reviewing', 'visit_scheduled'].includes(r.status) && (
-                  <form action={cancel.bind(null, r.id)}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Cancelar')}</button></form>
+          {(requests ?? []).map((r) => {
+            const adopted = Boolean(r.adoptions); // adoção é 1:1 com o pedido
+            const v = visitByAnimal.get(r.animal_id);
+            const showVisit = r.status === 'visit_scheduled' && v?.visit?.visit_at;
+            return (
+              <div key={r.id} className="flex flex-col gap-3 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-w-0 flex-col">
+                    <Link href={`/animais/${r.animals?.id}`} className="font-bold">{r.animals?.name ?? t('Animal')}</Link>
+                    <span className="text-xs text-muted">{r.ngos?.name} · {t('pedido em {d}', { d: new Date(r.created_at).toLocaleDateString(locale) })}</span>
+                    {r.status === 'rejected' && r.rejection_reason && <span className="text-xs text-muted">{t('Motivo:')} {r.rejection_reason}</span>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded-md px-2 py-1 text-xs font-bold ${adopted ? 'bg-brand-soft text-brand-dark' : 'bg-accent-soft text-accent-ink'}`}>
+                      {adopted ? t('Adotado') : t(REQUEST_STATUS_LABEL[r.status])}
+                    </span>
+                    {['sent', 'reviewing', 'visit_scheduled'].includes(r.status) && (
+                      <form action={cancel.bind(null, r.id)}><button className="btn-ghost min-h-9 px-3 text-xs">{t('Cancelar')}</button></form>
+                    )}
+                  </div>
+                </div>
+                {showVisit && (
+                  <Link href={`/mensagens/${v!.conv}`} className="flex items-start gap-3 rounded-xl bg-brand-soft p-3 text-sm">
+                    <CalendarIcon size={20} className="mt-0.5 shrink-0 text-brand" />
+                    <span className="flex min-w-0 flex-col">
+                      <strong className="first-letter:uppercase">{fmtVisit(v!.visit!.visit_at!)}</strong>
+                      {v!.visit!.visit_place && <span className="text-ink-2">{v!.visit!.visit_place}</span>}
+                      <span className="text-xs font-semibold text-brand-dark">{v!.visit!.visit_confirmed_at ? t('Visita confirmada') : t('Aguardando confirmação')} · {t('Abrir conversa')} →</span>
+                    </span>
+                  </Link>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
           {!requests?.length && <p className="p-8 text-center text-muted">{t('Você ainda não fez nenhum pedido.')}</p>}
         </div>
       </section>

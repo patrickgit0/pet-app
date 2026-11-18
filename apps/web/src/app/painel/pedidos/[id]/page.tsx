@@ -2,7 +2,7 @@ import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { HOME_LABEL, REQUEST_STATUS_LABEL, formatDistance, rpcErrorMessage, type RequestStatus } from '@adotai/shared';
+import { HOME_LABEL, REQUEST_STATUS_LABEL, formatDistance, formatPhone, rpcErrorMessage, type RequestStatus } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/server';
 import { getMyNgo } from '@/lib/ngo';
 import { CheckIcon } from '@/components/icons';
@@ -51,7 +51,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 
       <section className="card grid gap-3 p-5 text-sm sm:grid-cols-2">
-        <Info k={t('Verificação')} v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> {t('CPF verificado · celular informado')}</> : t('Incompleta')}</span>} />
+        <Info k={t('Celular')} v={c?.phone ? <a href={`tel:${c.phone}`} className="font-bold text-brand underline">{formatPhone(c.phone.replace(/^\+55/, ''))}</a> : '—'} />
+        <Info k={t('Verificação')} v={<span className="flex items-center gap-1 font-bold text-brand-dark">{c?.cpf_verified ? <><CheckIcon size={14} /> {t('CPF verificado')}</> : t('Incompleta')}</span>} />
         <Info k={t('Bairro')} v={`${c?.neighborhood ?? '—'}${c?.distance_km != null ? ` · ${t('{d} da ONG', { d: formatDistance(Number(c.distance_km), lang) })}` : ''}`} />
         <Info k={t('Moradia')} v={c?.home_type ? t(HOME_LABEL[c.home_type]) : '—'} />
         <Info k={t('Quintal')} v={c?.has_yard == null ? '—' : c.has_yard ? t('Sim') : t('Não')} />
@@ -62,11 +63,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {ct ? (
         <section className="card flex flex-col gap-1 border-brand p-5 text-sm">
           <h2 className="mb-1 font-extrabold">{t('Contato do adotante')}</h2>
-          <span>{t('Celular:')} <strong>{ct.phone}</strong></span>
           <span>{t('Endereço:')} <strong>{ct.street}{ct.complement ? `, ${ct.complement}` : ''} — {ct.neighborhood}, {ct.city}/{ct.state} · CEP {ct.cep}</strong></span>
         </section>
       ) : (
-        <p className="text-xs text-muted">{t('Celular e endereço completo aparecem aqui depois que você aprovar o pedido. O CPF nunca é exibido.')}</p>
+        <p className="text-xs text-muted">{t('O endereço completo aparece aqui depois que você aprovar o pedido. O CPF nunca é exibido.')}</p>
       )}
 
       <div className="flex flex-wrap gap-2">
@@ -81,7 +81,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {open && (
         <form action={setStatus.bind(null, id, 'rejected')} className="card flex flex-col gap-2 p-4">
           <label className="label" htmlFor="reason">{t('Recusar pedido')}</label>
-          <input id="reason" name="reason" placeholder={t('Motivo (o adotante verá esta mensagem)')} className="field" required />
+          <span className="text-xs text-muted">{t('O motivo é opcional. Se escrever, o adotante verá a mensagem.')}</span>
+          <input id="reason" name="reason" placeholder={t('Motivo (opcional)')} className="field" />
           <button className="btn self-start text-red-700 ring-[1.5px] ring-red-200 ring-inset">{t('Recusar')}</button>
         </form>
       )}

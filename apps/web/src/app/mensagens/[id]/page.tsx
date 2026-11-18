@@ -17,7 +17,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   const { data: conv } = await supabase
     .from('conversations')
-    .select('id, animal_id, adopter_id, ngo_id, blocked_at, animals(id, name), ngos(name), profiles!conversations_adopter_id_fkey(full_name)')
+    .select('id, animal_id, adopter_id, ngo_id, blocked_at, animals(id, name), ngos(name, address_text, neighborhood, city, state), profiles!conversations_adopter_id_fkey(full_name)')
     .eq('id', id)
     .maybeSingle();
   if (!conv) notFound();
@@ -76,6 +76,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         blocked={Boolean(conv.blocked_at)}
         initial={messages ?? []}
         requestId={isNgo ? request?.id : undefined}
+        defaultPlace={isNgo ? [conv.ngos?.name, conv.ngos?.address_text || [conv.ngos?.neighborhood, conv.ngos?.city].filter(Boolean).join(', ')].filter(Boolean).join(' — ') : ''}
       />
     </main>
   );

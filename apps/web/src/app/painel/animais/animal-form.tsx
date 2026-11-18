@@ -1,11 +1,12 @@
 'use client';
 
 import { useI18n } from '@/i18n/client';
-import { useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ENERGY_LABEL, SIZE_LABEL, type Database, type AnimalSize, type EnergyLevel } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/client';
 import { photoUrl } from '@/lib/utils';
+import { PlusIcon } from '@/components/icons';
 
 type Animal = Database['public']['Tables']['animals']['Row'];
 type Photo = { id: string; storage_path: string; position: number };
@@ -25,6 +26,12 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [current, setCurrent] = useState<Photo[]>(photos);
+  const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
+  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+  const addFiles = (list: FileList | null) => {
+    const ok = Array.from(list ?? []).filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
+    setFiles((cur) => [...cur, ...ok].slice(0, 10));
+  };
   const { t } = useI18n();
 
   function submit(formData: FormData) {
@@ -103,10 +110,19 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
           </select>
         </F>
         <F label="Idade aproximada">
-          <div className="flex gap-2">
-            <input name="age_years" type="number" min={0} max={25} defaultValue={Math.floor(ageM / 12)} className="field" aria-label={t('Anos')} />
-            <input name="age_months" type="number" min={0} max={11} defaultValue={ageM % 12} className="field" aria-label={t('Meses')} />
+          <div className="grid grid-cols-2 gap-2">
+            <span className="flex items-center rounded-xl bg-white ring-[1.5px] ring-line-2 ring-inset focus-within:ring-brand">
+              <input name="age_years" type="number" inputMode="numeric" min={0} max={25} defaultValue={Math.floor(ageM / 12)} aria-label={t('Anos')}
+                className="h-12 w-full min-w-0 bg-transparent pl-3.5 text-[15px] outline-none" />
+              <span className="pr-3.5 text-sm text-muted">{t('anos')}</span>
+            </span>
+            <span className="flex items-center rounded-xl bg-white ring-[1.5px] ring-line-2 ring-inset focus-within:ring-brand">
+              <input name="age_months" type="number" inputMode="numeric" min={0} max={11} defaultValue={ageM % 12} aria-label={t('Meses')}
+                className="h-12 w-full min-w-0 bg-transparent pl-3.5 text-[15px] outline-none" />
+              <span className="pr-3.5 text-sm text-muted">{t('meses')}</span>
+            </span>
           </div>
+          <span className="text-xs text-muted">{t('Ex.: 1 ano e 6 meses. Filhote de 3 meses: 0 anos e 3 meses.')}</span>
         </F>
         <F label="Energia">
           <select name="energy" defaultValue={animal?.energy ?? ''} className="field">
@@ -136,19 +152,23 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
 
       <div className="flex flex-col gap-2">
         <span className="label">{t('Fotos')}</span>
-        {current.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {current.map((p) => (
-              <div key={p.id} className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photoUrl(p.storage_path)!} alt="" className="h-20 w-20 rounded-lg object-cover" />
-                <button type="button" onClick={() => removePhoto(p)} aria-label={t('Remover foto')} className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white text-xs font-bold shadow">✕</button>
-              </div>
-            ))}
-          </div>
-        )}
-        <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e) => setFiles(Array.from(e.target.files ?? []))} className="text-sm" />
-        <span className="text-xs text-muted">{t('A primeira foto vira a capa do anúncio.')}</span>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {current.map((p, i) => (
+            <Thumb key={p.id} src={photoUrl(p.storage_path)!} cover={i === 0} onRemove={() => removePhoto(p)} />
+          ))}
+          {previews.map((src, i) => (
+            <Thumb key={src} src={src} cover={current.length === 0 && i === 0} isNew onRemove={() => setFiles((f) => f.filter((_, j) => j !== i))} />
+          ))}
+          <label
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); addFiles(e.dataTransfer.files); }}
+            className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line-2 bg-ground text-center text-xs font-semibold text-muted hover:border-brand hover:text-brand">
+            <PlusIcon size={22} />
+            {t('Adicionar fotos')}
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} />
+          </label>
+        </div>
+        <span className="text-xs text-muted">{t('A primeira foto vira a capa do anúncio. JPG, PNG ou WebP. Fotos claras e de frente adotam mais.')}</span>
       </div>
 
       <label className="flex items-center gap-2.5 text-sm font-semibold">
@@ -166,4 +186,18 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   const { t } = useI18n();
   return <label className="flex flex-col gap-1.5"><span className="label">{t(label)}</span>{children}</label>;
+}
+
+function Thumb({ src, cover, isNew, onRemove }: { src: string; cover: boolean; isNew?: boolean; onRemove: () => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="relative aspect-square overflow-hidden rounded-xl bg-field">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="h-full w-full object-cover" />
+      {cover && <span className="absolute bottom-1.5 left-1.5 rounded-md bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">{t('Capa')}</span>}
+      {isNew && <span className="absolute top-1.5 left-1.5 rounded-md bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-ink">{t('Nova')}</span>}
+      <button type="button" onClick={onRemove} aria-label={t('Remover foto')}
+        className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-xs font-bold shadow hover:bg-white">✕</button>
+    </div>
+  );
 }

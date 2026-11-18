@@ -510,4 +510,27 @@ export const EN: Record<string, string> = {
   '{a} pedidos · {b} adoções': '{a} requests · {b} adoptions',
   'Papel de {name}': 'Role of {name}',
   'Nenhum usuário encontrado.': 'No users found.',
+
+  // Ajustes 18/11 (visita, fotos, Instagram, candidato)
+  Hoje: 'Today',
+  Amanhã: 'Tomorrow',
+  'Dia da visita': 'Visit day',
+  Horário: 'Time',
+  'Escolha o dia': 'Pick a day',
+  'pedido em {d}': 'requested on {d}',
+  anos: 'years',
+  meses: 'months',
+  'Ex.: 1 ano e 6 meses. Filhote de 3 meses: 0 anos e 3 meses.': 'E.g. 1 year and 6 months. A 3-month-old puppy: 0 years and 3 months.',
+  'Adicionar fotos': 'Add photos',
+  'A primeira foto vira a capa do anúncio. JPG, PNG ou WebP. Fotos claras e de frente adotam mais.':
+    'The first photo becomes the listing cover. JPG, PNG or WebP. Bright, front-facing photos get adopted more.',
+  Capa: 'Cover',
+  Instagram: 'Instagram',
+  usuario_da_ong: 'shelter_username',
+  'Aparece na página pública da ONG.': "Shown on the shelter's public page.",
+  'CPF verificado': 'CPF verified',
+  'O endereço completo aparece aqui depois que você aprovar o pedido. O CPF nunca é exibido.':
+    'The full address appears here after you approve the request. The CPF is never shown.',
+  'O motivo é opcional. Se escrever, o adotante verá a mensagem.': 'The reason is optional. If you write one, the adopter will see it.',
+  'Motivo (opcional)': 'Reason (optional)',
 };
