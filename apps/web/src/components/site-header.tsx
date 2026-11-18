@@ -32,7 +32,7 @@ export async function SiteHeader() {
             <Link href="/mensagens" className="relative">
               Mensagens
               {unread > 0 && (
-                <span className="absolute -top-2 -right-4 rounded-full bg-accent px-1.5 text-[10px] font-extrabold text-ink">
+                <span className="ml-1 rounded-full bg-accent px-1.5 text-[10px] font-extrabold text-ink lg:absolute lg:-top-2 lg:-right-4 lg:ml-0">
                   {unread}
                 </span>
               )}

@@ -398,6 +398,23 @@ isOneToOne: false
             "accept_adoption_term":
 { Args: { "p_adoption_id": string }; Returns: undefined
                            },
+"admin_dashboard":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"admin_list_users":
+{ Args: { "p_limit"?: number,"p_offset"?: number,"p_query"?: string,"p_role"?: Database["public"]['Enums']["user_role"] }; Returns: {
+              "adoptions": number,"city": string,"created_at": string,"email": string,"full_name": string,"id": string,"last_sign_in_at": string,"neighborhood": string,"ngo_name": string,"phone_verified": boolean,"profile_complete": boolean,"requests": number,"role": Database["public"]['Enums']["user_role"],"total_count": number
+            }[]
+                           },
+"admin_resolve_report":
+{ Args: { "p_report_id": string }; Returns: undefined
+                           },
+"admin_set_animal_status":
+{ Args: { "p_animal_id": string,"p_status": Database["public"]['Enums']["animal_status"] }; Returns: undefined
+                           },
+"admin_set_user_role":
+{ Args: { "p_role": Database["public"]['Enums']["user_role"],"p_user_id": string }; Returns: undefined
+                           },
 "admin_verify_ngo":
 { Args: { "p_ngo_id": string,"p_verified": boolean }; Returns: undefined
                            },

@@ -1,56 +1,199 @@
-import { notFound } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
-import { createClient, getSession } from '@/lib/supabase/server';
-import { formatCnpj } from '@adotai/shared';
+import Link from 'next/link';
+import { getSession } from '@/lib/supabase/server';
+import { formatRating } from '@adotai/shared';
+import { Badge, PageTitle } from './ui';
 
-export const metadata = { title: 'Admin' };
+type Dash = {
+  users: { total: number; adopters: number; ngo_members: number; complete: number; new_7d: number; new_30d: number };
+  active_7d: number;
+  ngos: { total: number; verified: number; pending: number };
+  animals: { available: number; reserved: number; adopted: number; draft: number; archived: number; dogs: number; cats: number; no_photo: number; median_days_waiting: number | null };
+  requests: { open: number; waiting_48h: number; approved: number; rejected: number; cancelled: number; last_30d: number };
+  adoptions: { total: number; last_30d: number; returned: number };
+  checkins: { late: number; needs_help: number; answered_rate: number | null };
+  messages_7d: number;
+  reports_open: number;
+  funnel: { signed_up: number; completed: number; requested: number; adopted: number };
+  weekly: { week: string; signups: number; requests: number; adoptions: number }[];
+  ngo_health: { id: string; name: string; slug: string; verified: boolean; rating: number | null; adoptions: number; response_min: number | null; available: number; open_requests: number; stale_requests: number; late_checkins: number }[];
+};
 
-async function verify(ngoId: string, ok: boolean) {
-  'use server';
-  const supabase = await createClient();
-  await supabase.rpc('admin_verify_ngo', { p_ngo_id: ngoId, p_verified: ok });
-  revalidatePath('/admin');
-}
+export default async function AdminHome() {
+  const { supabase } = await getSession();
+  const { data, error } = await supabase.rpc('admin_dashboard');
+  if (error || !data) return <p className="card p-4 text-sm text-red-700">Não foi possível carregar os indicadores.</p>;
+  const d = data as unknown as Dash;
 
-export default async function Page() {
-  const { supabase, profile } = await getSession();
-  if (profile?.role !== 'admin') notFound();
-  const [{ data: ngos }, { data: reports }] = await Promise.all([
-    supabase.from('ngos').select('id, name, cnpj, city, email, verified_at, created_at').order('verified_at', { nullsFirst: true }).order('created_at'),
-    supabase.from('reports').select('id, target_type, reason, created_at').is('resolved_at', null).order('created_at', { ascending: false }),
-  ]);
+  // "Precisa de atenção": só o que exige ação de alguém
+  const alerts = [
+    d.ngos.pending > 0 && { n: d.ngos.pending, text: d.ngos.pending === 1 ? 'ONG aguardando verificação' : 'ONGs aguardando verificação', href: '/admin/ongs?status=pendente', tone: 'warn' as const },
+    d.requests.waiting_48h > 0 && { n: d.requests.waiting_48h, text: 'pedidos sem resposta há mais de 48 h', href: '/admin/pedidos?status=parado', tone: 'bad' as const },
+    d.checkins.needs_help > 0 && { n: d.checkins.needs_help, text: 'adotantes pediram ajuda e a ONG ainda não respondeu', href: '/admin/adocoes?filtro=ajuda', tone: 'bad' as const },
+    d.checkins.late > 0 && { n: d.checkins.late, text: 'check-ins de pós-adoção atrasados', href: '/admin/adocoes?filtro=atrasado', tone: 'warn' as const },
+    d.reports_open > 0 && { n: d.reports_open, text: 'denúncias abertas', href: '/admin/denuncias', tone: 'bad' as const },
+    d.animals.no_photo > 0 && { n: d.animals.no_photo, text: 'anúncios sem foto (adotam bem menos)', href: '/admin/animais?filtro=sem-foto', tone: 'warn' as const },
+  ].filter(Boolean) as { n: number; text: string; href: string; tone: 'warn' | 'bad' }[];
+
+  const kpis = [
+    { label: 'Adoções (30 dias)', value: d.adoptions.last_30d, sub: `${d.adoptions.total} no total` },
+    { label: 'Animais disponíveis', value: d.animals.available, sub: `${d.animals.dogs} cães · ${d.animals.cats} gatos` },
+    { label: 'Pedidos em aberto', value: d.requests.open, sub: `${d.requests.last_30d} nos últimos 30 dias` },
+    { label: 'Usuários', value: d.users.total, sub: `+${d.users.new_7d} na semana · ${d.active_7d} ativos` },
+    { label: 'ONGs', value: d.ngos.total, sub: `${d.ngos.verified} verificadas` },
+    {
+      label: 'Espera mediana',
+      value: d.animals.median_days_waiting == null ? '—' : `${Math.round(d.animals.median_days_waiting)} d`,
+      sub: 'tempo que os disponíveis estão esperando',
+    },
+  ];
+
+  const f = d.funnel;
+  const funnel = [
+    { label: 'Criaram conta', n: f.signed_up },
+    { label: 'Completaram o perfil', n: f.completed },
+    { label: 'Pediram adoção', n: f.requested },
+    { label: 'Adotaram', n: f.adopted },
+  ];
+  const top = Math.max(1, f.signed_up);
+  const weekMax = Math.max(1, ...d.weekly.map((w) => Math.max(w.signups, w.requests)));
+  const returnRate = d.adoptions.total ? Math.round((100 * d.adoptions.returned) / d.adoptions.total) : null;
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-8">
-      <h1 className="text-2xl font-extrabold">Administração</h1>
-      <section className="card overflow-x-auto">
-        <h2 className="p-4 font-extrabold">Verificação de ONGs</h2>
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="text-left text-muted"><tr><th className="p-3">ONG</th><th className="p-3">CNPJ</th><th className="p-3">Cidade</th><th className="p-3">Status</th><th className="p-3" /></tr></thead>
-          <tbody>
-            {(ngos ?? []).map((n) => (
-              <tr key={n.id} className="border-t border-line">
-                <td className="p-3"><strong>{n.name}</strong><div className="text-xs text-muted">{n.email}</div></td>
-                <td className="p-3 font-mono text-xs">
-                  <a className="text-brand underline" href={`https://brasilapi.com.br/api/cnpj/v1/${n.cnpj}`} target="_blank" rel="noreferrer">{formatCnpj(n.cnpj)}</a>
-                </td>
-                <td className="p-3">{n.city}</td>
-                <td className="p-3">{n.verified_at ? <span className="chip">Verificada</span> : <span className="rounded-md bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-ink">Pendente</span>}</td>
-                <td className="p-3 text-right">
-                  <form action={verify.bind(null, n.id, !n.verified_at)}>
-                    <button className={n.verified_at ? 'btn-ghost min-h-9 px-3 text-xs' : 'btn-primary min-h-9 px-3 text-xs'}>{n.verified_at ? 'Remover selo' : 'Verificar'}</button>
-                  </form>
-                </td>
-              </tr>
+    <>
+      <PageTitle title="Visão geral" subtitle="Como a plataforma está indo e o que precisa da sua atenção." />
+
+      <section className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {kpis.map((k) => (
+          <div key={k.label} className="card flex flex-col gap-1 p-4">
+            <span className="text-xs font-semibold text-muted">{k.label}</span>
+            <span className="text-2xl font-extrabold tabular-nums">{k.value}</span>
+            <span className="text-xs text-muted">{k.sub}</span>
+          </div>
+        ))}
+      </section>
+
+      <div className="grid gap-5 xl:grid-cols-2 [&>*]:min-w-0">
+        <section className="card p-4 sm:p-5">
+          <h2 className="mb-3 font-extrabold">Precisa de atenção</h2>
+          {alerts.length ? (
+            <ul className="flex flex-col">
+              {alerts.map((a) => (
+                <li key={a.href} className="border-t border-line first:border-0">
+                  <Link href={a.href} className="flex min-h-12 items-center gap-3 py-2 text-sm hover:text-brand">
+                    <Badge tone={a.tone}>{a.n}</Badge>
+                    <span className="flex-1">{a.text}</span>
+                    <span aria-hidden className="text-muted">›</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">Tudo em dia. Nenhuma pendência agora.</p>
+          )}
+        </section>
+
+        <section className="card p-4 sm:p-5">
+          <h2 className="font-extrabold">Funil de adoção</h2>
+          <p className="mb-4 text-xs text-muted">Adotantes em cada etapa (onde as pessoas desistem).</p>
+          <ol className="flex flex-col gap-3">
+            {funnel.map((s, i) => {
+              const prev = i ? funnel[i - 1].n : null;
+              const conv = prev ? Math.round((100 * s.n) / prev) : null;
+              return (
+                <li key={s.label} className="flex flex-col gap-1">
+                  <div className="flex justify-between text-sm">
+                    <span>{s.label}</span>
+                    <span className="font-bold tabular-nums">
+                      {s.n}
+                      {conv != null && <span className="ml-2 text-xs font-semibold text-muted">{conv}% da etapa anterior</span>}
+                    </span>
+                  </div>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-field">
+                    <div className="h-full rounded-full bg-brand" style={{ width: `${Math.max(2, (100 * s.n) / top)}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        <section className="card p-4 sm:p-5 xl:col-span-2">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="font-extrabold">Últimas 12 semanas</h2>
+              <p className="text-xs text-muted">Cadastros, pedidos e adoções por semana.</p>
+            </div>
+            <div className="flex gap-4 text-xs">
+              <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-line-2" />Cadastros</span>
+              <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-brand" />Pedidos</span>
+              <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-accent" />Adoções</span>
+            </div>
+          </div>
+          <div className="flex h-40 items-end gap-1.5 sm:gap-3">
+            {d.weekly.map((w) => (
+              <div key={w.week} className="flex h-full min-w-0 flex-1 flex-col justify-end gap-1"
+                title={`Semana de ${w.week.split('-').reverse().slice(0, 2).join('/')}: ${w.signups} cadastros, ${w.requests} pedidos, ${w.adoptions} adoções`}>
+                <div className="flex flex-1 items-end gap-px">
+                  <div className="flex-1 rounded-t bg-line-2" style={{ height: `${(100 * w.signups) / weekMax}%` }} />
+                  <div className="flex-1 rounded-t bg-brand" style={{ height: `${(100 * w.requests) / weekMax}%` }} />
+                  <div className="flex-1 rounded-t bg-accent" style={{ height: `${(100 * w.adoptions) / weekMax}%` }} />
+                </div>
+                <span className="truncate text-center text-[10px] text-muted">{w.week.split('-').reverse().slice(0, 2).join('/')}</span>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </section>
-      <section className="card p-4">
-        <h2 className="mb-2 font-extrabold">Denúncias abertas</h2>
-        {(reports ?? []).map((r) => <p key={r.id} className="border-t border-line py-2 text-sm">{r.target_type}: {r.reason}</p>)}
-        {!reports?.length && <p className="text-sm text-muted">Nenhuma denúncia aberta.</p>}
-      </section>
-    </main>
+          </div>
+        </section>
+
+        <section className="card p-4 sm:p-5">
+          <h2 className="mb-3 font-extrabold">Qualidade</h2>
+          <dl className="grid grid-cols-2 gap-4 text-sm">
+            <Stat label="Check-ins respondidos" value={d.checkins.answered_rate == null ? '—' : `${d.checkins.answered_rate}%`} />
+            <Stat label="Taxa de devolução" value={returnRate == null ? '—' : `${returnRate}%`} />
+            <Stat label="Pedidos aprovados" value={d.requests.approved} />
+            <Stat label="Pedidos recusados" value={d.requests.rejected} />
+            <Stat label="Mensagens (7 dias)" value={d.messages_7d} />
+            <Stat label="Perfis completos" value={`${d.users.complete} de ${d.users.adopters}`} />
+          </dl>
+        </section>
+
+        <section className="card overflow-hidden xl:col-span-1">
+          <h2 className="p-4 pb-2 font-extrabold sm:px-5">Saúde das ONGs</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[520px] text-sm">
+              <thead className="text-left text-xs text-muted">
+                <tr><th className="px-4 py-2 sm:px-5">ONG</th><th className="p-2">Nota</th><th className="p-2">Disponíveis</th><th className="p-2">Pedidos</th><th className="p-2">Resposta</th></tr>
+              </thead>
+              <tbody>
+                {d.ngo_health.map((n) => (
+                  <tr key={n.id} className="border-t border-line">
+                    <td className="px-4 py-2.5 sm:px-5">
+                      <Link href={`/ongs/${n.slug}`} className="font-semibold hover:text-brand">{n.name}</Link>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {!n.verified && <Badge tone="warn">Não verificada</Badge>}
+                        {n.stale_requests > 0 && <Badge tone="bad">{n.stale_requests} parados</Badge>}
+                        {n.late_checkins > 0 && <Badge tone="warn">{n.late_checkins} check-ins atrasados</Badge>}
+                      </div>
+                    </td>
+                    <td className="p-2 tabular-nums">{n.adoptions < 5 ? <span className="text-xs text-muted">Nova</span> : `★ ${formatRating(n.rating)}`}</td>
+                    <td className="p-2 tabular-nums">{n.available}</td>
+                    <td className="p-2 tabular-nums">{n.open_requests}</td>
+                    <td className="p-2 tabular-nums">{n.response_min == null ? '—' : n.response_min < 60 ? `${n.response_min} min` : `${Math.round(n.response_min / 60)} h`}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div>
+      <dt className="text-xs text-muted">{label}</dt>
+      <dd className="text-lg font-extrabold tabular-nums">{value}</dd>
+    </div>
   );
 }

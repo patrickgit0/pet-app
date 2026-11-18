@@ -1,0 +1,69 @@
+import Link from 'next/link';
+import { ANIMAL_STATUS_LABEL, SIZE_LABEL, formatAge, sexLabel, type AnimalStatus } from '@adotai/shared';
+import { getSession } from '@/lib/supabase/server';
+import { setAnimalStatus } from '../actions';
+import { Badge, PageTitle, Pager, SearchBar, daysSince } from '../ui';
+
+type SP = Promise<{ q?: string; status?: string; filtro?: string; page?: string }>;
+const SIZE = 30;
+const TONE: Record<AnimalStatus, 'good' | 'warn' | 'neutral' | 'bad'> = { available: 'good', reserved: 'warn', adopted: 'neutral', draft: 'neutral', archived: 'bad' };
+
+export default async function AdminAnimals({ searchParams }: { searchParams: SP }) {
+  const sp = await searchParams;
+  const page = Math.max(1, Number(sp.page ?? 1));
+  const noPhoto = sp.filtro === 'sem-foto';
+  const { supabase } = await getSession();
+  let query = supabase
+    .from('animals')
+    .select('id, name, species, sex, size, status, birth_date_estimate, published_at, created_at, ngos(name, slug), animal_photos(id)', { count: 'exact' })
+    .order('created_at', { ascending: false });
+  if (sp.q) query = query.ilike('name', `%${sp.q}%`);
+  if (sp.status) query = query.eq('status', sp.status as AnimalStatus);
+  if (noPhoto) query = query.eq('status', 'available');
+  query = noPhoto ? query.limit(500) : query.range((page - 1) * SIZE, page * SIZE - 1);
+  const { data, count } = await query;
+  const animals = noPhoto ? (data ?? []).filter((a) => a.animal_photos.length === 0) : (data ?? []);
+
+  const href = (p: number) => `/admin/animais?${new URLSearchParams({ ...(sp.q && { q: sp.q }), ...(sp.status && { status: sp.status }), page: String(p) })}`;
+
+  return (
+    <>
+      <PageTitle title="Animais" subtitle={noPhoto ? 'Anúncios disponíveis sem foto.' : `${count ?? 0} anúncios`} />
+      <SearchBar q={sp.q} placeholder="Nome do animal">
+        <select name="status" defaultValue={sp.status ?? ''} className="field h-11 w-auto text-sm">
+          <option value="">Todos os status</option>
+          {(Object.keys(ANIMAL_STATUS_LABEL) as AnimalStatus[]).map((s) => <option key={s} value={s}>{ANIMAL_STATUS_LABEL[s]}</option>)}
+        </select>
+      </SearchBar>
+      <ul className="card divide-y divide-line">
+        {animals.map((a) => {
+          const months = a.birth_date_estimate ? Math.round((daysSince(a.birth_date_estimate) ?? 0) / 30.4) : null;
+          const waiting = a.status === 'available' ? daysSince(a.published_at ?? a.created_at) : null;
+          return (
+            <li key={a.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href={`/animais/${a.id}`} className="font-bold hover:text-brand">{a.name}</Link>
+                  <Badge tone={TONE[a.status]}>{ANIMAL_STATUS_LABEL[a.status]}</Badge>
+                  {a.animal_photos.length === 0 && <Badge tone="warn">Sem foto</Badge>}
+                </div>
+                <p className="text-xs text-muted">
+                  {a.species === 'dog' ? 'Cão' : 'Gato'} · {sexLabel(a.sex)} · {formatAge(months)} · Porte {SIZE_LABEL[a.size].toLowerCase()} ·{' '}
+                  <Link href={`/ongs/${a.ngos?.slug}`} className="hover:text-brand">{a.ngos?.name}</Link>
+                  {waiting != null && ` · esperando há ${waiting} dias`}
+                </p>
+              </div>
+              {a.status !== 'archived' ? (
+                <form action={setAnimalStatus.bind(null, a.id, 'archived')}><button className="btn-ghost min-h-9 px-3 text-xs">Arquivar anúncio</button></form>
+              ) : (
+                <form action={setAnimalStatus.bind(null, a.id, 'available')}><button className="btn-ghost min-h-9 px-3 text-xs">Reativar</button></form>
+              )}
+            </li>
+          );
+        })}
+        {!animals.length && <li className="p-6 text-center text-sm text-muted">Nenhum animal encontrado.</li>}
+      </ul>
+      {!noPhoto && <Pager page={page} total={count ?? 0} size={SIZE} href={href} />}
+    </>
+  );
+}
