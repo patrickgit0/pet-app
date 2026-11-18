@@ -13,7 +13,7 @@ export function AuthForm({ mode, next }: { mode: 'signin' | 'signup'; next?: str
       <h1 className="text-2xl font-extrabold">{isSignup ? 'Criar conta' : 'Entrar'}</h1>
       <p className="text-sm text-muted">
         {isSignup
-          ? 'Só precisamos do básico agora. CPF e celular são pedidos apenas quando você for pedir uma adoção.'
+          ? 'Encontre seu novo melhor amigo. Leva menos de um minuto.'
           : 'Bom te ver de novo.'}
       </p>
       <input type="hidden" name="next" value={next ?? ''} />

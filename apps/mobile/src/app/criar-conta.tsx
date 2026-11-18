@@ -27,7 +27,7 @@ export default function SignUp() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 24, gap: 16 }} keyboardShouldPersistTaps="handled">
-      <Text style={s.muted}>Só o básico agora. CPF e celular são pedidos apenas quando você for pedir uma adoção.</Text>
+      <Text style={s.muted}>Encontre seu novo melhor amigo. Leva menos de um minuto.</Text>
       <Field label="Nome completo" value={name} onChangeText={setName} autoComplete="name" />
       <Field label="E-mail" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
       <Field label="Senha" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" hint="Mínimo de 8 caracteres" />
