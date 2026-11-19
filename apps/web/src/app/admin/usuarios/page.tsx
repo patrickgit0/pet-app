@@ -27,7 +27,9 @@ export default async function AdminUsers({ searchParams }: { searchParams: SP })
 
   return (
     <>
-      <PageTitle title={t('Usuários')} subtitle={t('{n} contas. O CPF nunca aparece aqui (LGPD).', { n: total })} />
+      <PageTitle title={t('Usuários')} subtitle={t('{n} contas. O CPF nunca aparece aqui (LGPD).', { n: total })}>
+        <a href="/api/admin/export/usuarios" download className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Exportar CSV')}</a>
+      </PageTitle>
       <SearchBar q={sp.q} placeholder="Nome ou e-mail">
         <select name="papel" defaultValue={sp.papel ?? ''} className="field h-11 w-auto text-sm">
           <option value="">{t('Todos')}</option><option value="adopter">{t('Adotantes')}</option><option value="ngo_member">{t('ONGs')}</option><option value="admin">{t('Admins')}</option>

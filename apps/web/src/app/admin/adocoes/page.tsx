@@ -28,7 +28,9 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
 
   return (
     <>
-      <PageTitle title={t('Adoções e pós-adoção')} subtitle={t('{n} adoções', { n: list.length })} />
+      <PageTitle title={t('Adoções e pós-adoção')} subtitle={t('{n} adoções', { n: list.length })}>
+        <a href="/api/admin/export/adocoes" download className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Exportar CSV')}</a>
+      </PageTitle>
       <nav className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
         {tabs.map((x) => (
           <Link key={x.v} href={x.v ? `/admin/adocoes?filtro=${x.v}` : '/admin/adocoes'}

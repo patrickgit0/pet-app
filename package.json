@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "description": "Adotaí — marketplace de adoção de cães e gatos (ONGs, adotantes, chat e pós-adoção)",
-  "workspaces": ["apps/web", "packages/*"],
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
   "scripts": {
     "dev:web": "npm run dev -w web",
     "build:web": "npm run build -w web",
@@ -14,6 +17,7 @@
     "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "supabase": "^3.2.0"
   }
 }

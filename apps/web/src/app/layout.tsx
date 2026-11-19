@@ -11,10 +11,14 @@ import { SITE_URL } from '@/lib/site';
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
+export const viewport = { themeColor: '#0F6E5C' };
+
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
   return {
     metadataBase: new URL(SITE_URL),
+    appleWebApp: { capable: true, title: 'Adotaí', statusBarStyle: 'default' },
+    icons: { apple: '/pwa-icon/192' },
     title: { default: t('Adotaí — adote um cão ou gato perto de você'), template: '%s · Adotaí' },
     description: t('Encontre cães e gatos para adoção perto de você, em ONGs verificadas. Converse com a ONG, peça a adoção e receba acompanhamento depois.'),
   };

@@ -35,7 +35,9 @@ export default async function AdminAnimals({ searchParams }: { searchParams: SP 
 
   return (
     <>
-      <PageTitle title={t('Animais')} subtitle={noPhoto ? t('Anúncios disponíveis sem foto.') : t('{n} anúncios', { n: count ?? 0 })} />
+      <PageTitle title={t('Animais')} subtitle={noPhoto ? t('Anúncios disponíveis sem foto.') : t('{n} anúncios', { n: count ?? 0 })}>
+        <a href="/api/admin/export/animais" download className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Exportar CSV')}</a>
+      </PageTitle>
       <SearchBar q={sp.q} placeholder="Nome do animal">
         <select name="especie" defaultValue={sp.especie ?? ''} className="field h-11 w-auto text-sm" aria-label={t('Espécie')}>
           <option value="">{t('Todas as espécies')}</option>

@@ -34,7 +34,9 @@ export default async function AdminRequests({ searchParams }: { searchParams: SP
 
   return (
     <>
-      <PageTitle title={t('Pedidos de adoção')} subtitle={t('{n} pedidos', { n: count ?? 0 })} />
+      <PageTitle title={t('Pedidos de adoção')} subtitle={t('{n} pedidos', { n: count ?? 0 })}>
+        <a href="/api/admin/export/pedidos" download className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Exportar CSV')}</a>
+      </PageTitle>
       <nav className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
         {tabs.map((x) => (
           <Link key={x.v} href={x.v ? `/admin/pedidos?status=${x.v}` : '/admin/pedidos'}

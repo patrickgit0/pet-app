@@ -975,4 +975,6 @@ export const EN: Record<string, string> = {
   'A ONG indica que não convive bem com cães': 'The shelter says it isn\'t good with dogs',
   'Convive bem com gatos': 'Good with cats',
   'A ONG indica que não convive bem com gatos': 'The shelter says it isn\'t good with cats',
+  'Exportar CSV': 'Export CSV',
+
 };

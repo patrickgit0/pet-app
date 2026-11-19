@@ -1,0 +1,72 @@
+# CI: a cada push/PR na main roda tipos, lint, testes, traduções, build e os testes de ponta a ponta
+# contra um Supabase local (migrations + seed). Não usa nenhum segredo nem o banco de produção.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Tipos, lint, testes e traduções
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tipos (web)
+        run: npx --prefix apps/web tsc --noEmit -p apps/web
+      - name: Lint (web)
+        run: npm run lint:web
+      - name: Testes do pacote compartilhado
+        run: node --test packages/shared/src/shared.test.ts
+      - name: Traduções (nenhum texto sem inglês)
+        run: python3 scripts/i18n-check.py
+
+  e2e:
+    name: Build e testes de ponta a ponta
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Supabase local (migrations + seed)
+        run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
+      - name: Variáveis do Supabase local
+        run: |
+          npx supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            | grep -E '^NEXT_PUBLIC_SUPABASE_(URL|ANON_KEY)=' | sed 's/"//g' >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000" >> "$GITHUB_ENV"
+      - name: Build (web)
+        run: npm run build:web
+      - name: Navegador do Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Testes de ponta a ponta
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

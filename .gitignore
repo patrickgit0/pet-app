@@ -12,3 +12,7 @@ supabase/.temp/
 supabase/.branches/
 coverage/
 apps/web/public/maplibre-gl-worker.mjs
+
+# Playwright
+test-results/
+playwright-report/

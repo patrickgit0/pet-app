@@ -24,7 +24,9 @@ export default async function AdminNgos({ searchParams }: { searchParams: SP }) 
 
   return (
     <>
-      <PageTitle title={t('ONGs')} subtitle={t('Confira o CNPJ antes de verificar. O selo aparece para os adotantes.')} />
+      <PageTitle title={t('ONGs')} subtitle={t('Confira o CNPJ antes de verificar. O selo aparece para os adotantes.')}>
+        <a href="/api/admin/export/ongs" download className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Exportar CSV')}</a>
+      </PageTitle>
       <SearchBar q={q} placeholder="Nome, e-mail ou CNPJ">
         <select name="status" defaultValue={status ?? ''} className="field h-11 w-auto text-sm">
           <option value="">{t('Todas')}</option><option value="pendente">{t('Pendentes')}</option><option value="verificada">{t('Verificadas')}</option>
