@@ -1,3 +1,4 @@
+import { SITE_URL } from '@/lib/site';
 import { ReportButton } from '@/components/report-button';
 import { NgoContact } from '@/components/ngo-contact';
 import { getI18n } from '@/i18n/server';
@@ -24,8 +25,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const rating = formatRating(ngo.rating, lang);
   const months = (b: string | null) => (b ? Math.max(0, Math.round((Date.now() - new Date(b).getTime()) / 2.63e9)) : null);
 
+  const jsonLd = {
+    '@context': 'https://schema.org', '@type': 'NGO', name: ngo.name, url: `${SITE_URL}/ongs/${ngo.slug}`,
+    description: ngo.description ?? undefined,
+    address: { '@type': 'PostalAddress', addressLocality: ngo.city, addressRegion: ngo.state, addressCountry: 'BR' },
+    sameAs: ngo.instagram ? [`https://instagram.com/${ngo.instagram}`] : undefined,
+  };
+
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <header className="card flex flex-wrap items-center gap-5 p-5 sm:p-6">
         <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand text-xl font-extrabold text-white">{initials(ngo.name)}</span>
         <div className="flex flex-1 flex-col gap-1">

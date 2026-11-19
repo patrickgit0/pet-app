@@ -6,12 +6,14 @@ import { SiteHeader } from '@/components/site-header';
 import { LangSwitch } from '@/components/lang-switch';
 import { LangProvider } from '@/i18n/client';
 import { getI18n } from '@/i18n/server';
+import { SITE_URL } from '@/lib/site';
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: t('Adotaí — adote um cão ou gato perto de você'), template: '%s · Adotaí' },
     description: t('Encontre cães e gatos para adoção perto de você, em ONGs verificadas. Converse com a ONG, peça a adoção e receba acompanhamento depois.'),
   };
@@ -32,6 +34,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/privacidade">{t('Privacidade (LGPD)')}</Link>
                 <Link href="/termo-de-adocao">{t('Termo de adoção')}</Link>
                 <Link href="/sou-ong">{t('Sou ONG')}</Link>
+                <Link href="/adotar/cachorro-em-ribeirao-preto">{t('Cães em Ribeirão Preto')}</Link>
+                <Link href="/adotar/gato-em-ribeirao-preto">{t('Gatos em Ribeirão Preto')}</Link>
                 <LangSwitch />
               </nav>
             </div>

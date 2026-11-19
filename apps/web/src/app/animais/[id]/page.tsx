@@ -1,3 +1,4 @@
+import { LANDINGS, SITE_URL } from '@/lib/site';
 import { ReportButton } from '@/components/report-button';
 import { ShareAnimal } from '@/components/share-animal';
 import { NgoContact } from '@/components/ngo-contact';
@@ -72,8 +73,20 @@ export default async function AnimalPage({ params, searchParams }: Params) {
     { ok: a.good_for_apartment, label: t('Apartamento') },
   ].filter((c) => c.ok !== null);
 
+  const landing = a.species === 'dog' ? 'cachorro-em-ribeirao-preto' : a.species === 'cat' ? 'gato-em-ribeirao-preto' : 'outros-animais-em-ribeirao-preto';
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Adotaí', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: t(LANDINGS[landing].title), item: `${SITE_URL}/adotar/${landing}` },
+      { '@type': 'ListItem', position: 3, name: a.name, item: SITE_URL + path },
+    ],
+  };
+
   return (
     <main className="mx-auto grid max-w-[1100px] gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section className="flex flex-col gap-3">
         <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl" style={{ background: tintFor(a.name) }}>
           {photos[0] ? (
