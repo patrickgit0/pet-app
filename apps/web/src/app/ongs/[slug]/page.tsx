@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (!ngo) notFound();
 
   const [{ data: animals }, { data: reviews }] = await Promise.all([
-    supabase.from('animals').select('id, name, sex, size, birth_date_estimate, animal_photos(storage_path, position)')
+    supabase.from('animals').select('id, name, code, sex, size, birth_date_estimate, animal_photos(storage_path, position)')
       .eq('ngo_id', ngo.id).eq('status', 'available').order('published_at', { ascending: false }),
     supabase.from('reviews').select('id, stars, comment, created_at').eq('ngo_id', ngo.id).order('created_at', { ascending: false }).limit(6),
   ]);
@@ -57,7 +57,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4">
           {(animals ?? []).map((a) => (
             <AnimalCard key={a.id} a={{
-              id: a.id, name: a.name, sex: a.sex, size: a.size, age_months: months(a.birth_date_estimate),
+              id: a.id, code: a.code, name: a.name, sex: a.sex, size: a.size, age_months: months(a.birth_date_estimate),
               cover_path: [...(a.animal_photos ?? [])].sort((x, y) => x.position - y.position)[0]?.storage_path ?? null,
               ngo_name: ngo.name, ngo_verified: Boolean(ngo.verified_at), ngo_rating: ngo.rating,
             }} />

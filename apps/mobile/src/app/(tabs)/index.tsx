@@ -78,6 +78,7 @@ export default function SearchScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           <Chip label="Cães" active={species === 'dog'} onPress={() => setSpecies(species === 'dog' ? null : 'dog')} />
           <Chip label="Gatos" active={species === 'cat'} onPress={() => setSpecies(species === 'cat' ? null : 'cat')} />
+          <Chip label="Outros" active={species === 'other'} onPress={() => setSpecies(species === 'other' ? null : 'other')} />
           {(Object.keys(SIZE_LABEL) as AnimalSize[]).map((sz) => (
             <Chip key={sz} label={`Porte ${SIZE_LABEL[sz].toLowerCase()}`} active={size === sz} onPress={() => setSize(size === sz ? null : sz)} />
           ))}

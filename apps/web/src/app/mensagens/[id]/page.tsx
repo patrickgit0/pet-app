@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { REQUEST_STATUS_LABEL } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, animalPath } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
 import { getI18n, pageTitle } from '@/i18n/server';
 import { tintFor } from '@/lib/utils';
@@ -17,7 +17,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   const { data: conv } = await supabase
     .from('conversations')
-    .select('id, animal_id, adopter_id, ngo_id, blocked_at, animals(id, name), ngos(name, address_text, neighborhood, city, state, opening_hours), profiles!conversations_adopter_id_fkey(full_name)')
+    .select('id, animal_id, adopter_id, ngo_id, blocked_at, animals(id, name, code), ngos(name, address_text, neighborhood, city, state, opening_hours), profiles!conversations_adopter_id_fkey(full_name)')
     .eq('id', id)
     .maybeSingle();
   if (!conv) notFound();
@@ -50,7 +50,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <Link href={participant ? '/mensagens' : '/admin/adocoes'} aria-label={t('Voltar')} className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
         <h1 className="text-lg font-extrabold">{title}</h1>
       </div>
-      <Link href={`/animais/${conv.animal_id}`} className="card flex items-center gap-3 p-3">
+      <Link href={conv.animals ? animalPath(conv.animals) : `/animais/${conv.animal_id}`} className="card flex items-center gap-3 p-3">
         <span className="h-11 w-11 rounded-xl" style={{ background: tintFor(conv.animals?.name ?? '') }} />
         <span className="flex flex-1 flex-col">
           <span className="text-sm font-bold">{conv.animals?.name}{request ? ` · ${t('Pedido de adoção')}` : ''}</span>

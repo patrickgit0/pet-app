@@ -1,11 +1,12 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { formatAge, formatDistance, formatRating, sexLabel, SIZE_LABEL, type AnimalSex, type AnimalSize } from '@adotai/shared';
+import { formatAge, formatDistance, formatRating, sexLabel, SIZE_LABEL, type AnimalSex, type AnimalSize, animalPath } from '@adotai/shared';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { PawIcon, VerifiedIcon } from './icons';
 
 export type AnimalCardData = {
   id: string;
+  code?: string | null;
   name: string;
   sex: AnimalSex;
   size: AnimalSize;
@@ -23,7 +24,7 @@ export async function AnimalCard({ a }: { a: AnimalCardData }) {
   const img = photoUrl(a.cover_path);
   const rating = formatRating(a.ngo_rating, lang);
   return (
-    <Link href={`/animais/${a.id}`} className="card flex flex-col overflow-hidden transition-shadow hover:shadow-md">
+    <Link href={animalPath(a)} className="card flex flex-col overflow-hidden transition-shadow hover:shadow-md">
       <div className="relative flex h-40 items-center justify-center" style={{ background: tintFor(a.name) }}>
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element

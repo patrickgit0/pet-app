@@ -23,7 +23,33 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "adoption_requests": {
+            "adoption_request_events": {
+                  Row: {
+                    "actor_id": string | null,"created_at": string,"id": number,"note": string | null,"request_id": string,"status": Database["public"]['Enums']["request_status"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"created_at"?: string,"id"?: never,"note"?: string | null,"request_id": string,"status": Database["public"]['Enums']["request_status"]
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"created_at"?: string,"id"?: never,"note"?: string | null,"request_id"?: string,"status"?: Database["public"]['Enums']["request_status"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "adoption_request_events_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "adoption_request_events_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "adoption_requests"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"adoption_requests": {
                   Row: {
                     "adopter_id": string,"animal_id": string,"answers": NonNullable<Json>,"approved_at": string | null,"created_at": string,"id": string,"ngo_id": string,"rejection_reason": string | null,"status": Database["public"]['Enums']["request_status"],"updated_at": string
                   }
@@ -115,14 +141,14 @@ isOneToOne: false
                   ]
                 },"animals": {
                   Row: {
-                    "birth_date_estimate": string | null,"breed": string,"created_at": string,"description": string | null,"dewormed": boolean | null,"energy": Database["public"]['Enums']["energy_level"] | null,"good_for_apartment": boolean | null,"good_with_cats": boolean | null,"good_with_dogs": boolean | null,"good_with_kids": boolean | null,"id": string,"location": unknown,"name": string,"neutered": boolean | null,"ngo_id": string,"published_at": string | null,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"special_needs": string | null,"species": Database["public"]['Enums']["species"],"status": Database["public"]['Enums']["animal_status"],"updated_at": string,"vaccinated": boolean | null
+                    "birth_date_estimate": string | null,"breed": string,"code": string,"created_at": string,"description": string | null,"dewormed": boolean | null,"energy": Database["public"]['Enums']["energy_level"] | null,"good_for_apartment": boolean | null,"good_with_cats": boolean | null,"good_with_dogs": boolean | null,"good_with_kids": boolean | null,"id": string,"location": unknown,"name": string,"neutered": boolean | null,"ngo_id": string,"published_at": string | null,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"special_needs": string | null,"species": Database["public"]['Enums']["species"],"status": Database["public"]['Enums']["animal_status"],"updated_at": string,"vaccinated": boolean | null,"vaccination_card_path": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "birth_date_estimate"?: string | null,"breed"?: string,"created_at"?: string,"description"?: string | null,"dewormed"?: boolean | null,"energy"?: Database["public"]['Enums']["energy_level"] | null,"good_for_apartment"?: boolean | null,"good_with_cats"?: boolean | null,"good_with_dogs"?: boolean | null,"good_with_kids"?: boolean | null,"id"?: string,"location"?: unknown,"name": string,"neutered"?: boolean | null,"ngo_id": string,"published_at"?: string | null,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"special_needs"?: string | null,"species": Database["public"]['Enums']["species"],"status"?: Database["public"]['Enums']["animal_status"],"updated_at"?: string,"vaccinated"?: boolean | null
+                    "birth_date_estimate"?: string | null,"breed"?: string,"code"?: string,"created_at"?: string,"description"?: string | null,"dewormed"?: boolean | null,"energy"?: Database["public"]['Enums']["energy_level"] | null,"good_for_apartment"?: boolean | null,"good_with_cats"?: boolean | null,"good_with_dogs"?: boolean | null,"good_with_kids"?: boolean | null,"id"?: string,"location"?: unknown,"name": string,"neutered"?: boolean | null,"ngo_id": string,"published_at"?: string | null,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"special_needs"?: string | null,"species": Database["public"]['Enums']["species"],"status"?: Database["public"]['Enums']["animal_status"],"updated_at"?: string,"vaccinated"?: boolean | null,"vaccination_card_path"?: string | null
                   }
                   Update: {
-                    "birth_date_estimate"?: string | null,"breed"?: string,"created_at"?: string,"description"?: string | null,"dewormed"?: boolean | null,"energy"?: Database["public"]['Enums']["energy_level"] | null,"good_for_apartment"?: boolean | null,"good_with_cats"?: boolean | null,"good_with_dogs"?: boolean | null,"good_with_kids"?: boolean | null,"id"?: string,"location"?: unknown,"name"?: string,"neutered"?: boolean | null,"ngo_id"?: string,"published_at"?: string | null,"sex"?: Database["public"]['Enums']["animal_sex"],"size"?: Database["public"]['Enums']["animal_size"],"special_needs"?: string | null,"species"?: Database["public"]['Enums']["species"],"status"?: Database["public"]['Enums']["animal_status"],"updated_at"?: string,"vaccinated"?: boolean | null
+                    "birth_date_estimate"?: string | null,"breed"?: string,"code"?: string,"created_at"?: string,"description"?: string | null,"dewormed"?: boolean | null,"energy"?: Database["public"]['Enums']["energy_level"] | null,"good_for_apartment"?: boolean | null,"good_with_cats"?: boolean | null,"good_with_dogs"?: boolean | null,"good_with_kids"?: boolean | null,"id"?: string,"location"?: unknown,"name"?: string,"neutered"?: boolean | null,"ngo_id"?: string,"published_at"?: string | null,"sex"?: Database["public"]['Enums']["animal_sex"],"size"?: Database["public"]['Enums']["animal_size"],"special_needs"?: string | null,"species"?: Database["public"]['Enums']["species"],"status"?: Database["public"]['Enums']["animal_status"],"updated_at"?: string,"vaccinated"?: boolean | null,"vaccination_card_path"?: string | null
                   }
                   Relationships: [
                     {
@@ -435,6 +461,9 @@ isOneToOne: false
 "admin_set_user_role":
 { Args: { "p_role": Database["public"]['Enums']["user_role"],"p_user_id": string }; Returns: undefined
                            },
+"admin_user_detail":
+{ Args: { "p_user_id": string }; Returns: Json
+                           },
 "admin_verify_ngo":
 { Args: { "p_ngo_id": string,"p_verified": boolean }; Returns: undefined
                            },
@@ -524,7 +553,7 @@ isOneToOne: false
                            },
 "search_animals":
 { Args: { "p_age_groups"?: (string)[],"p_good_for_apartment"?: boolean,"p_good_with_cats"?: boolean,"p_good_with_dogs"?: boolean,"p_good_with_kids"?: boolean,"p_lat": number,"p_limit"?: number,"p_lng": number,"p_neutered"?: boolean,"p_offset"?: number,"p_query"?: string,"p_radius_km"?: number,"p_sexes"?: (Database["public"]['Enums']["animal_sex"])[],"p_sizes"?: (Database["public"]['Enums']["animal_size"])[],"p_sort"?: string,"p_species"?: (Database["public"]['Enums']["species"])[],"p_verified_only"?: boolean }; Returns: {
-              "age_months": number,"approx_lat": number,"approx_lng": number,"breed": string,"cover_path": string,"distance_km": number,"good_with_kids": boolean,"id": string,"name": string,"neutered": boolean,"ngo_id": string,"ngo_name": string,"ngo_rating": number,"ngo_slug": string,"ngo_verified": boolean,"published_at": string,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"species": Database["public"]['Enums']["species"],"status": Database["public"]['Enums']["animal_status"],"total_count": number,"vaccinated": boolean
+              "age_months": number,"approx_lat": number,"approx_lng": number,"breed": string,"code": string,"cover_path": string,"distance_km": number,"good_with_kids": boolean,"id": string,"name": string,"neutered": boolean,"ngo_id": string,"ngo_name": string,"ngo_rating": number,"ngo_slug": string,"ngo_verified": boolean,"published_at": string,"sex": Database["public"]['Enums']["animal_sex"],"size": Database["public"]['Enums']["animal_size"],"species": Database["public"]['Enums']["species"],"status": Database["public"]['Enums']["animal_status"],"total_count": number,"vaccinated": boolean
             }[]
                            },
 "set_request_status":
@@ -538,7 +567,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "adoption_status": "active"|"returned","animal_sex": "male"|"female","animal_size": "small"|"medium"|"large","animal_status": "draft"|"available"|"reserved"|"adopted"|"archived","checkin_status": "pending"|"answered"|"late","energy_level": "low"|"medium"|"high","home_type": "house"|"apartment"|"farm","message_kind": "text"|"image"|"visit_proposal"|"system","ngo_member_role": "owner"|"volunteer","request_status": "sent"|"reviewing"|"visit_scheduled"|"approved"|"rejected"|"cancelled","species": "dog"|"cat","user_role": "adopter"|"ngo_member"|"admin"
+            "adoption_status": "active"|"returned","animal_sex": "male"|"female","animal_size": "small"|"medium"|"large","animal_status": "draft"|"available"|"reserved"|"adopted"|"archived","checkin_status": "pending"|"answered"|"late","energy_level": "low"|"medium"|"high","home_type": "house"|"apartment"|"farm","message_kind": "text"|"image"|"visit_proposal"|"system","ngo_member_role": "owner"|"volunteer","request_status": "sent"|"reviewing"|"visit_scheduled"|"approved"|"rejected"|"cancelled","species": "dog"|"cat"|"other","user_role": "adopter"|"ngo_member"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -658,7 +687,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "adoption_status": ["active", "returned"],"animal_sex": ["male", "female"],"animal_size": ["small", "medium", "large"],"animal_status": ["draft", "available", "reserved", "adopted", "archived"],"checkin_status": ["pending", "answered", "late"],"energy_level": ["low", "medium", "high"],"home_type": ["house", "apartment", "farm"],"message_kind": ["text", "image", "visit_proposal", "system"],"ngo_member_role": ["owner", "volunteer"],"request_status": ["sent", "reviewing", "visit_scheduled", "approved", "rejected", "cancelled"],"species": ["dog", "cat"],"user_role": ["adopter", "ngo_member", "admin"]
+            "adoption_status": ["active", "returned"],"animal_sex": ["male", "female"],"animal_size": ["small", "medium", "large"],"animal_status": ["draft", "available", "reserved", "adopted", "archived"],"checkin_status": ["pending", "answered", "late"],"energy_level": ["low", "medium", "high"],"home_type": ["house", "apartment", "farm"],"message_kind": ["text", "image", "visit_proposal", "system"],"ngo_member_role": ["owner", "volunteer"],"request_status": ["sent", "reviewing", "visit_scheduled", "approved", "rejected", "cancelled"],"species": ["dog", "cat", "other"],"user_role": ["adopter", "ngo_member", "admin"]
           }
         }
 } as const

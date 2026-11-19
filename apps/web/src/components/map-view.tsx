@@ -9,7 +9,7 @@ import { MAP_STYLE_URL } from '@adotai/shared';
 // O worker do MapLibre é servido de /public (copiado no build): o bundler do Next quebra o caminho padrão.
 maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
 
-export type MapPin = { id: string; label: string; lat: number; lng: number };
+export type MapPin = { id: string; href: string; label: string; lat: number; lng: number };
 
 /**
  * Mapa gratuito: MapLibre + OpenFreeMap (OpenStreetMap). Sem chave, sem custo.
@@ -41,7 +41,7 @@ export function MapView({ center, radiusKm, pins }: { center: { lat: number; lng
     const markers: maplibregl.Marker[] = [];
     for (const list of groups.values()) {
       const el = document.createElement('a');
-      el.href = list.length === 1 ? `/animais/${list[0].id}` : '#resultados';
+      el.href = list.length === 1 ? list[0].href : '#resultados';
       el.textContent = list.length === 1 ? list[0].label : String(list.length);
       el.className = 'rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-white shadow-md';
       el.setAttribute('aria-label', list.map((p) => p.label).join(', '));

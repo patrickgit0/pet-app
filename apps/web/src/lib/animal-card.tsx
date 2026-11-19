@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { formatAge, sexLabel, SIZE_LABEL, SPECIES_LABEL, type Lang } from '@adotai/shared';
+import { formatAge, sexLabel, SIZE_LABEL, speciesText, type Lang } from '@adotai/shared';
+import { animalRef } from '@/lib/animal-ref';
 import { createClient } from '@/lib/supabase/server';
 import { makeT } from '@/i18n';
 import { photoUrl } from '@/lib/utils';
@@ -10,12 +11,13 @@ export type CardFormat = keyof typeof CARD_SIZES;
 
 const BRAND = '#0F6E5C', ACCENT = '#E8833A', INK = '#1B1F1D', GROUND = '#F6F7F5';
 
-export async function loadCardAnimal(id: string) {
+export async function loadCardAnimal(param: string) {
+  const { col, value } = animalRef(param);
   const supabase = await createClient();
   const { data } = await supabase
     .from('animals')
-    .select('id, name, species, sex, size, birth_date_estimate, neutered, vaccinated, ngos(name, city, state), animal_photos(storage_path, position)')
-    .eq('id', id).maybeSingle();
+    .select('id, name, code, breed, species, sex, size, birth_date_estimate, neutered, vaccinated, ngos(name, city, state), animal_photos(storage_path, position)')
+    .eq(col, value).maybeSingle();
   return data;
 }
 
@@ -33,7 +35,7 @@ export function renderAnimalCard(a: CardAnimal, format: CardFormat, lang: Lang, 
   const [w, h] = CARD_SIZES[format];
   const photos = [...(a.animal_photos ?? [])].sort((x, y) => x.position - y.position);
   const photo = photoUrl(photos[0]?.storage_path);
-  const facts = [t(SPECIES_LABEL[a.species]), t(sexLabel(a.sex)), formatAge(ageMonths(a.birth_date_estimate), lang), `${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()}`];
+  const facts = [t(speciesText(a.species, a.breed)), t(sexLabel(a.sex)), formatAge(ageMonths(a.birth_date_estimate), lang), `${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()}`];
   const tags = [a.neutered && t('Castrado'), a.vaccinated && t('Vacinado')].filter(Boolean) as string[];
   const wide = format === 'og';
   const s = w / 1080; // escala de tipografia

@@ -1,3 +1,4 @@
+import { animalPath } from '@adotai/shared';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
@@ -11,7 +12,7 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
   const { t, locale } = await getI18n();
   const { data } = await supabase
     .from('adoptions')
-    .select('id, adopted_at, status, returned_at, return_reason, term_accepted_at, animals(id, name), ngos(name, slug), profiles(full_name), checkins(due_day, due_at, status, needs_help, ngo_followed_up_at)')
+    .select('id, request_id, adopter_id, adopted_at, status, returned_at, return_reason, term_accepted_at, animals(id, name, code), ngos(name, slug), profiles(full_name), checkins(due_day, due_at, status, needs_help, ngo_followed_up_at)')
     .order('adopted_at', { ascending: false })
     .limit(300);
 
@@ -41,8 +42,8 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
           <li key={a.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:gap-4">
             <div className="min-w-0 flex-1">
               <p>
-                <Link href={`/animais/${a.animals?.id}`} className="font-bold hover:text-brand">{a.animals?.name}</Link>
-                <span className="text-sm text-muted"> {t('com {name}', { name: a.profiles?.full_name })}</span>
+                <Link href={a.animals ? animalPath(a.animals) : '#'} className="font-bold hover:text-brand">{a.animals?.name}</Link>
+                <span className="text-sm text-muted"> {t('com')} </span><Link href={`/admin/usuarios/${a.adopter_id}`} className="text-sm font-semibold underline decoration-line-2 underline-offset-2 hover:text-brand">{a.profiles?.full_name}</Link>
               </p>
               <p className="text-xs text-muted">
                 <Link href={`/ongs/${a.ngos?.slug}`} className="hover:text-brand">{a.ngos?.name}</Link> · {t('adotado em {d}', { d: fmtDate(a.adopted_at, locale) })}
@@ -60,7 +61,8 @@ export default async function AdminAdoptions({ searchParams }: { searchParams: S
                 })}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Link href={`/admin/pedidos/${a.request_id}`} className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Ver histórico')}</Link>
               {a.status === 'returned' && <Badge tone="bad">{t('Devolvido')}</Badge>}
               {a.help && <Badge tone="bad">{t('Pediu ajuda')}</Badge>}
             </div>

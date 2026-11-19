@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
-import { formatAge, sexLabel, SIZE_LABEL } from '@adotai/shared';
+import { animalPath, formatAge, sexLabel, SIZE_LABEL } from '@adotai/shared';
 import { getMyNgo } from '@/lib/ngo';
 import { NgoPostKit } from '@/components/share-animal';
 import { AnimalForm } from '../animal-form';
@@ -30,7 +30,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-extrabold">{t('Editar {name}', { name: animal.name })}</h1>
-      {animal.status === 'available' && <NgoPostKit animalId={animal.id} name={animal.name} caption={caption} />}
+      {animal.status === 'available' && <NgoPostKit animalId={animal.id} path={animalPath(animal)} name={animal.name} caption={caption} />}
       <AnimalForm ngoId={ngo!.id} animal={animal} photos={photos ?? []} />
     </div>
   );

@@ -1,6 +1,7 @@
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { getSession } from '@/lib/supabase/server';
+import Link from 'next/link';
 import type { Database } from '@adotai/shared';
 import { setUserRole } from '../actions';
 import { Badge, PageTitle, Pager, SearchBar, fmtDate } from '../ui';
@@ -37,7 +38,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: SP })
           <li key={u.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <strong>{u.full_name}</strong>
+                <Link href={`/admin/usuarios/${u.id}`} className="font-bold underline decoration-line-2 underline-offset-2 hover:text-brand">{u.full_name}</Link>
                 <Badge tone={u.role === 'admin' ? 'bad' : u.role === 'ngo_member' ? 'good' : 'neutral'}>{t(ROLE[u.role])}</Badge>
                 {u.role === 'adopter' && (u.profile_complete ? <Badge tone="good">{t('Perfil completo')}</Badge> : <Badge>{t('Só cadastro')}</Badge>)}
               </div>

@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { ANIMAL_STATUS_LABEL, SPECIES_LABEL } from '@adotai/shared';
+import { ANIMAL_STATUS_LABEL, speciesText } from '@adotai/shared';
 import { getMyNgo } from '@/lib/ngo';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';
@@ -10,7 +10,7 @@ export default async function Page() {
   const { t } = await getI18n();
   const { data } = await supabase
     .from('animals')
-    .select('id, name, species, status, updated_at, animal_photos(storage_path, position)')
+    .select('id, name, species, breed, status, updated_at, animal_photos(storage_path, position)')
     .eq('ngo_id', ngo!.id).neq('status', 'archived').order('updated_at', { ascending: false });
 
   return (
@@ -29,7 +29,7 @@ export default async function Page() {
                 {cover && <img src={photoUrl(cover.storage_path)!} alt="" className="h-full w-full object-cover" />}
               </div>
               <div className="flex flex-wrap items-center justify-between gap-1 p-3">
-                <span><strong>{a.name}</strong> <span className="text-xs text-muted">· {t(SPECIES_LABEL[a.species])}</span></span>
+                <span><strong>{a.name}</strong> <span className="text-xs text-muted">· {t(speciesText(a.species, a.breed))}</span></span>
                 <span className="chip">{t(ANIMAL_STATUS_LABEL[a.status])}</span>
               </div>
             </Link>

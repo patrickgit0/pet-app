@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { REQUEST_STATUS_LABEL, type RequestStatus } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, type RequestStatus, animalPath } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
 import { Badge, PageTitle, Pager, daysSince, fmtDate } from '../ui';
 
@@ -18,7 +18,7 @@ export default async function AdminRequests({ searchParams }: { searchParams: SP
   const { t, locale } = await getI18n();
   let query = supabase
     .from('adoption_requests')
-    .select('id, status, created_at, updated_at, rejection_reason, animals(id, name), ngos(name, slug), profiles(full_name, neighborhood, city)', { count: 'exact' })
+    .select('id, status, created_at, updated_at, rejection_reason, adopter_id, animals(id, name, code), ngos(name, slug), profiles(full_name, neighborhood, city)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range((page - 1) * SIZE, page * SIZE - 1);
   if (sp.status === 'abertos') query = query.in('status', OPEN);
@@ -51,9 +51,9 @@ export default async function AdminRequests({ searchParams }: { searchParams: SP
             <li key={r.id} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:gap-4">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <strong>{r.profiles?.full_name}</strong>
+                  <Link href={`/admin/usuarios/${r.adopter_id}`} className="font-bold underline decoration-line-2 underline-offset-2 hover:text-brand">{r.profiles?.full_name}</Link>
                   <span className="text-sm text-muted">{t('quer adotar')}</span>
-                  <Link href={`/animais/${r.animals?.id}`} className="font-bold hover:text-brand">{r.animals?.name}</Link>
+                  <Link href={r.animals ? animalPath(r.animals) : '#'} className="font-bold hover:text-brand">{r.animals?.name}</Link>
                 </div>
                 <p className="text-xs text-muted">
                   <Link href={`/ongs/${r.ngos?.slug}`} className="hover:text-brand">{r.ngos?.name}</Link>
@@ -62,7 +62,8 @@ export default async function AdminRequests({ searchParams }: { searchParams: SP
                   {r.rejection_reason && ` · ${t('motivo:')} ${r.rejection_reason}`}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Link href={`/admin/pedidos/${r.id}`} className="btn-ghost min-h-9 bg-white px-3 text-xs">{t('Ver histórico')}</Link>
                 <Badge tone={TONE[r.status]}>{t(REQUEST_STATUS_LABEL[r.status])}</Badge>
                 {stale && <Badge tone="bad">{t('{n} dias sem resposta', { n: age })}</Badge>}
               </div>

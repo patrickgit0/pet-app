@@ -2,7 +2,7 @@ import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
-import { REQUEST_STATUS_LABEL } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, animalPath } from '@adotai/shared';
 import { createClient, getSession } from '@/lib/supabase/server';
 import { CalendarIcon } from '@/components/icons';
 
@@ -30,7 +30,7 @@ export default async function Page() {
   const { supabase, user } = await getSession();
   const { t, locale } = await getI18n();
   const [{ data: requests }, { data: checkins }, { data: convs }] = await Promise.all([
-    supabase.from('adoption_requests').select('id, status, rejection_reason, created_at, animal_id, animals(id, name), ngos(name), adoptions(id)')
+    supabase.from('adoption_requests').select('id, status, rejection_reason, created_at, animal_id, animals(id, name, code), ngos(name), adoptions(id)')
       .eq('adopter_id', user!.id).order('created_at', { ascending: false }),
     supabase.from('checkins').select('id, due_day, due_at, status, adoptions!inner(adopter_id, animals(name))')
       .eq('adoptions.adopter_id', user!.id).in('status', ['pending', 'late']).lte('due_at', new Date(Date.now() + 864e5).toISOString()),
@@ -75,7 +75,7 @@ export default async function Page() {
               <div key={r.id} className="flex flex-col gap-3 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex min-w-0 flex-col">
-                    <Link href={`/animais/${r.animals?.id}`} className="font-bold">{r.animals?.name ?? t('Animal')}</Link>
+                    <Link href={r.animals ? animalPath(r.animals) : '#'} className="font-bold">{r.animals?.name ?? t('Animal')}</Link>
                     <span className="text-xs text-muted">{r.ngos?.name} · {t('pedido em {d}', { d: new Date(r.created_at).toLocaleDateString(locale) })}</span>
                     {r.status === 'rejected' && r.rejection_reason && <span className="text-xs text-muted">{t('Motivo:')} {r.rejection_reason}</span>}
                   </div>

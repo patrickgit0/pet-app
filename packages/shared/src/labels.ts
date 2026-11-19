@@ -9,8 +9,14 @@ export type HomeType = Enums['home_type'];
 export type RequestStatus = Enums['request_status'];
 export type AnimalStatus = Enums['animal_status'];
 
-export const SPECIES_LABEL: Record<Species, string> = { dog: 'Cão', cat: 'Gato' };
-export const SPECIES_PLURAL: Record<Species, string> = { dog: 'Cães', cat: 'Gatos' };
+export const SPECIES_LABEL: Record<Species, string> = { dog: 'Cão', cat: 'Gato', other: 'Outro' };
+export const SPECIES_PLURAL: Record<Species, string> = { dog: 'Cães', cat: 'Gatos', other: 'Outros' };
+export const SPECIES_ORDER: Species[] = ['dog', 'cat', 'other'];
+
+/** Espécie para exibir: em "outro", a raça guarda qual é o animal (ex.: Coelho). */
+export function speciesText(species: Species, breed?: string | null): string {
+  return species === 'other' && breed && breed !== 'SRD' ? breed : SPECIES_LABEL[species];
+}
 export const SIZE_LABEL: Record<AnimalSize, string> = { small: 'Pequeno', medium: 'Médio', large: 'Grande' };
 export const ENERGY_LABEL: Record<EnergyLevel, string> = { low: 'Baixa', medium: 'Média', high: 'Alta' };
 export const HOME_LABEL: Record<HomeType, string> = { house: 'Casa', apartment: 'Apartamento', farm: 'Chácara' };
@@ -52,6 +58,17 @@ export const SORT_OPTIONS = [
 export type SortOption = (typeof SORT_OPTIONS)[number]['value'];
 
 export const RADIUS_OPTIONS_KM = [5, 10, 25, 50] as const;
+
+/** "Thor Bolinha" -> "thor-bolinha" (sem acento, só letras, números e hífen). */
+export function slugify(text: string): string {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'pet';
+}
+
+/** Link do anúncio: /animais/thor-3f2a9c. Sem código (dados antigos), cai no id. */
+export function animalPath(a: { id: string; name?: string | null; code?: string | null }): string {
+  return a.code ? `/animais/${slugify(a.name ?? '')}-${a.code}` : `/animais/${a.id}`;
+}
 
 /** Idioma da interface. Textos de domínio ficam em pt-BR e são traduzidos na camada de UI. */
 export type Lang = 'pt' | 'en';

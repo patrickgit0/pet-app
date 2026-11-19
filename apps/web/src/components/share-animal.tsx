@@ -4,38 +4,33 @@ import { useState } from 'react';
 import { useI18n } from '@/i18n/client';
 import { WhatsAppGlyph } from './whatsapp-glyph';
 
-const pageUrl = (id: string) => `${window.location.origin}/animais/${id}`;
+const fullUrl = (path: string) => `${window.location.origin}${path}`;
 
-/** Compartilhar o animal: WhatsApp, menu do celular (com a imagem pronta quando possível) e copiar link. */
-export function ShareAnimal({ animalId, name }: { animalId: string; name: string }) {
+/** Compartilhar o link do anúncio: WhatsApp, menu do celular e copiar. A prévia com foto aparece sozinha no link. */
+export function ShareAnimal({ path, name }: { path: string; name: string }) {
   const { t } = useI18n();
   const [msg, setMsg] = useState<string | null>(null);
   const text = () => t('Conheça {name}, para adoção no Adotaí:', { name });
 
   async function nativeShare() {
-    const url = pageUrl(animalId);
-    try {
-      const blob = await (await fetch(`/api/card/${animalId}?formato=feed`)).blob();
-      const file = new File([blob], `adotai-${animalId}.png`, { type: 'image/png' });
-      if (navigator.canShare?.({ files: [file] })) return await navigator.share({ files: [file], text: `${text()} ${url}` });
-      if (navigator.share) return await navigator.share({ title: name, text: text(), url });
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return;
+    if (navigator.share) {
+      try { return await navigator.share({ title: name, text: text(), url: fullUrl(path) }); }
+      catch (e) { if ((e as Error).name === 'AbortError') return; }
     }
     copy();
   }
 
   async function copy() {
-    await navigator.clipboard.writeText(pageUrl(animalId));
-    setMsg(t('Link copiado.'));
-    setTimeout(() => setMsg(null), 2500);
+    try { await navigator.clipboard.writeText(fullUrl(path)); setMsg(t('Link copiado.')); }
+    catch { setMsg(fullUrl(path)); }
+    setTimeout(() => setMsg(null), 4000);
   }
 
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-semibold text-muted">{t('Conhece alguém que adotaria? Compartilhe:')}</span>
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${text()} ${pageUrl(animalId)}`)}`, '_blank', 'noopener')}
+        <button type="button" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${text()} ${fullUrl(path)}`)}`, '_blank', 'noopener')}
           className="btn min-h-10 bg-[#1FA855] px-3 text-sm text-white hover:bg-[#178a45]">
           <WhatsAppGlyph /> WhatsApp
         </button>
@@ -45,16 +40,16 @@ export function ShareAnimal({ animalId, name }: { animalId: string; name: string
         </button>
         <button type="button" onClick={copy} className="btn-ghost min-h-10 bg-white px-3 text-sm">{t('Copiar link')}</button>
       </div>
-      {msg && <span role="status" className="text-xs font-semibold text-brand-dark">{msg}</span>}
+      {msg && <span role="status" className="break-all text-xs font-semibold text-brand-dark">{msg}</span>}
     </div>
   );
 }
 
 /** Painel de divulgação para a ONG: prévia do post, baixar feed/stories e legenda pronta. */
-export function NgoPostKit({ animalId, name, caption }: { animalId: string; name: string; caption: string }) {
+export function NgoPostKit({ animalId, path, name, caption }: { animalId: string; path: string; name: string; caption: string }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
-  const full = () => caption.replace('{url}', pageUrl(animalId));
+  const full = () => caption.replace('{url}', fullUrl(path));
 
   return (
     <section className="card flex flex-col gap-4 p-4 sm:p-6">
@@ -72,7 +67,7 @@ export function NgoPostKit({ animalId, name, caption }: { animalId: string; name
           </div>
           <label className="flex flex-col gap-1.5">
             <span className="label">{t('Legenda pronta')}</span>
-            <textarea readOnly value={caption.replace('{url}', `…/animais/${animalId}`)} rows={6} className="field h-auto py-3 text-sm" />
+            <textarea readOnly value={caption.replace('{url}', `…${path}`)} rows={6} className="field h-auto py-3 text-sm" />
           </label>
           <button type="button" className="btn-ghost min-h-10 self-start bg-white px-3 text-sm"
             onClick={async () => { await navigator.clipboard.writeText(full()); setCopied(true); setTimeout(() => setCopied(false), 2500); }}>

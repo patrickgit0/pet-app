@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import {
   AGE_GROUPS, PILOT_CITY, RADIUS_OPTIONS_KM, SIZE_LABEL, SORT_OPTIONS,
-  type AnimalSize, type Species,
+  type AnimalSize, type Species, animalPath, SPECIES_ORDER, SPECIES_PLURAL,
 } from '@adotai/shared';
 import { getSession } from '@/lib/supabase/server';
 import { readSearchLocation } from '@/lib/search-location';
@@ -66,7 +66,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const total = Number(animals?.[0]?.total_count ?? 0);
   const pins = (animals ?? [])
     .filter((a) => a.approx_lat != null && a.approx_lng != null)
-    .map((a) => ({ id: a.id, label: a.name, lat: Number(a.approx_lat), lng: Number(a.approx_lng) }));
+    .map((a) => ({ id: a.id, href: animalPath(a), label: a.name, lat: Number(a.approx_lat), lng: Number(a.approx_lng) }));
 
   const activeCount = species.length + sizes.length + ages.length +
     ['castrado', 'criancas', 'caes', 'gatos', 'apartamento', 'verificadas'].filter((k) => sp[k] === '1').length + (sp.raio ? 1 : 0);
@@ -102,7 +102,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             {RADIUS_OPTIONS_KM.map((r) => <option key={r} value={r}>{t('Até {r} km', { r })}</option>)}
           </select>
         </label>
-        <Group title={t('Espécie')} name="especie" values={species} options={[{ value: 'dog', label: t('Cães') }, { value: 'cat', label: t('Gatos') }]} />
+        <Group title={t('Espécie')} name="especie" values={species} options={SPECIES_ORDER.map((s) => ({ value: s, label: t(SPECIES_PLURAL[s]) }))} />
         <Group title={t('Porte')} name="porte" values={sizes} options={(Object.keys(SIZE_LABEL) as AnimalSize[]).map((s) => ({ value: s, label: t(SIZE_LABEL[s]) }))} />
         <Group title={t('Idade')} name="idade" values={ages} options={AGE_GROUPS.map((a) => ({ value: a.value, label: t(a.label) }))} />
         <fieldset className="flex flex-col gap-2">

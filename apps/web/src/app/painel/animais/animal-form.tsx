@@ -3,7 +3,7 @@
 import { useI18n } from '@/i18n/client';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ENERGY_LABEL, SIZE_LABEL, type Database, type AnimalSize, type EnergyLevel } from '@adotai/shared';
+import { ENERGY_LABEL, SIZE_LABEL, SPECIES_LABEL, SPECIES_ORDER, type Database, type AnimalSize, type EnergyLevel, type Species } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/client';
 import { photoUrl } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';
@@ -27,6 +27,11 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [current, setCurrent] = useState<Photo[]>(photos);
+  const [species, setSpecies] = useState<Species>(animal?.species ?? 'dog');
+  const [cardPath, setCardPath] = useState<string | null>(animal?.vaccination_card_path ?? null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
+  const cardPreview = useMemo(() => (cardFile ? URL.createObjectURL(cardFile) : null), [cardFile]);
+  useEffect(() => () => { if (cardPreview) URL.revokeObjectURL(cardPreview); }, [cardPreview]);
   const [confirm, confirmDialog] = useConfirm();
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
@@ -47,10 +52,10 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
       const payload = {
         ngo_id: ngoId,
         name: String(formData.get('name')).trim(),
-        species: formData.get('species') as 'dog' | 'cat',
+        species: formData.get('species') as Species,
         sex: formData.get('sex') as 'male' | 'female',
         size: formData.get('size') as AnimalSize,
-        breed: String(formData.get('breed') || 'SRD'),
+        breed: String(formData.get('breed') || '').trim() || (formData.get('species') === 'other' ? '' : 'SRD'),
         birth_date_estimate: birth.toISOString().slice(0, 10),
         description: String(formData.get('description') || ''),
         energy: (formData.get('energy') || null) as EnergyLevel | null,
@@ -80,6 +85,17 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
         if (up.error) { setError(`Falha ao enviar ${f.name}.`); continue; }
         await supabase.from('animal_photos').insert({ animal_id: id, storage_path: path, position: pos++ });
       }
+      // Carteirinha de vacinação: uma foto só, substitui a anterior
+      if (cardFile) {
+        const ext = cardFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const path = `${ngoId}/${id}/vacina-${crypto.randomUUID()}.${ext}`;
+        const up = await supabase.storage.from('animal-photos').upload(path, cardFile, { contentType: cardFile.type });
+        if (up.error) setError('Falha ao enviar a carteirinha.');
+        else {
+          await supabase.from('animals').update({ vaccination_card_path: path }).eq('id', id);
+          if (animal?.vaccination_card_path) await supabase.storage.from('animal-photos').remove([animal.vaccination_card_path]);
+        }
+      }
       router.push('/painel/animais');
       router.refresh();
     });
@@ -92,6 +108,14 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
     setCurrent((c) => c.filter((x) => x.id !== p.id));
   }
 
+  async function removeCard() {
+    if (!cardPath || !animal) return setCardFile(null);
+    if (!(await confirm({ title: 'Remover a carteirinha?', message: 'A foto da carteirinha sai do anúncio na hora.', confirmLabel: 'Remover', tone: 'danger' }))) return;
+    await supabase.from('animals').update({ vaccination_card_path: null }).eq('id', animal.id);
+    await supabase.storage.from('animal-photos').remove([cardPath]);
+    setCardPath(null);
+  }
+
   const ageM = animal?.birth_date_estimate
     ? (new Date().getFullYear() - new Date(animal.birth_date_estimate).getFullYear()) * 12 + (new Date().getMonth() - new Date(animal.birth_date_estimate).getMonth())
     : 0;
@@ -101,10 +125,14 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
       {confirmDialog}
       <div className="grid gap-4 sm:grid-cols-2">
         <F label="Nome"><input name="name" required defaultValue={animal?.name} className="field" /></F>
-        <F label="Raça"><input name="breed" defaultValue={animal?.breed ?? 'SRD'} className="field" /></F>
         <F label="Espécie">
-          <select name="species" defaultValue={animal?.species ?? 'dog'} className="field"><option value="dog">{t('Cão')}</option><option value="cat">{t('Gato')}</option></select>
+          <select name="species" value={species} onChange={(e) => setSpecies(e.target.value as Species)} className="field">
+            {SPECIES_ORDER.map((s) => <option key={s} value={s}>{t(SPECIES_LABEL[s])}</option>)}
+          </select>
         </F>
+        {species === 'other'
+          ? <F label="Qual animal?"><input key="other" name="breed" required defaultValue={animal?.species === 'other' ? animal.breed : ''} placeholder={t('Ex.: coelho, calopsita, porquinho-da-índia')} className="field" /></F>
+          : <F label="Raça"><input key="breed" name="breed" defaultValue={animal && animal.species !== 'other' ? animal.breed : 'SRD'} className="field" /></F>}
         <F label="Sexo">
           <select name="sex" defaultValue={animal?.sex ?? 'female'} className="field"><option value="female">{t('Fêmea')}</option><option value="male">{t('Macho')}</option></select>
         </F>
@@ -173,6 +201,31 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
           </label>
         </div>
         <span className="text-xs text-muted">{t('A primeira foto vira a capa do anúncio. JPG, PNG ou WebP. Fotos claras e de frente adotam mais.')}</span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="label">{t('Carteirinha de vacinação (opcional)')}</span>
+        {cardPreview || cardPath ? (
+          <div className="flex items-center gap-3">
+            <a href={cardPreview ?? photoUrl(cardPath)!} target="_blank" rel="noopener noreferrer" className="block h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-field ring-1 ring-line">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cardPreview ?? photoUrl(cardPath)!} alt={t('Carteirinha de vacinação')} className="h-full w-full object-cover" />
+            </a>
+            <div className="flex flex-col gap-2">
+              <label className="btn-ghost min-h-10 cursor-pointer bg-white px-3 text-sm">
+                {t('Trocar foto')}
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) setCardFile(f); e.target.value = ''; }} />
+              </label>
+              <button type="button" onClick={() => (cardFile ? setCardFile(null) : removeCard())} className="text-left text-sm font-semibold text-red-700">{t('Remover')}</button>
+            </div>
+          </div>
+        ) : (
+          <label className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-line-2 bg-ground px-4 text-sm font-semibold text-muted hover:border-brand hover:text-brand">
+            <PlusIcon size={20} /> {t('Enviar foto da carteirinha')}
+            <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) setCardFile(f); e.target.value = ''; }} />
+          </label>
+        )}
+        <span className="text-xs text-muted">{t('Aparece no anúncio para quem quer adotar. Tire a foto das páginas com as vacinas, com boa luz.')}</span>
       </div>
 
       <label className="flex items-center gap-2.5 text-sm font-semibold">

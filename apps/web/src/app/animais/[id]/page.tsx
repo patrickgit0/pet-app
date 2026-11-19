@@ -2,10 +2,11 @@ import { ShareAnimal } from '@/components/share-animal';
 import { NgoContact } from '@/components/ngo-contact';
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ENERGY_LABEL, SIZE_LABEL, SPECIES_LABEL, formatAge, formatRating, sexLabel } from '@adotai/shared';
+import { ENERGY_LABEL, SIZE_LABEL, animalPath, formatAge, formatRating, sexLabel, speciesText } from '@adotai/shared';
+import { animalRef } from '@/lib/animal-ref';
 import { getSession, createClient } from '@/lib/supabase/server';
 import { photoUrl, tintFor, initials } from '@/lib/utils';
 import { ChatIcon, HeartIcon, PawIcon, VerifiedIcon } from '@/components/icons';
@@ -20,12 +21,13 @@ function ageMonths(birth: string | null): number | null {
   return (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
 }
 
-async function load(id: string) {
+async function load(param: string) {
+  const { col, value } = animalRef(param);
   const supabase = await createClient();
   const { data } = await supabase
     .from('animals')
     .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood, whatsapp, opening_hours), animal_photos(storage_path, position)')
-    .eq('id', id)
+    .eq(col, value)
     .maybeSingle();
   return data;
 }
@@ -36,7 +38,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { t } = await getI18n();
   return {
     title: t('{name} para adoção', { name: a.name }),
-    description: `${t(SPECIES_LABEL[a.species])} · ${t(sexLabel(a.sex))} · ${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()} · ${a.ngos?.name}. ${a.description ?? ''}`.slice(0, 160),
+    alternates: { canonical: animalPath(a) },
+    description: `${t(speciesText(a.species, a.breed))} · ${t(sexLabel(a.sex))} · ${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()} · ${a.ngos?.name}. ${a.description ?? ''}`.slice(0, 160),
   };
 }
 
@@ -45,12 +48,15 @@ export default async function AnimalPage({ params, searchParams }: Params) {
   const { erro } = await searchParams;
   const a = await load(id);
   if (!a || !a.ngos) notFound();
+  // Link antigo (uuid) ou nome mudou: manda para o link bonito atual
+  const path = animalPath(a);
+  if (decodeURIComponent(id) !== path.slice('/animais/'.length)) permanentRedirect(erro ? `${path}?erro=${encodeURIComponent(erro)}` : path);
   const { supabase, user, profile } = await getSession();
   const { t, lang } = await getI18n();
 
   let isFav = false;
   if (user) {
-    const { count } = await supabase.from('favorites').select('animal_id', { count: 'exact', head: true }).eq('animal_id', id);
+    const { count } = await supabase.from('favorites').select('animal_id', { count: 'exact', head: true }).eq('animal_id', a.id);
     isFav = (count ?? 0) > 0;
   }
   const isNgoMember = profile?.role === 'ngo_member';
@@ -91,7 +97,8 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           <div>
             <h1 className="text-3xl font-extrabold">{a.name}</h1>
             <p className="text-muted">
-              {t(sexLabel(a.sex))} · {formatAge(ageMonths(a.birth_date_estimate), lang)} · {t('Porte')} {t(SIZE_LABEL[a.size]).toLowerCase()} · {a.breed === 'SRD' ? t('SRD') : a.breed}
+              {[a.species === 'other' ? speciesText(a.species, a.breed) : null, t(sexLabel(a.sex)), formatAge(ageMonths(a.birth_date_estimate), lang),
+                `${t('Porte')} ${t(SIZE_LABEL[a.size]).toLowerCase()}`, a.species === 'other' ? null : a.breed === 'SRD' ? t('SRD') : a.breed].filter(Boolean).join(' · ')}
             </p>
             {a.status === 'reserved' && <span className="mt-2 inline-block rounded-lg bg-accent-soft px-2 py-1 text-xs font-bold text-accent-ink">{t('Reservado — adoção em andamento')}</span>}
           </div>
@@ -109,6 +116,18 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           <Fact k={t('Vacinas')} v={a.vaccinated == null ? t('Não informado') : a.vaccinated ? t('Em dia') : t('Pendentes')} />
           <Fact k={t('Energia')} v={a.energy ? t(ENERGY_LABEL[a.energy]) : t('Não informado')} />
         </div>
+
+        {a.vaccination_card_path && (
+          <a href={photoUrl(a.vaccination_card_path)!} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-line ring-inset hover:ring-brand">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photoUrl(a.vaccination_card_path)!} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+            <span className="flex flex-col">
+              <span className="font-bold">{t('Carteirinha de vacinação')}</span>
+              <span className="text-xs text-muted">{t('Toque para ver a foto enviada pela ONG')}</span>
+            </span>
+          </a>
+        )}
 
         {compat.length > 0 && (
           <div className="flex flex-col gap-2">
@@ -139,7 +158,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           </span>
         </Link>
 
-        <NgoContact ngo={ngo} loggedIn={Boolean(user)} animalName={a.name} next={`/animais/${a.id}`} />
+        <NgoContact ngo={ngo} loggedIn={Boolean(user)} animalName={a.name} next={path} />
 
         {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 
@@ -153,7 +172,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
             </form>
           </div>
         )}
-        {a.status === 'available' && <ShareAnimal animalId={a.id} name={a.name} />}
+        {a.status === 'available' && <ShareAnimal path={path} name={a.name} />}
         {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}
       </section>
     </main>
