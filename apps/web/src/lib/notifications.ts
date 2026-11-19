@@ -19,6 +19,9 @@ export function notificationText(t: T, kind: string, raw: unknown): string {
     case 'visit': return t('{from} propôs uma visita para conhecer {animal}.', d);
     case 'adoption': return t('Adoção de {animal} confirmada. Bem-vindo à família!', d);
     case 'checkin': return t('Hora do check-in: como está {animal}?', d);
+    case 'term_accepted': return t('{adopter} aceitou o termo de adoção de {animal}.', d);
+    case 'review': return t('Nova avaliação ({stars} de 5) na adoção de {animal}.', d);
+    case 'report': return t('Nova denúncia para analisar.', d);
     default: return t('Você tem um aviso novo.');
   }
 }

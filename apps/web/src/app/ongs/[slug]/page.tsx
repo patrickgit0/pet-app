@@ -1,3 +1,4 @@
+import { ReportButton } from '@/components/report-button';
 import { NgoContact } from '@/components/ngo-contact';
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
@@ -73,11 +74,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               <div key={r.id} className="card p-4 text-sm">
                 <span className="font-bold text-accent-ink">{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</span>
                 {r.comment && <p className="mt-1 text-ink-2">{r.comment}</p>}
+                <ReportButton type="review" id={r.id} loggedIn={Boolean(user)} className="mt-2 block" />
               </div>
             ))}
           </div>
         </section>
       )}
+      <ReportButton type="ngo" id={ngo.id} loggedIn={Boolean(user)} label="Denunciar esta ONG" className="self-start" />
     </main>
   );
 }

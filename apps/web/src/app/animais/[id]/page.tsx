@@ -1,3 +1,4 @@
+import { ReportButton } from '@/components/report-button';
 import { ShareAnimal } from '@/components/share-animal';
 import { NgoContact } from '@/components/ngo-contact';
 import { ConfirmSubmit } from '@/components/confirm';
@@ -174,6 +175,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
         )}
         {a.status === 'available' && <ShareAnimal path={path} name={a.name} />}
         {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}
+        {!isNgoMember && <ReportButton type="animal" id={a.id} loggedIn={Boolean(user)} label="Denunciar anúncio" className="self-start" />}
       </section>
     </main>
   );

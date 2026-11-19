@@ -7,6 +7,7 @@ import { ENERGY_LABEL, SIZE_LABEL, SPECIES_LABEL, SPECIES_ORDER, type Database, 
 import { createClient } from '@/lib/supabase/client';
 import { photoUrl } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';
+import { compressImage, extOf } from '@/lib/image';
 import { useConfirm } from '@/components/confirm';
 
 type Animal = Database['public']['Tables']['animals']['Row'];
@@ -78,18 +79,19 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
 
       // Upload das fotos: <ngo_id>/<animal_id>/<arquivo>
       let pos = current.length;
-      for (const f of files) {
-        const ext = f.name.split('.').pop()?.toLowerCase() || 'jpg';
+      for (const original of files) {
+        const f = await compressImage(original);
+        const ext = extOf(f);
         const path = `${ngoId}/${id}/${crypto.randomUUID()}.${ext}`;
         const up = await supabase.storage.from('animal-photos').upload(path, f, { contentType: f.type });
-        if (up.error) { setError(`Falha ao enviar ${f.name}.`); continue; }
+        if (up.error) { setError(`Falha ao enviar ${original.name}.`); continue; }
         await supabase.from('animal_photos').insert({ animal_id: id, storage_path: path, position: pos++ });
       }
       // Carteirinha de vacinação: uma foto só, substitui a anterior
       if (cardFile) {
-        const ext = cardFile.name.split('.').pop()?.toLowerCase() || 'jpg';
-        const path = `${ngoId}/${id}/vacina-${crypto.randomUUID()}.${ext}`;
-        const up = await supabase.storage.from('animal-photos').upload(path, cardFile, { contentType: cardFile.type });
+        const card = await compressImage(cardFile, 2000, 0.85); // carteirinha precisa de mais resolução para ler
+        const path = `${ngoId}/${id}/vacina-${crypto.randomUUID()}.${extOf(card)}`;
+        const up = await supabase.storage.from('animal-photos').upload(path, card, { contentType: card.type });
         if (up.error) setError('Falha ao enviar a carteirinha.');
         else {
           await supabase.from('animals').update({ vaccination_card_path: path }).eq('id', id);

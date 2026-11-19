@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <LangProvider lang={lang}>
           <SiteHeader />
           <div className="flex-1 pb-16">{children}</div>
-          <footer className="border-t border-line bg-white">
+          <footer className="border-t border-line bg-white print:hidden">
             <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-muted sm:px-6">
               <span>© {new Date().getFullYear()} Adotaí · Ribeirão Preto/SP</span>
               <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">

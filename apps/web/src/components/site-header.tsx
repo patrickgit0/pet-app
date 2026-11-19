@@ -34,7 +34,7 @@ export async function SiteHeader() {
   const isAdmin = profile?.role === 'admin';
 
   return (
-    <header className="border-b border-line bg-white">
+    <header className="border-b border-line bg-white print:hidden">
       <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-x-7 gap-y-1 px-4 pt-3 sm:px-6 lg:flex-nowrap lg:py-3.5">
         <Link href="/" className="flex items-center gap-2 text-[22px] font-extrabold text-brand">
           <PawIcon size={28} />

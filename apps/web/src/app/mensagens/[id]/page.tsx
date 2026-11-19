@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { REQUEST_STATUS_LABEL, animalPath } from '@adotai/shared';
-import { getSession } from '@/lib/supabase/server';
+import { createClient, getSession } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
+import { ConfirmSubmit } from '@/components/confirm';
+import { ReportButton } from '@/components/report-button';
 import { getI18n, pageTitle } from '@/i18n/server';
 import { tintFor } from '@/lib/utils';
 import { BackIcon } from '@/components/icons';
@@ -10,6 +13,13 @@ import { myConversationsFilter } from '@/lib/conversations';
 
 export const generateMetadata = pageTitle('Conversa');
 
+async function toggleBlock(id: string, block: boolean) {
+  'use server';
+  const supabase = await createClient();
+  await supabase.from('conversations').update({ blocked_at: block ? new Date().toISOString() : null }).eq('id', id);
+  revalidatePath(`/mensagens/${id}`);
+}
+
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ pedido?: string }> }) {
   const { id } = await params;
   const { pedido } = await searchParams;
@@ -17,7 +27,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   const { data: conv } = await supabase
     .from('conversations')
-    .select('id, animal_id, adopter_id, ngo_id, blocked_at, animals(id, name, code), ngos(name, address_text, neighborhood, city, state, opening_hours), profiles!conversations_adopter_id_fkey(full_name)')
+    .select('id, animal_id, adopter_id, ngo_id, blocked_at, blocked_by, animals(id, name, code), ngos(name, address_text, neighborhood, city, state, opening_hours), profiles!conversations_adopter_id_fkey(full_name)')
     .eq('id', id)
     .maybeSingle();
   if (!conv) notFound();
@@ -48,7 +58,21 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <main className="mx-auto flex max-w-2xl flex-col gap-3 px-4 py-6">
       <div className="flex items-center gap-2">
         <Link href={participant ? '/mensagens' : '/admin/adocoes'} aria-label={t('Voltar')} className="btn-ghost h-11 w-11 rounded-full p-0"><BackIcon /></Link>
-        <h1 className="text-lg font-extrabold">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg font-extrabold">{title}</h1>
+        {participant && (
+          <div className="flex shrink-0 items-center gap-3">
+            <ReportButton type={isNgo ? 'user' : 'ngo'} id={isNgo ? conv.adopter_id : conv.ngo_id} loggedIn />
+            {!conv.blocked_at ? (
+              <form action={toggleBlock.bind(null, id, true)}>
+                <ConfirmSubmit title="Bloquear esta conversa?" message="Ninguém mais consegue enviar mensagens aqui. Só você pode desbloquear depois." confirmLabel="Bloquear" tone="danger" className="text-xs font-semibold text-muted underline-offset-2 hover:underline">{t('Bloquear')}</ConfirmSubmit>
+              </form>
+            ) : conv.blocked_by === user!.id && (
+              <form action={toggleBlock.bind(null, id, false)}>
+                <ConfirmSubmit title="Desbloquear esta conversa?" message="As mensagens voltam a ser enviadas normalmente." confirmLabel="Desbloquear" className="text-xs font-semibold text-brand underline-offset-2 hover:underline">{t('Desbloquear')}</ConfirmSubmit>
+              </form>
+            )}
+          </div>
+        )}
       </div>
       <Link href={conv.animals ? animalPath(conv.animals) : `/animais/${conv.animal_id}`} className="card flex items-center gap-3 p-3">
         <span className="h-11 w-11 rounded-xl" style={{ background: tintFor(conv.animals?.name ?? '') }} />

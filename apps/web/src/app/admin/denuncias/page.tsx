@@ -15,6 +15,13 @@ export default async function AdminReports({ searchParams }: { searchParams: Pro
   let query = supabase.from('reports').select('id, target_type, target_id, reason, created_at, resolved_at, profiles(full_name)').order('created_at', { ascending: false }).limit(200);
   if (!all) query = query.is('resolved_at', null);
   const { data: reports } = await query;
+  const ids = (type: string) => (reports ?? []).filter((r) => r.target_type === type).map((r) => r.target_id);
+  const [{ data: ngos }, { data: reviews }] = await Promise.all([
+    supabase.from('ngos').select('id, slug, name').in('id', ids('ngo').length ? ids('ngo') : ['00000000-0000-0000-0000-000000000000']),
+    supabase.from('reviews').select('id, stars, comment, ngos(slug, name)').in('id', ids('review').length ? ids('review') : ['00000000-0000-0000-0000-000000000000']),
+  ]);
+  const ngoById = new Map((ngos ?? []).map((n) => [n.id, n]));
+  const reviewById = new Map((reviews ?? []).map((v) => [v.id, v]));
 
   return (
     <>
@@ -28,9 +35,17 @@ export default async function AdminReports({ searchParams }: { searchParams: Pro
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone="warn">{t(TARGET[r.target_type] ?? r.target_type)}</Badge>
                 {r.target_type === 'animal' && <Link href={`/animais/${r.target_id}`} className="text-sm font-semibold text-brand">{t('Abrir anúncio')}</Link>}
+                {r.target_type === 'ngo' && ngoById.get(r.target_id) && <Link href={`/ongs/${ngoById.get(r.target_id)!.slug}`} className="text-sm font-semibold text-brand">{ngoById.get(r.target_id)!.name}</Link>}
+                {r.target_type === 'user' && <Link href={`/admin/usuarios/${r.target_id}`} className="text-sm font-semibold text-brand">{t('Ver ficha')}</Link>}
+                {r.target_type === 'review' && reviewById.get(r.target_id) && (
+                  <Link href={`/ongs/${reviewById.get(r.target_id)!.ngos?.slug}`} className="text-sm font-semibold text-brand">
+                    {t('Avaliação de {s} estrelas em {ngo}', { s: reviewById.get(r.target_id)!.stars, ngo: reviewById.get(r.target_id)!.ngos?.name ?? '' })}
+                  </Link>
+                )}
                 {r.resolved_at && <Badge tone="good">{t('Resolvida')}</Badge>}
               </div>
               <p className="mt-1 text-sm">{r.reason}</p>
+              {r.target_type === 'review' && reviewById.get(r.target_id)?.comment && <p className="text-sm text-muted italic">“{reviewById.get(r.target_id)!.comment}”</p>}
               <p className="text-xs text-muted">{t('Por {name} em {d}', { name: r.profiles?.full_name ?? '—', d: fmtDate(r.created_at, locale) })}</p>
             </div>
             {!r.resolved_at && (

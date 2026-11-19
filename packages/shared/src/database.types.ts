@@ -181,14 +181,14 @@ isOneToOne: false
                   ]
                 },"conversations": {
                   Row: {
-                    "adopter_id": string,"animal_id": string,"assigned_member_id": string | null,"blocked_at": string | null,"created_at": string,"id": string,"last_message_at": string | null,"ngo_id": string
+                    "adopter_id": string,"animal_id": string,"assigned_member_id": string | null,"blocked_at": string | null,"blocked_by": string | null,"created_at": string,"id": string,"last_message_at": string | null,"ngo_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "adopter_id": string,"animal_id": string,"assigned_member_id"?: string | null,"blocked_at"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"ngo_id": string
+                    "adopter_id": string,"animal_id": string,"assigned_member_id"?: string | null,"blocked_at"?: string | null,"blocked_by"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"ngo_id": string
                   }
                   Update: {
-                    "adopter_id"?: string,"animal_id"?: string,"assigned_member_id"?: string | null,"blocked_at"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"ngo_id"?: string
+                    "adopter_id"?: string,"animal_id"?: string,"assigned_member_id"?: string | null,"blocked_at"?: string | null,"blocked_by"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"ngo_id"?: string
                   }
                   Relationships: [
                     {
@@ -206,6 +206,12 @@ isOneToOne: false
     },{
       foreignKeyName: "conversations_assigned_member_id_fkey"
       columns: ["assigned_member_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_blocked_by_fkey"
+      columns: ["blocked_by"]
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
@@ -540,7 +546,7 @@ isOneToOne: false
 { Args: { "p_ngo_id": string }; Returns: number
                            },
 "register_return":
-{ Args: { "p_adoption_id": string,"p_reason": string }; Returns: undefined
+{ Args: { "p_adoption_id": string,"p_reason": string,"p_relist"?: boolean }; Returns: undefined
                            },
 "request_adoption":
 { Args: { "p_animal_id": string,"p_answers"?: Json }; Returns: string

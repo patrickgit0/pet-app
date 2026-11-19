@@ -21,7 +21,7 @@ async function setStatus(requestId: string, status: RequestStatus, formData: For
 async function completeAdoption(requestId: string) {
   'use server';
   const supabase = await createClient();
-  const { error } = await supabase.rpc('complete_adoption', { p_request_id: requestId });
+  const { error } = await supabase.rpc('complete_adoption', { p_request_id: requestId, p_checkin_days: [7, 30, 90, 180] });
   if (error) redirect(`/painel/pedidos/${requestId}?erro=${encodeURIComponent(rpcErrorMessage(error.message))}`);
   redirect('/painel/pos-adocao?nova=1');
 }
@@ -76,7 +76,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         {open && <form action={setStatus.bind(null, id, 'visit_scheduled')}><ConfirmSubmit title="Marcar visita como combinada?" message="Use depois de combinar dia e local com o adotante (dá para propor pelo chat)." confirmLabel="Confirmar" className="btn-ghost">{t('Visita marcada')}</ConfirmSubmit></form>}
         {open && <form action={setStatus.bind(null, id, 'approved')}><ConfirmSubmit title="Aprovar este pedido?" message="O animal fica reservado para este adotante e você passa a ver o endereço completo dele." confirmLabel="Aprovar pedido" className="btn-primary">{t('Aprovar pedido')}</ConfirmSubmit></form>}
         {req.status === 'approved' && !adoption && (
-          <form action={completeAdoption.bind(null, id)}><ConfirmSubmit title="Confirmar que o animal foi entregue?" message="A adoção fica registrada e os check-ins de 7 e 30 dias são agendados. Não dá para desfazer." confirmLabel="Confirmar adoção" className="btn-primary">{t('Confirmar adoção (animal entregue)')}</ConfirmSubmit></form>
+          <form action={completeAdoption.bind(null, id)}><ConfirmSubmit title="Confirmar que o animal foi entregue?" message="A adoção fica registrada e os check-ins de 7, 30, 90 e 180 dias são agendados. Não dá para desfazer." confirmLabel="Confirmar adoção" className="btn-primary">{t('Confirmar adoção (animal entregue)')}</ConfirmSubmit></form>
         )}
       </div>
       {open && (

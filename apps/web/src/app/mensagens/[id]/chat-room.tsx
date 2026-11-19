@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { hoursOn, parseOpeningHours, visitSlots, type Database, type OpeningHours } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/client';
+import { compressImage, extOf } from '@/lib/image';
 import { CalendarIcon, SendIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
@@ -65,14 +66,14 @@ export function ChatRoom({ conversationId, me, isNgo, blocked, initial, requestI
     setMsgs((cur) => cur.map((m) => (m.id === id ? { ...m, visit_confirmed_at: new Date().toISOString() } : m)));
   }
 
-  async function sendPhoto(file: File) {
+  async function sendPhoto(original: File) {
     setError(null);
+    const file = await compressImage(original);
     if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) return setError(t('Envie uma foto (JPG, PNG ou WebP).'));
     if (file.size > MAX_PHOTO_MB * 1024 * 1024) return setError(t('A foto pode ter no máximo {n} MB.', { n: MAX_PHOTO_MB }));
     if (!(await confirm({ title: 'Enviar esta foto?', message: 'Ela fica visível só para você e a outra pessoa da conversa.', confirmLabel: 'Enviar foto' }))) return;
     setUploading(true);
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const path = `${conversationId}/${crypto.randomUUID()}.${ext}`;
+    const path = `${conversationId}/${crypto.randomUUID()}.${extOf(file)}`;
     const up = await supabase.storage.from(CHAT_BUCKET).upload(path, file, { contentType: file.type });
     if (up.error) { setUploading(false); return setError(t('Não foi possível enviar a foto. Tente de novo.')); }
     const ok = await send(draft, { kind: 'image', attachment_path: path });
