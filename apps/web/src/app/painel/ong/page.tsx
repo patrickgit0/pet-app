@@ -32,6 +32,7 @@ async function save(ngoId: string, fd: FormData) {
     pix_key: String(fd.get('pix_key') || '') || null,
     instagram: normalizeInstagram(String(fd.get('instagram') || '')),
     opening_hours: hours,
+    application_questions: [0, 1, 2, 3, 4].map((i) => String(fd.get(`q${i}`) ?? '').trim().slice(0, 200)).filter(Boolean),
   }).eq('id', ngoId);
   revalidatePath('/painel/ong');
   redirect(error ? '/painel/ong?erro=1' : '/painel/ong?salvo=1');
@@ -42,6 +43,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
   const { ngo } = await getMyNgo();
   const { t } = await getI18n();
   const n = ngo!;
+  const questions = (Array.isArray(n.application_questions) ? n.application_questions : []) as unknown[];
   return (
     <div className="flex max-w-2xl flex-col gap-4">
       <h1 className="text-2xl font-extrabold">{t('Dados da ONG')}</h1>
@@ -66,7 +68,18 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
           <span className="text-xs text-muted">{t('Aparece na página pública da ONG.')}</span>
         </label>
         <HoursEditor initial={parseOpeningHours(n.opening_hours)} />
-        <label className="flex flex-col gap-1.5"><span className="label">{t('Chave Pix para doações (aparece na página pública)')}</span><input name="pix_key" defaultValue={n.pix_key ?? ''} className="field" /></label>
+        <label className="flex flex-col gap-1.5"><span className="label">{t('Chave Pix para doações (aparece na página pública)')}</span>
+          <input name="pix_key" defaultValue={n.pix_key ?? ''} placeholder={t('CNPJ, e-mail, celular ou chave aleatória')} className="field" />
+          <span className="text-xs text-muted">{t('O site gera o QR Code e o Pix copia e cola. O dinheiro vai direto para a ONG.')}</span>
+        </label>
+        <fieldset className="flex flex-col gap-2">
+          <legend className="label mb-1">{t('Perguntas para quem pede adoção (até 5, opcional)')}</legend>
+          <span className="text-xs text-muted">{t('Aparecem no botão "Quero adotar". As respostas chegam junto com o pedido.')}</span>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <input key={i} name={`q${i}`} maxLength={200} defaultValue={(questions[i] as string) ?? ''}
+              placeholder={[t('Ex.: Você já teve animais? Como foi?'), t('Ex.: Quem cuida do animal nas viagens?'), t('Ex.: A casa tem tela nas janelas?'), '', ''][i]} className="field" />
+          ))}
+        </fieldset>
         <button className="btn-primary self-start">{t('Salvar')}</button>
       </form>
     </div>

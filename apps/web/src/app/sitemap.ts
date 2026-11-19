@@ -17,8 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...Object.keys(LANDINGS).map((slug) => ({ url: `${SITE_URL}/adotar/${slug}`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.9 })),
     ...(animals ?? []).map((a) => ({ url: SITE_URL + animalPath(a), lastModified: new Date(a.updated_at), changeFrequency: 'weekly' as const, priority: 0.8 })),
     ...(ngos ?? []).map((n) => ({ url: `${SITE_URL}/ongs/${n.slug}`, lastModified: new Date(n.updated_at), changeFrequency: 'weekly' as const, priority: 0.6 })),
+    { url: `${SITE_URL}/feiras`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+    { url: `${SITE_URL}/lar-temporario`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/sou-ong`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/privacidade`, changeFrequency: 'yearly', priority: 0.2 },
+    { url: `${SITE_URL}/termos`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/termo-de-adocao`, changeFrequency: 'yearly', priority: 0.2 },
   ];
 }

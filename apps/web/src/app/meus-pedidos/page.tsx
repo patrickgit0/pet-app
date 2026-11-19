@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { REQUEST_STATUS_LABEL, animalPath, type RequestStatus } from '@adotai/shared';
 import { createClient, getSession } from '@/lib/supabase/server';
 import { CalendarIcon } from '@/components/icons';
+import { photoUrl, tintFor } from '@/lib/utils';
 import { CheckinForm } from './checkin-form';
 
 export const generateMetadata = pageTitle('Meus pedidos');
@@ -54,7 +55,7 @@ export default async function Page() {
   const { t, locale } = await getI18n();
   const [{ data: requests }, { data: checkins }, { data: convs }, { data: adoptions }] = await Promise.all([
     supabase.from('adoption_requests')
-      .select('id, status, rejection_reason, created_at, animal_id, animals(id, name, code, species), ngos(name), adoption_request_events(status, created_at)')
+      .select('id, status, rejection_reason, created_at, animal_id, animals(id, name, code, species, size), ngos(name), adoption_request_events(status, created_at)')
       .eq('adopter_id', user!.id).order('created_at', { ascending: false }),
     supabase.from('checkins').select('id, due_day, due_at, status, adoption_id, adoptions!inner(adopter_id, status, animals(name))')
       .eq('adoptions.adopter_id', user!.id).eq('adoptions.status', 'active').in('status', ['pending', 'late'])
@@ -66,6 +67,16 @@ export default async function Page() {
     supabase.from('adoptions').select('id, request_id, adopted_at, term_accepted_at, status, returned_at, reviews(stars), checkins(due_day, due_at, answered_at)')
       .eq('adopter_id', user!.id),
   ]);
+  // Recusados nos últimos 60 dias: sugere animais parecidos (mesma espécie, de preferência mesmo porte)
+  const rejected = (requests ?? []).filter((r) => r.status === 'rejected' && r.animals && Date.now() - new Date(r.created_at).getTime() < 60 * 864e5);
+  const { data: pool } = rejected.length
+    ? await supabase.from('animals').select('id, name, code, species, size, animal_photos(storage_path, position)')
+      .eq('status', 'available').in('species', [...new Set(rejected.map((r) => r.animals!.species))]).order('published_at', { ascending: false }).limit(40)
+    : { data: [] };
+  const similarFor = (r: (typeof rejected)[number]) => (pool ?? [])
+    .filter((x) => x.species === r.animals!.species && x.id !== r.animals!.id)
+    .sort((x, y) => Number(y.size === r.animals!.size) - Number(x.size === r.animals!.size))
+    .slice(0, 3);
   const visitByAnimal = new Map((convs ?? []).map((c) => [c.animal_id, { conv: c.id, visit: c.messages?.[0] }]));
   const adoptionByRequest = new Map((adoptions ?? []).map((a) => [a.request_id, a]));
   const fmtVisit = (iso: string) => new Date(iso).toLocaleString(locale, { weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
@@ -137,6 +148,24 @@ export default async function Page() {
                       <Link href={`/?especie=${r.animals.species}`} className="mt-1 block font-semibold text-brand">{t('Ver animais parecidos →')}</Link>
                     )}
                   </p>
+                )}
+                {r.status === 'rejected' && rejected.includes(r) && similarFor(r).length > 0 && (
+                  <ul className="grid grid-cols-3 gap-2">
+                    {similarFor(r).map((x) => {
+                      const cover = [...x.animal_photos].sort((p1, p2) => p1.position - p2.position)[0]?.storage_path;
+                      return (
+                        <li key={x.id}>
+                          <Link href={animalPath(x)} className="flex flex-col gap-1 text-xs font-bold">
+                            <span className="aspect-square overflow-hidden rounded-xl" style={{ background: tintFor(x.name) }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              {cover && <img src={photoUrl(cover)!} alt="" className="h-full w-full object-cover" />}
+                            </span>
+                            {x.name}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 )}
 
                 {showVisit && (

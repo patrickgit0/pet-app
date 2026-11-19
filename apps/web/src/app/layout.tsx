@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/site-header';
 import { LangSwitch } from '@/components/lang-switch';
+import { CookieNotice } from '@/components/cookie-notice';
 import { LangProvider } from '@/i18n/client';
 import { getI18n } from '@/i18n/server';
 import { SITE_URL } from '@/lib/site';
@@ -32,14 +33,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span>© {new Date().getFullYear()} Adotaí · Ribeirão Preto/SP</span>
               <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <Link href="/privacidade">{t('Privacidade (LGPD)')}</Link>
+                <Link href="/termos">{t('Termos de uso')}</Link>
                 <Link href="/termo-de-adocao">{t('Termo de adoção')}</Link>
                 <Link href="/sou-ong">{t('Sou ONG')}</Link>
+                <Link href="/lar-temporario">{t('Seja lar temporário')}</Link>
                 <Link href="/adotar/cachorro-em-ribeirao-preto">{t('Cães em Ribeirão Preto')}</Link>
                 <Link href="/adotar/gato-em-ribeirao-preto">{t('Gatos em Ribeirão Preto')}</Link>
                 <LangSwitch />
               </nav>
             </div>
           </footer>
+          <CookieNotice />
         </LangProvider>
       </body>
     </html>

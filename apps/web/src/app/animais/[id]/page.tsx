@@ -1,3 +1,4 @@
+import { DonatePix } from '@/components/donate-pix';
 import { LANDINGS, SITE_URL } from '@/lib/site';
 import { ReportButton } from '@/components/report-button';
 import { ShareAnimal } from '@/components/share-animal';
@@ -8,13 +9,14 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ENERGY_LABEL, SIZE_LABEL, animalPath, formatAge, formatRating, sexLabel, speciesText } from '@adotai/shared';
+import { compatibility } from '@adotai/shared';
 import { animalRef } from '@/lib/animal-ref';
 import { getSession, createClient } from '@/lib/supabase/server';
 import { photoUrl, tintFor, initials } from '@/lib/utils';
 import { ChatIcon, HeartIcon, PawIcon, VerifiedIcon } from '@/components/icons';
 import { requestAdoption, startChat, toggleFavorite } from './actions';
 
-type Params = { params: Promise<{ id: string }>; searchParams: Promise<{ erro?: string }> };
+type Params = { params: Promise<{ id: string }>; searchParams: Promise<{ erro?: string; perfil?: string }> };
 
 function ageMonths(birth: string | null): number | null {
   if (!birth) return null;
@@ -28,7 +30,7 @@ async function load(param: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from('animals')
-    .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood, whatsapp, opening_hours), animal_photos(storage_path, position)')
+    .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood, city, whatsapp, opening_hours, pix_key, application_questions), animal_photos(storage_path, position)')
     .eq(col, value)
     .maybeSingle();
   return data;
@@ -47,7 +49,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function AnimalPage({ params, searchParams }: Params) {
   const { id } = await params;
-  const { erro } = await searchParams;
+  const { erro, perfil } = await searchParams;
   const a = await load(id);
   if (!a || !a.ngos) notFound();
   // Link antigo (uuid) ou nome mudou: manda para o link bonito atual
@@ -62,8 +64,10 @@ export default async function AnimalPage({ params, searchParams }: Params) {
     isFav = (count ?? 0) > 0;
   }
   const isNgoMember = profile?.role === 'ngo_member';
+  const match = profile && !isNgoMember ? compatibility(a, profile) : null;
   const photos = [...(a.animal_photos ?? [])].sort((x, y) => x.position - y.position);
   const ngo = a.ngos;
+  const questions = ((ngo.application_questions ?? []) as unknown[]).filter((q): q is string => typeof q === 'string').slice(0, 5);
   const rating = formatRating(ngo.rating, lang);
 
   const compat = [
@@ -156,6 +160,23 @@ export default async function AnimalPage({ params, searchParams }: Params) {
           </div>
         )}
 
+        {match && (
+          <div className={`flex flex-col gap-2 rounded-2xl p-4 text-sm ${match.overall === 'good' ? 'bg-brand-soft' : match.overall === 'warn' ? 'bg-accent-soft' : 'bg-red-50'}`}>
+            <h2 className="text-[15px] font-extrabold">
+              {match.overall === 'good' ? t('Combina com a sua casa') : match.overall === 'warn' ? t('Pode combinar, com alguns cuidados') : t('Pode não combinar com a sua casa')}
+            </h2>
+            <ul className="flex flex-col gap-1">
+              {match.items.map((i) => (
+                <li key={i.text} className="flex gap-2">
+                  <span aria-hidden className={i.level === 'good' ? 'text-brand' : i.level === 'warn' ? 'text-accent-ink' : 'text-red-700'}>{i.level === 'good' ? '✓' : i.level === 'warn' ? '!' : '✕'}</span>
+                  {t(i.text)}
+                </li>
+              ))}
+            </ul>
+            <span className="text-xs text-muted">{t('Calculado com o seu perfil de moradia e as informações da ONG. Na dúvida, pergunte na conversa.')}</span>
+          </div>
+        )}
+
         {a.special_needs && <p className="rounded-xl bg-accent-soft p-3 text-sm text-accent-ink"><strong>{t('Cuidados especiais:')}</strong> {a.special_needs}</p>}
         {a.description && <p className="leading-relaxed text-ink-2">{a.description}</p>}
 
@@ -177,16 +198,37 @@ export default async function AnimalPage({ params, searchParams }: Params) {
         {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{t(erro)}</p>}
 
         {!isNgoMember && a.status === 'available' && (
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             <form action={startChat.bind(null, a.id)}>
-              <button className="btn-outline h-13 px-5 text-[15px]"><ChatIcon /> {t('Conversar')}</button>
+              <button className="btn-outline h-12 w-full px-5 text-[15px]"><ChatIcon /> {t('Conversar com a ONG')}</button>
             </form>
-            <form action={requestAdoption.bind(null, a.id)} className="flex-1">
+            {perfil === 'ok' && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">{t('Perfil completo! Agora é só confirmar o pedido abaixo.')}</p>}
+            <form id="pedido" action={requestAdoption.bind(null, a.id)} className="flex scroll-mt-4 flex-col gap-3 rounded-2xl border border-line bg-white p-4">
+              {questions.length > 0 && (
+                <fieldset className="flex flex-col gap-3">
+                  <legend className="label mb-1">{t('Perguntas da {ngo} (opcional, ajudam na análise)', { ngo: ngo.name })}</legend>
+                  {questions.map((q, i) => (
+                    <label key={i} className="flex flex-col gap-1.5 text-sm">
+                      <span className="font-semibold">{q}</span>
+                      <textarea name={`q${i}`} rows={2} maxLength={800} className="field h-auto py-2.5" />
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+              <label className="flex items-start gap-2.5 text-sm">
+                <input type="checkbox" name="compromisso" required className="mt-0.5 h-5 w-5 shrink-0 accent-brand" />
+                <span>{t('Entendo que adotar é um compromisso para a vida toda do animal: cuidar da saúde, não abandonar e avisar a ONG se não puder mais ficar com ele.')}{' '}
+                  <Link href="/termo-de-adocao" target="_blank" className="font-semibold text-brand">{t('Ver o termo')}</Link></span>
+              </label>
               <ConfirmSubmit title="Pedir a adoção?" message="A ONG vai receber seu pedido com seu perfil e seu celular. O endereço completo só é liberado se ela aprovar." confirmLabel="Enviar pedido" className="btn-primary h-13 w-full text-base font-extrabold">{t('Quero adotar')}</ConfirmSubmit>
             </form>
           </div>
         )}
         {a.status === 'available' && <ShareAnimal path={path} name={a.name} />}
+        {ngo.pix_key && !isNgoMember && (
+          <DonatePix ngo={{ name: ngo.name, city: ngo.city, pix_key: ngo.pix_key }} message={`Adotai ${a.name}`}
+            title={t('Ajude a cuidar de {name} com um Pix para a ONG', { name: a.name })} />
+        )}
         {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}
         {!isNgoMember && <ReportButton type="animal" id={a.id} loggedIn={Boolean(user)} label="Denunciar anúncio" className="self-start" />}
       </section>

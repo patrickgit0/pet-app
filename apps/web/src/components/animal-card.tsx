@@ -17,12 +17,15 @@ export type AnimalCardData = {
   ngo_verified: boolean;
   ngo_rating: number | null;
   neutered?: boolean | null;
+  /** Data de publicação: anúncio parado há 60+ dias ganha o selo "esperando há X meses". */
+  published_at?: string | null;
 };
 
 export async function AnimalCard({ a }: { a: AnimalCardData }) {
   const { t, lang } = await getI18n();
   const img = photoUrl(a.cover_path);
   const rating = formatRating(a.ngo_rating, lang);
+  const waitingMonths = a.published_at ? Math.floor((Date.now() - new Date(a.published_at).getTime()) / (30 * 864e5)) : 0;
   return (
     <Link href={animalPath(a)} className="card flex flex-col overflow-hidden transition-shadow hover:shadow-md">
       <div className="relative flex h-40 items-center justify-center" style={{ background: tintFor(a.name) }}>
@@ -35,6 +38,11 @@ export async function AnimalCard({ a }: { a: AnimalCardData }) {
         {a.distance_km != null && (
           <span className="absolute top-2.5 left-2.5 rounded-lg bg-white px-2 py-0.5 text-[11px] font-bold">
             {formatDistance(a.distance_km, lang)}
+          </span>
+        )}
+        {waitingMonths >= 2 && (
+          <span className="absolute right-2.5 bottom-2.5 rounded-lg bg-accent px-2 py-0.5 text-[11px] font-bold text-ink">
+            {waitingMonths >= 12 ? t('Esperando há mais de 1 ano') : t('Esperando há {n} meses', { n: waitingMonths })}
           </span>
         )}
       </div>

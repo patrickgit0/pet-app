@@ -12,6 +12,8 @@ const MENU = [
   { href: '/painel/pedidos', label: 'Candidatos' },
   { href: '/mensagens', label: 'Mensagens' },
   { href: '/painel/pos-adocao', label: 'Pós-adoção' },
+  { href: '/painel/feiras', label: 'Feiras' },
+  { href: '/painel/lar-temporario', label: 'Lar temporário' },
   { href: '/painel/ong', label: 'Dados da ONG' },
 ];
 

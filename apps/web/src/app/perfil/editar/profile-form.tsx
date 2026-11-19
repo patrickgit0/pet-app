@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { formatCep, formatCpf, formatPhone, isValidCpf, lookupCep, rpcErrorMessage, toE164Phone, HOME_LABEL, type CepResult, type HomeType } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/client';
 import { CheckIcon } from '@/components/icons';
-import { requestAdoption } from '@/app/animais/[id]/actions';
 
 type Initial = {
   fullName: string; cpf: string; phone: string; cep: string; street: string; complement: string;
@@ -100,7 +99,8 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
         } as never);
         if (error) return setError(rpcErrorMessage(error.message));
       }
-      if (animalId) await requestAdoption(animalId); // redireciona para o chat com o pedido enviado
+      // Volta para o anúncio: lá a pessoa marca o compromisso, responde as perguntas da ONG e envia o pedido
+      if (animalId) { router.push(`/animais/${animalId}?perfil=ok#pedido`); router.refresh(); }
       else { router.push('/perfil?salvo=1'); router.refresh(); }
     });
   }
@@ -142,7 +142,7 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
               onBlur={() => setPhoneMsg(phone && !validPhone(phone) ? 'Confira o número: DDD + celular com 9 dígitos.' : null)}
               placeholder="(16) 99123-4567" className="field" />
             {phoneMsg ? <span className="text-xs text-red-700">{t(phoneMsg)}</span>
-              : <span className="text-xs text-muted">{t('A ONG só recebe seu celular depois de aprovar o pedido.')}</span>}
+              : <span className="text-xs text-muted">{t('A ONG vê seu celular quando você pede uma adoção. O CPF nunca aparece para ela.')}</span>}
           </label>
 
           <div className="grid grid-cols-[1fr_2fr] gap-2">
@@ -199,7 +199,7 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
 
       {error && <p role="alert" className="text-sm font-semibold text-red-700">{t(error)}</p>}
       <button disabled={pending} className="btn-primary h-12 text-base">
-        {pending ? t('Salvando…') : animalId ? t('Salvar e enviar pedido') : t('Salvar')}
+        {pending ? t('Salvando…') : animalId ? t('Salvar e voltar ao pedido') : t('Salvar')}
       </button>
     </form>
   );

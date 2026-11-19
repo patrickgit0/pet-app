@@ -41,6 +41,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const { data: conv } = await supabase.from('conversations').select('id').eq('animal_id', req.animal_id).eq('adopter_id', req.adopter_id).maybeSingle();
   const { data: adoption } = await supabase.from('adoptions').select('id').eq('request_id', id).maybeSingle();
   const open = ['sent', 'reviewing', 'visit_scheduled'].includes(req.status);
+  const ans = (req.answers ?? {}) as { compromisso_em?: string; perguntas?: { pergunta: string; resposta: string }[] };
 
   return (
     <div className="flex max-w-3xl flex-col gap-5">
@@ -60,6 +61,21 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <Info k={t('Crianças em casa')} v={c?.has_children == null ? '—' : c.has_children ? t('Sim') : t('Não')} />
         <Info k={t('Outros animais')} v={c?.other_pets || '—'} />
       </section>
+
+      {(ans.compromisso_em || !!ans.perguntas?.length) && (
+        <section className="card flex flex-col gap-3 p-5 text-sm">
+          <h2 className="font-extrabold">{t('Respostas do pedido')}</h2>
+          {ans.compromisso_em && (
+            <p className="flex items-center gap-1.5 font-semibold text-brand-dark"><CheckIcon size={14} /> {t('Aceitou o compromisso de guarda responsável')}</p>
+          )}
+          {ans.perguntas?.map((q, i) => (
+            <div key={i}>
+              <p className="text-xs text-muted">{q.pergunta}</p>
+              <p className="whitespace-pre-line">{q.resposta || <span className="text-muted">{t('Sem resposta')}</span>}</p>
+            </div>
+          ))}
+        </section>
+      )}
 
       {ct ? (
         <section className="card flex flex-col gap-1 border-brand p-5 text-sm">

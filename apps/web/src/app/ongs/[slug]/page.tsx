@@ -1,3 +1,4 @@
+import { DonatePix } from '@/components/donate-pix';
 import { SITE_URL } from '@/lib/site';
 import { ReportButton } from '@/components/report-button';
 import { NgoContact } from '@/components/ngo-contact';
@@ -5,22 +6,26 @@ import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
 import { formatRating } from '@adotai/shared';
 import { createClient } from '@/lib/supabase/server';
-import { initials } from '@/lib/utils';
-import { VerifiedIcon } from '@/components/icons';
+import { initials, photoUrl, tintFor } from '@/lib/utils';
+import { EventCard } from '@/components/event-card';
+import { PawIcon, VerifiedIcon } from '@/components/icons';
 import { AnimalCard } from '@/components/animal-card';
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const { t, lang } = await getI18n();
+  const { t, lang, locale } = await getI18n();
   const { data: ngo } = await supabase.from('ngos').select('*').eq('slug', slug).maybeSingle();
   if (!ngo) notFound();
 
-  const [{ data: animals }, { data: reviews }] = await Promise.all([
-    supabase.from('animals').select('id, name, code, sex, size, birth_date_estimate, animal_photos(storage_path, position)')
+  const [{ data: animals }, { data: reviews }, { data: happy }, { data: events }] = await Promise.all([
+    supabase.from('animals').select('id, name, code, sex, size, birth_date_estimate, published_at, animal_photos(storage_path, position)')
       .eq('ngo_id', ngo.id).eq('status', 'available').order('published_at', { ascending: false }),
     supabase.from('reviews').select('id, stars, comment, created_at').eq('ngo_id', ngo.id).order('created_at', { ascending: false }).limit(6),
+    supabase.rpc('ngo_happy_endings', { p_ngo_id: ngo.id, p_limit: 8 }),
+    supabase.from('ngo_events').select('id, title, starts_at, ends_at, place, neighborhood, city, description')
+      .eq('ngo_id', ngo.id).gte('ends_at', new Date().toISOString()).order('starts_at').limit(4),
   ]);
   const rating = formatRating(ngo.rating, lang);
   const months = (b: string | null) => (b ? Math.max(0, Math.round((Date.now() - new Date(b).getTime()) / 2.63e9)) : null);
@@ -58,22 +63,49 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       <NgoContact ngo={ngo} loggedIn={Boolean(user)} next={`/ongs/${ngo.slug}`} />
 
-      {ngo.pix_key && (
-        <p className="rounded-xl bg-brand-soft p-4 text-sm">{t('Quer ajudar a {name}? Doe via Pix:', { name: ngo.name })} <strong className="select-all">{ngo.pix_key}</strong></p>
-      )}
+      {ngo.pix_key && <DonatePix ngo={{ name: ngo.name, city: ngo.city, pix_key: ngo.pix_key }} />}
 
       <section>
         <h2 className="mb-3 text-lg font-extrabold">{t('Animais disponíveis ({n})', { n: animals?.length ?? 0 })}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4">
           {(animals ?? []).map((a) => (
             <AnimalCard key={a.id} a={{
-              id: a.id, code: a.code, name: a.name, sex: a.sex, size: a.size, age_months: months(a.birth_date_estimate),
+              id: a.id, code: a.code, name: a.name, sex: a.sex, size: a.size, age_months: months(a.birth_date_estimate), published_at: a.published_at,
               cover_path: [...(a.animal_photos ?? [])].sort((x, y) => x.position - y.position)[0]?.storage_path ?? null,
               ngo_name: ngo.name, ngo_verified: Boolean(ngo.verified_at), ngo_rating: ngo.rating,
             }} />
           ))}
         </div>
       </section>
+
+      {!!events?.length && (
+        <section>
+          <h2 className="mb-3 text-lg font-extrabold">{t('Próximas feiras de adoção')}</h2>
+          <div className="grid gap-3 sm:grid-cols-2">{events.map((e) => <EventCard key={e.id} e={e} />)}</div>
+        </section>
+      )}
+
+      {!!happy?.length && (
+        <section>
+          <h2 className="mb-1 text-lg font-extrabold">{t('Finais felizes')}</h2>
+          <p className="mb-3 text-sm text-muted">{t('Animais que já encontraram uma família pelo Adotaí.')}</p>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {happy.map((h, i) => (
+              <li key={i} className="card overflow-hidden">
+                <div className="flex aspect-square items-center justify-center" style={{ background: tintFor(h.animal_name) }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {h.cover_path ? <img src={photoUrl(h.cover_path)!} alt="" className="h-full w-full object-cover" /> : <PawIcon size={28} className="text-ink/30" />}
+                </div>
+                <div className="p-3 text-sm">
+                  <strong>{h.animal_name}</strong>
+                  <span className="block text-xs text-muted">{t('adotado em {d}', { d: new Date(h.adopted_at).toLocaleDateString(locale, { month: 'long', year: 'numeric' }) })}</span>
+                  {h.review_comment && <p className="mt-1 line-clamp-3 text-xs text-ink-2 italic">“{h.review_comment}”</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {!!reviews?.length && (
         <section>

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { isValidCpf, formatCpf, toE164Phone, formatPhone, isValidCnpj, formatCnpj } from './cpf.ts';
 import { formatCep, lookupCep } from './cep.ts';
 import { openNow, parseOpeningHours, visitSlots, whatsappLink } from './hours.ts';
+import { compatibility } from './compat.ts';
 
 test('CPF válido e inválido', () => {
   assert.equal(isValidCpf('529.982.247-25'), true);
@@ -56,4 +57,15 @@ test('horário da ONG e horários de visita', () => {
   assert.equal(openNow(oh, new Date(2026, 10, 16, 11, 0))?.open, false);
   assert.equal(parseOpeningHours({}), null);
   assert.equal(whatsappLink('55 16 99999-0000', 'Oi!'), 'https://wa.me/5516999990000?text=Oi!');
+});
+
+test('compatibilidade adotante × animal', () => {
+  const dog = { species: 'dog', size: 'large', energy: 'high', good_with_kids: true, good_with_cats: false, good_for_apartment: null } as const;
+  assert.equal(compatibility(dog, {}), null); // sem perfil de moradia
+  const apt = compatibility(dog, { home_type: 'apartment', has_yard: false, has_children: true, other_pets: 'Uma gata' })!;
+  assert.equal(apt.overall, 'bad'); // não convive com gatos
+  assert.ok(apt.items.some((i) => i.text.includes('crianças') && i.level === 'good'));
+  assert.ok(apt.items.some((i) => i.level === 'warn' && i.text.includes('apartamento')));
+  const house = compatibility({ ...dog, energy: 'low' }, { home_type: 'house', has_yard: true, has_children: false, other_pets: 'não' })!;
+  assert.equal(house.overall, 'good');
 });

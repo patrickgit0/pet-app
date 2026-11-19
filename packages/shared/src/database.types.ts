@@ -249,6 +249,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"foster_offers": {
+                  Row: {
+                    "active": boolean,"contact_phone": string | null,"created_at": string,"has_other_pets": boolean | null,"max_weeks": number,"notes": string | null,"sizes": (Database["public"]['Enums']["animal_size"])[],"species": (Database["public"]['Enums']["species"])[],"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active"?: boolean,"contact_phone"?: string | null,"created_at"?: string,"has_other_pets"?: boolean | null,"max_weeks"?: number,"notes"?: string | null,"sizes"?: (Database["public"]['Enums']["animal_size"])[],"species"?: (Database["public"]['Enums']["species"])[],"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "active"?: boolean,"contact_phone"?: string | null,"created_at"?: string,"has_other_pets"?: boolean | null,"max_weeks"?: number,"notes"?: string | null,"sizes"?: (Database["public"]['Enums']["animal_size"])[],"species"?: (Database["public"]['Enums']["species"])[],"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "foster_offers_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"messages": {
                   Row: {
                     "attachment_path": string | null,"body": string | null,"conversation_id": string,"created_at": string,"id": string,"kind": Database["public"]['Enums']["message_kind"],"read_at": string | null,"sender_id": string,"visit_at": string | null,"visit_confirmed_at": string | null,"visit_place": string | null
@@ -272,6 +292,26 @@ isOneToOne: false
       columns: ["sender_id"]
 isOneToOne: false
       referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"ngo_events": {
+                  Row: {
+                    "city": string,"created_at": string,"description": string | null,"ends_at": string,"id": string,"neighborhood": string | null,"ngo_id": string,"place": string,"starts_at": string,"title": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "city"?: string,"created_at"?: string,"description"?: string | null,"ends_at": string,"id"?: string,"neighborhood"?: string | null,"ngo_id": string,"place": string,"starts_at": string,"title": string
+                  }
+                  Update: {
+                    "city"?: string,"created_at"?: string,"description"?: string | null,"ends_at"?: string,"id"?: string,"neighborhood"?: string | null,"ngo_id"?: string,"place"?: string,"starts_at"?: string,"title"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ngo_events_ngo_id_fkey"
+      columns: ["ngo_id"]
+isOneToOne: false
+      referencedRelation: "ngos"
       referencedColumns: ["id"]
     }
                   ]
@@ -303,14 +343,14 @@ isOneToOne: false
                   ]
                 },"ngos": {
                   Row: {
-                    "address_text": string | null,"city": string,"cnpj": string,"completed_adoptions": number,"created_at": string,"description": string | null,"email": string | null,"id": string,"instagram": string | null,"location": unknown,"logo_url": string | null,"median_response_minutes": number | null,"name": string,"neighborhood": string | null,"opening_hours": Json | null,"phone": string | null,"pix_key": string | null,"rating": number | null,"rating_count": number,"slug": string,"state": string,"updated_at": string,"verified_at": string | null,"whatsapp": string | null
+                    "address_text": string | null,"application_questions": NonNullable<Json>,"city": string,"cnpj": string,"completed_adoptions": number,"created_at": string,"description": string | null,"email": string | null,"id": string,"instagram": string | null,"location": unknown,"logo_url": string | null,"median_response_minutes": number | null,"name": string,"neighborhood": string | null,"opening_hours": Json | null,"phone": string | null,"pix_key": string | null,"rating": number | null,"rating_count": number,"slug": string,"state": string,"updated_at": string,"verified_at": string | null,"whatsapp": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "address_text"?: string | null,"city": string,"cnpj": string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location": unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name": string,"neighborhood"?: string | null,"opening_hours"?: Json | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug": string,"state": string,"updated_at"?: string,"verified_at"?: string | null,"whatsapp"?: string | null
+                    "address_text"?: string | null,"application_questions"?: NonNullable<Json>,"city": string,"cnpj": string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location": unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name": string,"neighborhood"?: string | null,"opening_hours"?: Json | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug": string,"state": string,"updated_at"?: string,"verified_at"?: string | null,"whatsapp"?: string | null
                   }
                   Update: {
-                    "address_text"?: string | null,"city"?: string,"cnpj"?: string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location"?: unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name"?: string,"neighborhood"?: string | null,"opening_hours"?: Json | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug"?: string,"state"?: string,"updated_at"?: string,"verified_at"?: string | null,"whatsapp"?: string | null
+                    "address_text"?: string | null,"application_questions"?: NonNullable<Json>,"city"?: string,"cnpj"?: string,"completed_adoptions"?: number,"created_at"?: string,"description"?: string | null,"email"?: string | null,"id"?: string,"instagram"?: string | null,"location"?: unknown,"logo_url"?: string | null,"median_response_minutes"?: number | null,"name"?: string,"neighborhood"?: string | null,"opening_hours"?: Json | null,"phone"?: string | null,"pix_key"?: string | null,"rating"?: number | null,"rating_count"?: number,"slug"?: string,"state"?: string,"updated_at"?: string,"verified_at"?: string | null,"whatsapp"?: string | null
                   }
                   Relationships: [
                     
@@ -530,8 +570,18 @@ isOneToOne: false
 "is_valid_cpf":
 { Args: { "p_cpf": string }; Returns: boolean
                            },
+"list_foster_offers":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "city": string,"contact_phone": string,"full_name": string,"has_other_pets": boolean,"max_weeks": number,"neighborhood": string,"notes": string,"sizes": (Database["public"]['Enums']["animal_size"])[],"species": (Database["public"]['Enums']["species"])[],"updated_at": string,"user_id": string
+            }[]
+                           },
 "mark_checkin_followed_up":
 { Args: { "p_checkin_id": string }; Returns: undefined
+                           },
+"ngo_happy_endings":
+{ Args: { "p_limit"?: number,"p_ngo_id": string }; Returns: {
+              "adopted_at": string,"animal_name": string,"cover_path": string,"review_comment": string,"review_stars": number,"species": Database["public"]['Enums']["species"]
+            }[]
                            },
 "notify":
 { Args: { "p_data": Json,"p_kind": string,"p_link": string,"p_user": string }; Returns: undefined

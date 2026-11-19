@@ -10,7 +10,7 @@ export default async function Overview() {
   const ngoId = ngo!.id;
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
-  const [available, newReqs, adoptionsMonth, requests, alerts] = await Promise.all([
+  const [available, newReqs, adoptionsMonth, requests, alerts, allAnimals] = await Promise.all([
     supabase.from('animals').select('id', { count: 'exact', head: true }).eq('ngo_id', ngoId).eq('status', 'available'),
     supabase.from('adoption_requests').select('id', { count: 'exact', head: true }).eq('ngo_id', ngoId).eq('status', 'sent'),
     supabase.from('adoptions').select('id', { count: 'exact', head: true }).eq('ngo_id', ngoId).gte('adopted_at', monthStart),
@@ -21,7 +21,21 @@ export default async function Overview() {
     supabase.from('checkins')
       .select('id, due_day, status, needs_help, adoptions!inner(ngo_id, animals(name))')
       .eq('adoptions.ngo_id', ngoId).or('status.eq.late,needs_help.eq.true').is('ngo_followed_up_at', null).limit(5),
+    supabase.from('animals').select('id, status, animal_photos(id)').eq('ngo_id', ngoId).neq('status', 'archived'),
   ]);
+
+  // Primeiro acesso: o que falta para a ONG estar pronta para receber pedidos
+  const animalsList = allAnimals.data ?? [];
+  const live = animalsList.filter((a) => a.status === 'available');
+  const steps = [
+    { done: Boolean(ngo!.description && ngo!.description.length >= 40), label: t('Escreva a apresentação da ONG'), href: '/painel/ong' },
+    { done: Boolean(ngo!.opening_hours), label: t('Defina o horário de funcionamento'), href: '/painel/ong' },
+    { done: Boolean(ngo!.whatsapp || ngo!.phone), label: t('Informe um telefone ou WhatsApp'), href: '/painel/ong' },
+    { done: animalsList.length >= 3, label: t('Cadastre pelo menos 3 animais ({n}/3)', { n: Math.min(3, animalsList.length) }), href: '/painel/animais/novo' },
+    { done: live.length > 0 && live.every((a) => a.animal_photos.length >= 3), label: t('Coloque 3 fotos ou mais em cada anúncio'), href: '/painel/animais' },
+    { done: Boolean(ngo!.pix_key), label: t('Cadastre a chave Pix para receber doações (opcional)'), href: '/painel/ong' },
+  ];
+  const doneCount = steps.filter((x) => x.done).length;
 
   const rating = formatRating(ngo!.rating, lang);
   const kpis = [
@@ -40,6 +54,27 @@ export default async function Overview() {
         </div>
         <Link href="/painel/animais/novo" className="btn-primary"><PlusIcon size={18} /> {t('Cadastrar animal')}</Link>
       </div>
+
+      {doneCount < steps.length && (
+        <section className="card p-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-[17px] font-extrabold">{t('Deixe a ONG pronta para receber pedidos')}</h2>
+            <span className="text-sm font-bold text-brand-dark">{doneCount}/{steps.length}</span>
+          </div>
+          <div className="mb-3 h-2 overflow-hidden rounded-full bg-line"><div className="h-full rounded-full bg-brand" style={{ width: `${(doneCount / steps.length) * 100}%` }} /></div>
+          <ul className="flex flex-col gap-1">
+            {steps.map((x) => (
+              <li key={x.label}>
+                <Link href={x.href} className={`flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm hover:bg-ground ${x.done ? 'text-muted line-through' : 'font-semibold'}`}>
+                  <span aria-hidden className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-[11px] ${x.done ? 'border-brand bg-brand text-white' : 'border-line-2'}`}>{x.done ? '✓' : ''}</span>
+                  <span className="sr-only">{x.done ? t('Feito:') : t('Falta:')}</span>
+                  {x.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3.5">
         {kpis.map((k) => (

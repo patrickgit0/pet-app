@@ -87,6 +87,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
           {t('Você pode excluir sua conta a qualquer momento. Se já adotou pelo Adotaí, mantemos só o registro mínimo da adoção (sem CPF, celular ou endereço) para o histórico da ONG.')}{' '}
           <Link href="/privacidade" className="font-semibold text-brand underline">{t('Política de Privacidade')}</Link>
         </p>
+        <p className="mt-3 text-muted">{t('Você também pode baixar uma cópia de tudo o que o Adotaí guarda sobre você (arquivo JSON).')}</p>
+        <a href="/api/meus-dados" download className="btn-ghost mt-2 min-h-10 bg-white px-3 text-sm">{t('Baixar meus dados')}</a>
         <form action={deleteAccount} className="mt-3">
           <ConfirmSubmit title="Excluir sua conta?" message="Seus dados (CPF, celular, endereço, mensagens, favoritos e pedidos) serão apagados. Isso não pode ser desfeito." confirmLabel="Excluir conta" tone="danger" className="btn text-red-700 ring-[1.5px] ring-red-200 ring-inset hover:bg-red-50">{t('Excluir minha conta')}</ConfirmSubmit>
         </form>

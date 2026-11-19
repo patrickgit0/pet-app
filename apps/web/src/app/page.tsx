@@ -10,7 +10,7 @@ import { readSearchLocation } from '@/lib/search-location';
 import { AnimalCard } from '@/components/animal-card';
 import { MapView } from '@/components/map-view';
 import { LocateButton } from '@/components/locate-button';
-import { SearchIcon } from '@/components/icons';
+import { CalendarIcon, SearchIcon } from '@/components/icons';
 import { FilterPanel } from '@/components/filter-panel';
 import { AutoSubmitSelect } from '@/components/auto-submit-select';
 
@@ -21,7 +21,7 @@ const PAGE_SIZE = 24;
 export default async function SearchPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const { supabase, profile } = await getSession();
-  const { t } = await getI18n();
+  const { t, locale } = await getI18n();
 
   // Centro da busca: localização escolhida (cookie) > endereço do perfil > cidade piloto
   let center: { lat: number; lng: number; label: string } = { lat: PILOT_CITY.lat, lng: PILOT_CITY.lng, label: `${PILOT_CITY.name}, ${PILOT_CITY.state}` };
@@ -64,6 +64,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   });
 
   const total = Number(animals?.[0]?.total_count ?? 0);
+  const { data: events } = page === 1
+    ? await supabase.from('ngo_events').select('id, title, starts_at, place, ngos(name)')
+      .gte('ends_at', new Date().toISOString()).lte('starts_at', new Date(Date.now() + 21 * 864e5).toISOString()).order('starts_at').limit(2)
+    : { data: [] };
   const pins = (animals ?? [])
     .filter((a) => a.approx_lat != null && a.approx_lng != null)
     .map((a) => ({ id: a.id, href: animalPath(a), label: a.name, lat: Number(a.approx_lat), lng: Number(a.approx_lng) }));
@@ -142,6 +146,17 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </div>
 
         {error && <p className="card p-4 text-sm text-red-700">{t('Não foi possível carregar os animais agora.')}</p>}
+
+        {!!events?.length && (
+          <Link href="/feiras" className="flex items-center gap-3 rounded-2xl bg-accent-soft p-3 text-sm text-accent-ink hover:brightness-95">
+            <CalendarIcon size={20} className="shrink-0" />
+            <span className="min-w-0 flex-1">
+              <strong>{t('Feira de adoção')}: </strong>
+              {events.map((e) => `${e.title} · ${new Date(e.starts_at).toLocaleDateString(locale, { timeZone: 'America/Sao_Paulo', weekday: 'short', day: '2-digit', month: '2-digit' })}`).join(' / ')}
+            </span>
+            <span className="shrink-0 font-bold">{t('Ver')} →</span>
+          </Link>
+        )}
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:gap-5">
           <div id="resultados" className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:gap-4">

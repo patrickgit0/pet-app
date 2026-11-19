@@ -29,15 +29,21 @@ export default async function Page() {
       <ul>
         <li>A ONG vê seu nome, bairro, distância e perfil de moradia quando você conversa ou faz um pedido.</li>
         <li>Seu <strong>CPF nunca é mostrado</strong> à ONG — ela vê apenas &quot;CPF válido&quot;.</li>
-        <li>Celular e endereço completo só são liberados para a ONG <strong>depois que ela aprova</strong> seu pedido.</li>
+        <li>Seu <strong>celular</strong> aparece para a ONG quando você envia um pedido de adoção, para ela poder falar com você.</li>
+        <li>O <strong>endereço completo</strong> só é liberado para a ONG <strong>depois que ela aprova</strong> seu pedido. Antes disso, ela vê só o bairro e a distância.</li>
+        <li>Se você se oferecer como <strong>lar temporário</strong>, ONGs verificadas veem seu nome, bairro, celular e o que você escreveu na oferta. Você pode pausar ou apagar quando quiser.</li>
+        <li>Fotos de check-in ficam visíveis só para você e a ONG da adoção.</li>
         <li>Não vendemos seus dados.</li>
       </ul>
+
+      <h2>Cookies</h2>
+      <p>Usamos só cookies essenciais: para manter você logado, lembrar o idioma escolhido e o local da busca. Não usamos cookies de propaganda nem de rastreamento.</p>
 
       <h2>Por quanto tempo guardamos</h2>
       <p>Enquanto sua conta estiver ativa. Se você excluir a conta, apagamos seus dados. Caso já tenha adotado pelo Adotaí, mantemos somente o registro mínimo da adoção (sem CPF, celular ou endereço) para o histórico da ONG.</p>
 
       <h2>Seus direitos (LGPD)</h2>
-      <p>Você pode acessar, corrigir e excluir seus dados a qualquer momento em <a className="font-bold text-brand" href="/perfil">Meu perfil</a>. Dúvidas: [E-MAIL DO ENCARREGADO DE DADOS].</p>
+      <p>Você pode acessar, corrigir, <strong>baixar uma cópia</strong> (arquivo JSON) e excluir seus dados a qualquer momento em <a className="font-bold text-brand" href="/perfil">Meu perfil</a> → Privacidade. Dúvidas: [E-MAIL DO ENCARREGADO DE DADOS].</p>
     </main>
   );
 }
@@ -68,15 +74,21 @@ function PrivacyEn() {
       <ul>
         <li>The shelter sees your name, neighborhood, distance and home profile when you message them or make a request.</li>
         <li>Your <strong>CPF is never shown</strong> to the shelter — it only sees &quot;Valid CPF&quot;.</li>
-        <li>Your phone number and full address are only released to the shelter <strong>after it approves</strong> your request.</li>
+        <li>Your <strong>phone number</strong> is shown to the shelter when you send an adoption request, so it can contact you.</li>
+        <li>Your <strong>full address</strong> is only released to the shelter <strong>after it approves</strong> your request. Before that, it only sees your neighborhood and distance.</li>
+        <li>If you offer to be a <strong>foster home</strong>, verified shelters see your name, neighborhood, phone number and what you wrote in the offer. You can pause or delete it at any time.</li>
+        <li>Check-in photos are visible only to you and the shelter of the adoption.</li>
         <li>We do not sell your data.</li>
       </ul>
+
+      <h2>Cookies</h2>
+      <p>We only use essential cookies: to keep you logged in and to remember your language and search location. We do not use advertising or tracking cookies.</p>
 
       <h2>How long we keep it</h2>
       <p>While your account is active. If you delete your account, we erase your data. If you have already adopted through Adotaí, we keep only a minimal record of the adoption (without CPF, phone or address) for the shelter&apos;s history.</p>
 
       <h2>Your rights (LGPD — Brazilian data protection law)</h2>
-      <p>You can access, correct and delete your data at any time in <a className="font-bold text-brand" href="/perfil">My profile</a>. Questions: [DATA PROTECTION OFFICER EMAIL].</p>
+      <p>You can access, correct, <strong>download a copy</strong> (JSON file) and delete your data at any time in <a className="font-bold text-brand" href="/perfil">My profile</a> → Privacy. Questions: [DATA PROTECTION OFFICER EMAIL].</p>
     </main>
   );
 }
