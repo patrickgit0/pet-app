@@ -27,7 +27,9 @@ test.describe('Visitante (sem login)', () => {
     expect((await request.get('/sitemap.xml')).status()).toBe(200);
     expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /painel');
     expect((await request.get('/manifest.webmanifest')).status()).toBe(200);
-    expect((await request.get('/adotar/nao-existe')).status()).toBe(404);
+    // Com o loading.tsx da raiz, em produção o "não encontrado" chega por streaming: status 200 + noindex (Google não indexa)
+    const missing = await request.get('/adotar/nao-existe');
+    if (missing.status() !== 404) expect(await missing.text()).toContain('<meta name="robots" content="noindex"/>');
     expect((await request.get('/api/admin/export/pedidos')).status()).toBe(403);
   });
 

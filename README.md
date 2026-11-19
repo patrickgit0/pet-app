@@ -4,7 +4,9 @@
 
 # Adotaí
 
-**Adoção de cães e gatos perto de você — com ONGs verificadas, chat e acompanhamento pós-adoção.**
+**Adoção de cães, gatos e outros animais perto de você — com ONGs verificadas, chat e acompanhamento pós-adoção.**
+
+**No ar:** [adotaiapp.vercel.app](https://adotaiapp.vercel.app) (dados de demonstração)
 
 Marketplace no estilo classificados: ONGs anunciam, adotantes buscam por distância e pela qualidade da ONG,
 conversam pelo chat e a plataforma acompanha o animal depois da adoção.
@@ -33,14 +35,16 @@ O Adotaí junta três coisas que hoje ficam separadas:
 | --- | --- |
 | 🔎 **Vitrine com busca por distância** | Lista + mapa + filtros (espécie, porte, idade, castração, convivência com crianças/cães/gatos, apartamento). |
 | ⭐ **Reputação medida das ONGs** | Nota de 0 a 5 calculada com dados reais da plataforma, não só estrelas. |
-| 🤝 **Pós-adoção estruturado** | Check-ins automáticos (7, 30, 90 e 180 dias), alerta para a ONG e botão "estou com dificuldade". |
+| 🤝 **Pós-adoção estruturado** | Termo aceito digitalmente, check-ins com foto (7, 30, 90 e 180 dias), alerta para a ONG, avaliação e registro de devolução. |
+| 📣 **Divulgação pronta** | Link bonito por animal, prévia com foto no WhatsApp, posts prontos para o Instagram, páginas para o Google. |
+| 🏠 **Comunidade** | Feiras de adoção, cadastro de lar temporário e doação por Pix direto para a ONG (QR Code gerado no site). |
 
 ## Telas
 
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/animal-web.png" alt="Página do animal" /><br/><sub><b>Página do animal</b> — saúde, convivência, ONG com nota e tempo de resposta.</sub></td>
-    <td width="50%"><img src="docs/screenshots/completar-perfil.png" alt="Completar perfil" /><br/><sub><b>Completar perfil</b> — CPF, celular por SMS e CEP que preenche cidade e bairro.</sub></td>
+    <td width="50%"><img src="docs/screenshots/completar-perfil.png" alt="Completar perfil" /><br/><sub><b>Completar perfil</b> — CPF, celular e CEP que preenche cidade e bairro.</sub></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/painel-ong.png" alt="Painel da ONG" /><br/><sub><b>Painel da ONG</b> — indicadores, candidatos e alertas de pós-adoção.</sub></td>
@@ -69,23 +73,24 @@ flowchart LR
   B --> C{Conversar ou<br/>Quero adotar?}
   C -- Conversar --> D[Chat com a ONG]
   C -- Quero adotar --> E{Perfil completo?}
-  E -- não --> F[Completar perfil<br/><sub>CPF, celular por SMS, CEP + endereço</sub>]
-  F --> G[Pedido enviado]
-  E -- sim --> G
-  G --> H[ONG analisa<br/><sub>vê só bairro, moradia e<br/>'CPF verificado'</sub>]
-  H -- aprova --> I[ONG recebe celular<br/>e endereço]
-  I --> J[Adoção confirmada]
-  J --> K[Check-ins 7 / 30 / 90 / 180 dias]
-  K --> L[Nota da ONG]
+  E -- não --> F[Completar perfil<br/><sub>CPF, celular, CEP + endereço</sub>]
+  F --> C
+  E -- sim --> G[Pedido enviado<br/><sub>compromisso de guarda responsável<br/>+ perguntas da ONG</sub>]
+  G --> H[ONG analisa<br/><sub>vê bairro, moradia, celular e<br/>'CPF válido'</sub>]
+  H -- aprova --> I[ONG recebe<br/>o endereço]
+  I --> J[Adoção confirmada<br/><sub>termo aceito no site</sub>]
+  J --> K[Check-ins 7 / 30 / 90 / 180 dias<br/><sub>com foto</sub>]
+  K --> L[Avaliação e nota da ONG]
 ```
 
 ### Regras de privacidade (LGPD)
 
 - **Cadastro em duas etapas:** para olhar, favoritar e conversar basta nome, e-mail e senha. CPF, celular e endereço só são pedidos ao clicar em **"Quero adotar"**.
-- **A ONG nunca vê o CPF** — apenas o selo "CPF verificado".
-- **Celular e endereço completo** só são liberados para a ONG **depois que ela aprova** o pedido.
+- **A ONG nunca vê o CPF** — apenas "CPF válido" (o sistema confere os dígitos; não consulta a Receita).
+- O **celular** aparece para a ONG já no pedido; o **endereço completo** só depois que ela **aprova**.
+- **Baixar meus dados** (JSON) e **excluir a conta** a qualquer momento, no perfil.
 - Localização dos animais no mapa é **arredondada (~1 km)**; distâncias abaixo de 1 km aparecem como "menos de 1 km".
-- Exclusão de conta a qualquer momento (com anonimização quando já houve adoção).
+- Exclusão de conta com anonimização quando já houve adoção. Só cookies essenciais (sem rastreamento).
 
 Essas regras ficam **no banco** (Row Level Security + funções SQL), não só na interface.
 
@@ -111,7 +116,7 @@ flowchart TB
   end
   subgraph Supabase
     PG[(Postgres + PostGIS<br/><sub>RLS + funções de negócio</sub>)]
-    AU[Auth<br/><sub>e-mail/senha, SMS</sub>]
+    AU[Auth<br/><sub>e-mail/senha com código</sub>]
     RT[Realtime<br/><sub>chat</sub>]
     ST[Storage<br/><sub>fotos</sub>]
   end
@@ -132,7 +137,9 @@ app-pet/
 ├── supabase/
 │   ├── migrations/   Schema, RLS, funções (busca por raio, pedidos, ranking), storage
 │   └── seed.sql      Dados fictícios de Ribeirão Preto
-└── scripts/          Gerador das capturas de tela
+├── e2e/              Testes de ponta a ponta (Playwright)
+├── scripts/          Capturas de tela e verificador de traduções
+└── .github/          CI (tipos, lint, testes, traduções, build e E2E)
 ```
 
 ## Rodando localmente
@@ -157,7 +164,7 @@ npm run dev:web             # http://localhost:3000
 | `ong2@adotai.dev` / `ong3@adotai.dev` | Lar do Focinho / Abrigo Esperança |
 | `admin@adotai.dev` | Administração |
 
-No ambiente local o SMS é simulado: use o celular **(16) 99999-0000** e o código **123456**.
+O celular não é verificado por SMS (decisão do produto): só o formato é validado (DDD + 9 dígitos).
 
 ### App mobile (Expo)
 
@@ -176,8 +183,10 @@ login, cadastro (etapa 1) e completar perfil (etapa 2, com SMS e CEP).
 Outros comandos:
 
 ```bash
-npm test                 # testes do pacote compartilhado (CPF, CNPJ, CEP, máscaras)
+npm test                 # testes do pacote compartilhado (CPF, CNPJ, CEP, máscaras, compatibilidade)
 npm run lint:web
+python scripts/i18n-check.py   # todo texto da web precisa ter inglês (o CI falha se faltar)
+npx playwright test      # testes de ponta a ponta (site rodando em :3000 contra o banco local)
 npm run build:web
 npm run db:reset         # recria o banco local com migrations + seed
 npm run db:types         # regenera os tipos TypeScript a partir do banco
@@ -190,14 +199,19 @@ node scripts/screenshots.mjs <id-de-um-animal>   # atualiza as imagens deste REA
 - [x] Banco: schema, RLS, busca por raio, pedidos, chat, pós-adoção, ranking
 - [x] Web: busca com mapa, animal, ONG, cadastro em 2 etapas, chat em tempo real, painel da ONG, admin
 - [x] App mobile (Expo) do adotante — primeira versão (busca, animal, favoritos, chat, perfil, cadastro em 2 etapas)
-- [ ] App mobile: mapa (MapLibre nativo), notificações push, testes em aparelho
-- [ ] Projeto Supabase em produção + deploy da web
-- [ ] SMS real (provedor de SMS) e e-mails transacionais
-- [ ] Tarefas agendadas (check-ins atrasados, recálculo de notas) com `pg_cron`
-- [ ] Fase 2: buscas salvas com alerta, avaliações na interface, carteira de saúde
-- [ ] Fase 3: relatórios para ONGs, doações via Pix integradas, equipe com papéis
+- [x] Projeto Supabase em produção + deploy da web (Vercel)
+- [x] Avisos no site, recuperar senha, tarefas agendadas (`pg_cron`), travas de segurança no banco
+- [x] Pós-adoção completo: termo digital, check-ins com foto, avaliação, devolução
+- [x] Denunciar e bloquear; linha do tempo do pedido; histórico e fichas no admin; exportar CSV
+- [x] Divulgação: link bonito, prévia com foto, kit de posts, SEO local (sitemap, páginas por cidade)
+- [x] Compatibilidade com a casa do adotante, perguntas da ONG, feiras, lar temporário, doação por Pix
+- [x] LGPD: Termos de uso (rascunho), baixar meus dados, aviso de cookies
+- [x] CI no GitHub + testes de ponta a ponta; site instalável (PWA)
+- [ ] E-mails transacionais (precisa de domínio + Resend)
+- [ ] App mobile: mapa, push, telas novas, testes em aparelho
+- [ ] Buscas salvas com alerta, equipe da ONG com papéis, estatísticas por animal
 
 ## Aviso
 
 Todos os nomes de ONGs, animais e pessoas nos dados de exemplo e nas imagens são **fictícios**.
-A Política de Privacidade e o Termo de Adoção incluídos são **rascunhos** e precisam de revisão jurídica antes do lançamento.
+A Política de Privacidade, os Termos de uso e o Termo de Adoção incluídos são **rascunhos** e precisam de revisão jurídica antes do lançamento.
