@@ -735,7 +735,7 @@ export const EN: Record<string, string> = {
   'A ONG vai analisar seu perfil. Você recebe um aviso quando ela responder.': 'The shelter will review your profile. You\'ll get a notification when it replies.',
   'Aceitar o termo de adoção?': 'Accept the adoption agreement?',
   'Aceite digital': 'Digital acceptance',
-  'Aceite feito pelo adotante na própria conta no Adotaí, com data e hora registradas. Modelo padrão em revisão jurídica.': 'Accepted by the adopter in their Adotaí account, with date and time recorded. Standard template under legal review.',
+  'Aceite feito pelo adotante na própria conta no Adotaí, com data e hora registradas.': 'Accepted by the adopter in their Adotaí account, with date and time recorded.',
   'Adaptação': 'Adaptation',
   'Adicionar foto': 'Add photo',
   'Adoção registrada em': 'Adoption recorded on',

@@ -33,8 +33,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <div><dt className="text-xs text-muted">{t('Adoção registrada em')}</dt><dd className="font-semibold text-ink">{dt(a.adopted_at)}</dd></div>
         <div className="sm:col-span-2"><dt className="text-xs text-muted">{t('Aceite digital')}</dt><dd className="font-semibold text-ink">{dt(a.term_accepted_at)} · {t('versão {v}', { v: a.term_version ?? 'padrao-v1' })} · {t('código {c}', { c: a.id.slice(0, 8).toUpperCase() })}</dd></div>
       </dl>
-      <TermClauses lang={lang === 'en' ? 'en' : 'pt'} />
-      <p className="mt-8 text-xs text-muted">{t('Aceite feito pelo adotante na própria conta no Adotaí, com data e hora registradas. Modelo padrão em revisão jurídica.')}</p>
+      <TermClauses lang={lang === 'en' ? 'en' : 'pt'} version={a.term_version} />
+      <p className="mt-8 text-xs text-muted">{t('Aceite feito pelo adotante na própria conta no Adotaí, com data e hora registradas.')}</p>
     </main>
   );
 }

@@ -6,6 +6,13 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL
   ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://adotaiapp.vercel.app'))
   .replace(/\/$/, '');
 
+/**
+ * Quem opera o Adotaí (controlador dos dados, LGPD art. 9º) e o canal de contato/privacidade.
+ * Definidos na Vercel; enquanto não houver, as páginas legais mostram o aviso entre colchetes.
+ */
+export const OPERATOR_NAME = process.env.NEXT_PUBLIC_OPERATOR_NAME?.trim() || '';
+export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || '';
+
 /** Cliente sem sessão (só dados públicos), para sitemap e páginas que não dependem do usuário. */
 export function publicClient() {
   return createSupabase<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
