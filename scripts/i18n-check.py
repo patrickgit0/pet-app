@@ -16,6 +16,8 @@ skip_class = re.compile(r'\b(flex|grid|text-|bg-|px-|py-|p-\d|rounded|font-|item
 keys = {}
 for f in files:
     s = open(f, encoding='utf-8').read()
+    if 'i18n-check: ignore-file' in s:  # páginas com PT e EN no próprio arquivo (ex.: guia-ong)
+        continue
     # ignora comentários de linha e de bloco
     s = re.sub(r'/\*.*?\*/', '', s, flags=re.S)
     s = re.sub(r'(^|\s)//[^\n]*', r'\1', s)

@@ -20,16 +20,17 @@ test.describe('Visitante (sem login)', () => {
   });
 
   test('páginas de SEO, feiras, lar temporário e LGPD respondem', async ({ page, request }) => {
-    for (const path of ['/adotar/cachorro-em-ribeirao-preto', '/feiras', '/lar-temporario', '/termos', '/privacidade', '/termo-de-adocao', '/ongs']) {
+    for (const path of ['/adotar/cachorro-em-ribeirao-preto', '/feiras', '/lar-temporario', '/termos', '/privacidade', '/termo-de-adocao', '/ongs', '/guia-ong']) {
       const res = await page.goto(path);
       expect(res?.status(), path).toBe(200);
     }
     expect((await request.get('/sitemap.xml')).status()).toBe(200);
     expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /painel');
     expect((await request.get('/manifest.webmanifest')).status()).toBe(200);
-    // Com o loading.tsx da raiz, em produção o "não encontrado" chega por streaming: status 200 + noindex (Google não indexa)
-    const missing = await request.get('/adotar/nao-existe');
-    if (missing.status() !== 404) expect(await missing.text()).toContain('<meta name="robots" content="noindex"/>');
+    // Página inexistente responde 404 de verdade (o loading.tsx não fica acima dessas páginas)
+    for (const path of ['/adotar/nao-existe', '/animais/nao-existe-zzzzzz', '/ongs/nao-existe']) {
+      expect((await request.get(path)).status(), path).toBe(404);
+    }
     expect((await request.get('/api/admin/export/pedidos')).status()).toBe(403);
   });
 

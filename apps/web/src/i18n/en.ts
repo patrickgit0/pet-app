@@ -977,4 +977,8 @@ export const EN: Record<string, string> = {
   'A ONG indica que não convive bem com gatos': 'The shelter says it isn\'t good with cats',
   'Exportar CSV': 'Export CSV',
 
+  'Página não encontrada': 'Page not found',
+  'O link pode estar errado ou o anúncio já foi removido (às vezes porque o animal foi adotado).': 'The link may be wrong or the listing was removed (sometimes because the animal was adopted).',
+  'Guia para ONGs': 'Guide for NGOs',
+  'Como funciona: guia para ONGs': 'How it works: guide for NGOs',
 };

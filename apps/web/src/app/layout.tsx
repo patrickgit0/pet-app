@@ -40,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/termos">{t('Termos de uso')}</Link>
                 <Link href="/termo-de-adocao">{t('Termo de adoção')}</Link>
                 <Link href="/sou-ong">{t('Sou ONG')}</Link>
+                <Link href="/guia-ong">{t('Guia para ONGs')}</Link>
                 <Link href="/lar-temporario">{t('Seja lar temporário')}</Link>
                 <Link href="/adotar/cachorro-em-ribeirao-preto">{t('Cães em Ribeirão Preto')}</Link>
                 <Link href="/adotar/gato-em-ribeirao-preto">{t('Gatos em Ribeirão Preto')}</Link>

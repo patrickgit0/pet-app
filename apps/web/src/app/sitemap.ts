@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/feiras`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
     { url: `${SITE_URL}/lar-temporario`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/sou-ong`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${SITE_URL}/guia-ong`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/privacidade`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/termos`, changeFrequency: 'yearly', priority: 0.2 },
     { url: `${SITE_URL}/termo-de-adocao`, changeFrequency: 'yearly', priority: 0.2 },

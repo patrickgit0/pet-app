@@ -24,6 +24,7 @@ export default async function Page() {
           <li>✓ {t('Check-ins automáticos de pós-adoção')}</li>
           <li>✓ {t('Nota pública baseada em resultados, não em popularidade')}</li>
         </ul>
+        <Link href="/guia-ong" className="text-sm font-semibold text-brand">{t('Como funciona: guia para ONGs')}</Link>
       </section>
       {user ? (
         <NgoSignupForm />

@@ -10,10 +10,10 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { ENERGY_LABEL, SIZE_LABEL, animalPath, formatAge, formatRating, sexLabel, speciesText } from '@adotai/shared';
 import { compatibility } from '@adotai/shared';
-import { animalRef } from '@/lib/animal-ref';
-import { getSession, createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/supabase/server';
 import { photoUrl, tintFor, initials } from '@/lib/utils';
 import { ChatIcon, HeartIcon, PawIcon, VerifiedIcon } from '@/components/icons';
+import { loadAnimal as load } from './load';
 import { requestAdoption, startChat, toggleFavorite } from './actions';
 
 type Params = { params: Promise<{ id: string }>; searchParams: Promise<{ erro?: string; perfil?: string }> };
@@ -23,17 +23,6 @@ function ageMonths(birth: string | null): number | null {
   const b = new Date(birth);
   const now = new Date();
   return (now.getFullYear() - b.getFullYear()) * 12 + (now.getMonth() - b.getMonth());
-}
-
-async function load(param: string) {
-  const { col, value } = animalRef(param);
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('animals')
-    .select('*, ngos(id, name, slug, verified_at, rating, completed_adoptions, median_response_minutes, neighborhood, city, whatsapp, opening_hours, pix_key, application_questions), animal_photos(storage_path, position)')
-    .eq(col, value)
-    .maybeSingle();
-  return data;
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

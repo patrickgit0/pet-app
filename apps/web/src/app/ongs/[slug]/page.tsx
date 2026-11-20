@@ -10,13 +10,14 @@ import { initials, photoUrl, tintFor } from '@/lib/utils';
 import { EventCard } from '@/components/event-card';
 import { PawIcon, VerifiedIcon } from '@/components/icons';
 import { AnimalCard } from '@/components/animal-card';
+import { loadNgo } from './load';
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { t, lang, locale } = await getI18n();
-  const { data: ngo } = await supabase.from('ngos').select('*').eq('slug', slug).maybeSingle();
+  const ngo = await loadNgo(slug);
   if (!ngo) notFound();
 
   const [{ data: animals }, { data: reviews }, { data: happy }, { data: events }] = await Promise.all([
