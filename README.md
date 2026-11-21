@@ -38,6 +38,7 @@ O Adotaí junta três coisas que hoje ficam separadas:
 | 🤝 **Pós-adoção estruturado** | Termo aceito digitalmente, check-ins com foto (7, 30, 90 e 180 dias), alerta para a ONG, avaliação e registro de devolução. |
 | 📣 **Divulgação pronta** | Link bonito por animal, prévia com foto no WhatsApp, posts prontos para o Instagram, páginas para o Google. |
 | 🏠 **Comunidade** | Feiras de adoção, cadastro de lar temporário e doação por Pix direto para a ONG (QR Code gerado no site). |
+| 📘 **Pronto para as ONGs** | [Guia passo a passo](https://adotaiapp.vercel.app/guia-ong) para quem vai começar a anunciar. |
 
 ## Telas
 
@@ -91,6 +92,9 @@ flowchart LR
 - **Baixar meus dados** (JSON) e **excluir a conta** a qualquer momento, no perfil.
 - Localização dos animais no mapa é **arredondada (~1 km)**; distâncias abaixo de 1 km aparecem como "menos de 1 km".
 - Exclusão de conta com anonimização quando já houve adoção. Só cookies essenciais (sem rastreamento).
+- Textos completos no site: [Política de Privacidade](https://adotaiapp.vercel.app/privacidade) (bases legais, prestadores, direitos, canal de privacidade),
+  [Termos de uso](https://adotaiapp.vercel.app/termos) e [Termo de adoção](https://adotaiapp.vercel.app/termo-de-adocao) versionado —
+  cada adotante vê sempre a versão que aceitou.
 
 Essas regras ficam **no banco** (Row Level Security + funções SQL), não só na interface.
 
@@ -150,7 +154,7 @@ Pré-requisitos: **Node 20+**, **Docker** (para o Supabase local).
 npm install                 # instala web + shared + CLI do Supabase
 npx supabase start          # sobe Postgres, Auth, Realtime e Storage no Docker (aplica migrations e seed)
 npx supabase status -o env  # copie API_URL e ANON_KEY
-cp apps/web/.env.example apps/web/.env.local   # e cole os valores
+cp apps/web/.env.example apps/web/.env.local   # e cole os valores (nome do responsável e e-mail de contato são opcionais no dev)
 npm run dev:web             # http://localhost:3000
 ```
 
@@ -178,7 +182,7 @@ npx expo start         # abra no Expo Go (Android/iOS) lendo o QR code
 ```
 
 Telas: busca com filtros e "usar minha localização", animal, favoritos, chat em tempo real, perfil com pedidos,
-login, cadastro (etapa 1) e completar perfil (etapa 2, com SMS e CEP).
+login, cadastro (etapa 1) e completar perfil (etapa 2, com celular validado e CEP).
 
 Outros comandos:
 
@@ -205,13 +209,16 @@ node scripts/screenshots.mjs <id-de-um-animal>   # atualiza as imagens deste REA
 - [x] Denunciar e bloquear; linha do tempo do pedido; histórico e fichas no admin; exportar CSV
 - [x] Divulgação: link bonito, prévia com foto, kit de posts, SEO local (sitemap, páginas por cidade)
 - [x] Compatibilidade com a casa do adotante, perguntas da ONG, feiras, lar temporário, doação por Pix
-- [x] LGPD: Termos de uso (rascunho), baixar meus dados, aviso de cookies
+- [x] LGPD: Política de Privacidade, Termos de uso e Termo de adoção v2 completos; baixar meus dados; aviso de cookies
+- [x] Guia para ONGs; página inexistente responde 404 de verdade
 - [x] CI no GitHub + testes de ponta a ponta; site instalável (PWA)
 - [ ] E-mails transacionais (precisa de domínio + Resend)
 - [ ] App mobile: mapa, push, telas novas, testes em aparelho
+- [ ] Moderação no admin (esconder avaliação, agir direto na denúncia)
+- [ ] Sustentabilidade: página de impacto, parceiros locais com kit de boas-vindas pós-adoção, "Apoie o Adotaí"
 - [ ] Buscas salvas com alerta, equipe da ONG com papéis, estatísticas por animal
 
 ## Aviso
 
 Todos os nomes de ONGs, animais e pessoas nos dados de exemplo e nas imagens são **fictícios**.
-A Política de Privacidade, os Termos de uso e o Termo de Adoção incluídos são **rascunhos** e precisam de revisão jurídica antes do lançamento.
+A Política de Privacidade, os Termos de uso e o Termo de Adoção foram escritos com base na LGPD, no Marco Civil da Internet e na legislação de proteção animal, **sem revisão de advogado**. Revise antes de reutilizá-los em outro projeto.
