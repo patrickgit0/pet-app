@@ -1,4 +1,4 @@
--- Adotaí — Pós-adoção completo, denúncias e bloqueio (migration 13)
+-- Vira Lar — Pós-adoção completo, denúncias e bloqueio (migration 13)
 
 -- Tipos de aviso novos: termo aceito, avaliação, denúncia (para o admin), lar temporário e feira
 alter table public.notifications drop constraint if exists notifications_kind_check;

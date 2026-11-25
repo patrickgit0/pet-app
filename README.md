@@ -2,20 +2,19 @@
 
 <img src="docs/logo.svg" alt="" width="72" height="72" />
 
-# Adotaí
+# Vira Lar
 
 **Adoção de cães, gatos e outros animais perto de você — com ONGs verificadas, chat e acompanhamento pós-adoção.**
 
-**No ar:** [adotaiapp.vercel.app](https://adotaiapp.vercel.app) (dados de demonstração)
+**No ar:** [viralarpet.vercel.app](https://viralarpet.vercel.app) (dados de demonstração)
 
 Marketplace no estilo classificados: ONGs anunciam, adotantes buscam por distância e pela qualidade da ONG,
 conversam pelo chat e a plataforma acompanha o animal depois da adoção.
 
 ![Status](https://img.shields.io/badge/status-MVP%20em%20desenvolvimento-E8833A)
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs)
-![Expo](https://img.shields.io/badge/Expo-SDK%2058-000020?logo=expo)
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20PostGIS-3ECF8E?logo=supabase)
-![Piloto](https://img.shields.io/badge/piloto-Ribeir%C3%A3o%20Preto%2FSP-0F6E5C)
+![Piloto](https://img.shields.io/badge/piloto-Franca%2FSP-0F6E5C)
 
 </div>
 
@@ -23,13 +22,13 @@ conversam pelo chat e a plataforma acompanha o animal depois da adoção.
   <img src="docs/screenshots/busca-web.png" alt="Busca de animais com filtros, lista e mapa" width="900" />
 </p>
 
-## Por que o Adotaí
+## Por que o Vira Lar
 
 Hoje a adoção acontece espalhada entre Instagram, grupos de WhatsApp e planilhas. Isso funciona para
 divulgar, mas falha em duas coisas: **ajudar o adotante a escolher com calma** e **acompanhar o animal
 depois que ele vai para casa** — que é onde acontecem as devoluções.
 
-O Adotaí junta três coisas que hoje ficam separadas:
+O Vira Lar junta três coisas que hoje ficam separadas:
 
 | | |
 | --- | --- |
@@ -38,7 +37,7 @@ O Adotaí junta três coisas que hoje ficam separadas:
 | 🤝 **Pós-adoção estruturado** | Termo aceito digitalmente, check-ins com foto (7, 30, 90 e 180 dias), alerta para a ONG, avaliação e registro de devolução. |
 | 📣 **Divulgação pronta** | Link bonito por animal, prévia com foto no WhatsApp, posts prontos para o Instagram, páginas para o Google. |
 | 🏠 **Comunidade** | Feiras de adoção, cadastro de lar temporário e doação por Pix direto para a ONG (QR Code gerado no site). |
-| 📘 **Pronto para as ONGs** | [Guia passo a passo](https://adotaiapp.vercel.app/guia-ong) para quem vai começar a anunciar. |
+| 📘 **Pronto para as ONGs** | [Guia passo a passo](https://viralarpet.vercel.app/guia-ong) para quem vai começar a anunciar. |
 
 ## Telas
 
@@ -58,12 +57,8 @@ O Adotaí junta três coisas que hoje ficam separadas:
 </table>
 
 <p align="center">
-  <img src="docs/screenshots/app-animal.png" alt="App: página do animal" width="240" />
-  &nbsp;
-  <img src="docs/screenshots/app-criar-conta.png" alt="App: criar conta" width="240" />
-  &nbsp;
   <img src="docs/screenshots/busca-mobile.png" alt="Site no celular" width="240" />
-  <br/><sub>App do adotante (Expo) — animal e cadastro — e o site responsivo no celular.</sub>
+  <br/><sub>O site é responsivo e instalável (PWA) no celular.</sub>
 </p>
 
 ## Como funciona
@@ -92,8 +87,8 @@ flowchart LR
 - **Baixar meus dados** (JSON) e **excluir a conta** a qualquer momento, no perfil.
 - Localização dos animais no mapa é **arredondada (~1 km)**; distâncias abaixo de 1 km aparecem como "menos de 1 km".
 - Exclusão de conta com anonimização quando já houve adoção. Só cookies essenciais (sem rastreamento).
-- Textos completos no site: [Política de Privacidade](https://adotaiapp.vercel.app/privacidade) (bases legais, prestadores, direitos, canal de privacidade),
-  [Termos de uso](https://adotaiapp.vercel.app/termos) e [Termo de adoção](https://adotaiapp.vercel.app/termo-de-adocao) versionado —
+- Textos completos no site: [Política de Privacidade](https://viralarpet.vercel.app/privacidade) (bases legais, prestadores, direitos, canal de privacidade),
+  [Termos de uso](https://viralarpet.vercel.app/termos) e [Termo de adoção](https://viralarpet.vercel.app/termo-de-adocao) versionado —
   cada adotante vê sempre a versão que aceitou.
 
 Essas regras ficam **no banco** (Row Level Security + funções SQL), não só na interface.
@@ -104,7 +99,7 @@ Essas regras ficam **no banco** (Row Level Security + funções SQL), não só n
 | --- | --- | --- |
 | Sucesso das adoções | 30% | % sem devolução após 90 dias |
 | Pós-adoção cumprido | 20% | % de check-ins respondidos |
-| Avaliação de adotantes | 20% | Estrelas, só de quem adotou pelo app |
+| Avaliação de adotantes | 20% | Estrelas, só de quem adotou pela plataforma |
 | Tempo de resposta | 15% | Mediana da 1ª resposta no chat |
 | Transparência | 15% | Anúncios com saúde e descrição completas e atualizados |
 
@@ -116,17 +111,16 @@ ONGs com menos de 5 adoções aparecem como **"Nova na plataforma"**. A ordenaç
 flowchart TB
   subgraph Clientes
     W[Web — Next.js 15<br/><sub>busca, animal, ONG, painel, admin</sub>]
-    M[App — Expo / React Native<br/><sub>adotante</sub>]
   end
   subgraph Supabase
     PG[(Postgres + PostGIS<br/><sub>RLS + funções de negócio</sub>)]
-    AU[Auth<br/><sub>e-mail/senha com código</sub>]
+    AU[Auth<br/><sub>e-mail/senha com link de confirmação</sub>]
     RT[Realtime<br/><sub>chat</sub>]
     ST[Storage<br/><sub>fotos</sub>]
   end
-  W & M --> AU & PG & RT & ST
-  W & M -. CEP .-> BR[BrasilAPI / ViaCEP / Nominatim]
-  W & M -. mapa .-> OFM[OpenFreeMap + MapLibre]
+  W --> AU & PG & RT & ST
+  W -. CEP .-> BR[BrasilAPI / ViaCEP / Nominatim]
+  W -. mapa .-> OFM[OpenFreeMap + MapLibre]
 ```
 
 Tudo gratuito no início: mapas com **OpenFreeMap/OpenStreetMap** (sem chave), CEP com **BrasilAPI/ViaCEP**, backend no plano free do Supabase.
@@ -134,13 +128,12 @@ Tudo gratuito no início: mapas com **OpenFreeMap/OpenStreetMap** (sem chave), C
 ```
 app-pet/
 ├── apps/
-│   ├── web/          Next.js — site público, área do adotante, painel da ONG e admin
-│   └── mobile/       Expo — app do adotante (Android/iOS)
+│   └── web/          Next.js — site público, área do adotante, painel da ONG e admin
 ├── packages/
 │   └── shared/       Tipos do banco, validação de CPF/CNPJ, máscaras, CEP, rótulos pt-BR
 ├── supabase/
 │   ├── migrations/   Schema, RLS, funções (busca por raio, pedidos, ranking), storage
-│   └── seed.sql      Dados fictícios de Ribeirão Preto
+│   └── seed.sql      Dados fictícios de Franca
 ├── e2e/              Testes de ponta a ponta (Playwright)
 ├── scripts/          Capturas de tela e verificador de traduções
 └── .github/          CI (tipos, lint, testes, traduções, build e E2E)
@@ -170,20 +163,6 @@ npm run dev:web             # http://localhost:3000
 
 O celular não é verificado por SMS (decisão do produto): só o formato é validado (DDD + 9 dígitos).
 
-### App mobile (Expo)
-
-O app fica fora dos workspaces (o Expo SDK 58 usa outra versão do React):
-
-```bash
-cd apps/mobile
-npm install
-cp .env.example .env   # use o IP da sua máquina na rede (ex.: http://192.168.0.10:54321), não 127.0.0.1
-npx expo start         # abra no Expo Go (Android/iOS) lendo o QR code
-```
-
-Telas: busca com filtros e "usar minha localização", animal, favoritos, chat em tempo real, perfil com pedidos,
-login, cadastro (etapa 1) e completar perfil (etapa 2, com celular validado e CEP).
-
 Outros comandos:
 
 ```bash
@@ -202,7 +181,6 @@ node scripts/screenshots.mjs <id-de-um-animal>   # atualiza as imagens deste REA
 - [x] Plano, protótipo e decisões de produto
 - [x] Banco: schema, RLS, busca por raio, pedidos, chat, pós-adoção, ranking
 - [x] Web: busca com mapa, animal, ONG, cadastro em 2 etapas, chat em tempo real, painel da ONG, admin
-- [x] App mobile (Expo) do adotante — primeira versão (busca, animal, favoritos, chat, perfil, cadastro em 2 etapas)
 - [x] Projeto Supabase em produção + deploy da web (Vercel)
 - [x] Avisos no site, recuperar senha, tarefas agendadas (`pg_cron`), travas de segurança no banco
 - [x] Pós-adoção completo: termo digital, check-ins com foto, avaliação, devolução
@@ -213,9 +191,8 @@ node scripts/screenshots.mjs <id-de-um-animal>   # atualiza as imagens deste REA
 - [x] Guia para ONGs; página inexistente responde 404 de verdade
 - [x] CI no GitHub + testes de ponta a ponta; site instalável (PWA)
 - [ ] E-mails transacionais (precisa de domínio + Resend)
-- [ ] App mobile: mapa, push, telas novas, testes em aparelho
 - [ ] Moderação no admin (esconder avaliação, agir direto na denúncia)
-- [ ] Sustentabilidade: página de impacto, parceiros locais com kit de boas-vindas pós-adoção, "Apoie o Adotaí"
+- [ ] Sustentabilidade: página de impacto, parceiros locais com kit de boas-vindas pós-adoção, "Apoie o Vira Lar"
 - [ ] Buscas salvas com alerta, equipe da ONG com papéis, estatísticas por animal
 
 ## Aviso

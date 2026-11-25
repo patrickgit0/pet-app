@@ -1,6 +1,6 @@
 # Fotos dos anúncios de demonstração
 
-Fotos das contas fictícias de produção (ONG Exemplo Adotaí e Amigos de Quatro Patas), enviadas em 18/11/2026.
+Fotos das contas fictícias de produção (ONG Exemplo Vira Lar e Amigos de Quatro Patas), enviadas em 18/11/2026.
 Todas vêm do Wikimedia Commons com licença **CC0** (domínio público, uso livre sem atribuição obrigatória).
 Apagar junto com os dados de demonstração antes do lançamento.
 

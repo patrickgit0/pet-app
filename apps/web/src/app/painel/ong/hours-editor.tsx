@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { WEEK_ORDER, WEEKDAY_LABEL, type OpeningHours, type WeekdayKey } from '@adotai/shared';
+import { WEEK_ORDER, WEEKDAY_LABEL, type OpeningHours, type WeekdayKey } from '@viralar/shared';
 import { useI18n } from '@/i18n/client';
 
 const TIMES = Array.from({ length: 33 }, (_, i) => `${String(6 + Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`); // 06:00–22:00

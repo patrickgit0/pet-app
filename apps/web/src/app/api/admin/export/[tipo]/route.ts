@@ -74,7 +74,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ tipo: stri
   return new NextResponse(toCsv(rows), {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="adotai-${tipo}-${new Date().toISOString().slice(0, 10)}.csv"`,
+      'Content-Disposition': `attachment; filename="viralar-${tipo}-${new Date().toISOString().slice(0, 10)}.csv"`,
       'Cache-Control': 'no-store',
     },
   });

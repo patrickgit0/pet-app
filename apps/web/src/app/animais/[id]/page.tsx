@@ -8,8 +8,8 @@ import { getI18n } from '@/i18n/server';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ENERGY_LABEL, SIZE_LABEL, animalPath, formatAge, formatRating, sexLabel, speciesText } from '@adotai/shared';
-import { compatibility } from '@adotai/shared';
+import { ENERGY_LABEL, SIZE_LABEL, animalPath, formatAge, formatRating, sexLabel, speciesText } from '@viralar/shared';
+import { compatibility } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { photoUrl, tintFor, initials } from '@/lib/utils';
 import { ChatIcon, HeartIcon, PawIcon, VerifiedIcon } from '@/components/icons';
@@ -66,12 +66,12 @@ export default async function AnimalPage({ params, searchParams }: Params) {
     { ok: a.good_for_apartment, label: t('Apartamento') },
   ].filter((c) => c.ok !== null);
 
-  const landing = a.species === 'dog' ? 'cachorro-em-ribeirao-preto' : a.species === 'cat' ? 'gato-em-ribeirao-preto' : 'outros-animais-em-ribeirao-preto';
+  const landing = a.species === 'dog' ? 'cachorro-em-franca' : a.species === 'cat' ? 'gato-em-franca' : 'outros-animais-em-franca';
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Adotaí', item: SITE_URL },
+      { '@type': 'ListItem', position: 1, name: 'Vira Lar', item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: t(LANDINGS[landing].title), item: `${SITE_URL}/adotar/${landing}` },
       { '@type': 'ListItem', position: 3, name: a.name, item: SITE_URL + path },
     ],
@@ -215,7 +215,7 @@ export default async function AnimalPage({ params, searchParams }: Params) {
         )}
         {a.status === 'available' && <ShareAnimal path={path} name={a.name} />}
         {ngo.pix_key && !isNgoMember && (
-          <DonatePix ngo={{ name: ngo.name, city: ngo.city, pix_key: ngo.pix_key }} message={`Adotai ${a.name}`}
+          <DonatePix ngo={{ name: ngo.name, city: ngo.city, pix_key: ngo.pix_key }} message={`Vira Lar ${a.name}`}
             title={t('Ajude a cuidar de {name} com um Pix para a ONG', { name: a.name })} />
         )}
         {!user && <p className="text-xs text-muted">{t('Para conversar ou pedir a adoção você precisa de uma conta (só nome, e-mail e senha).')}</p>}

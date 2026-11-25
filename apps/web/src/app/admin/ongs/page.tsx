@@ -1,7 +1,7 @@
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { formatCnpj, formatRating } from '@adotai/shared';
+import { formatCnpj, formatRating } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { verifyNgo } from '../actions';
 import { Badge, PageTitle, SearchBar, fmtDate } from '../ui';

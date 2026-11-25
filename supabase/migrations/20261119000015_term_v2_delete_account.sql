@@ -1,4 +1,4 @@
--- Adotaí — Termo de adoção v2 e exclusão de conta mais completa (migration 15)
+-- Vira Lar — Termo de adoção v2 e exclusão de conta mais completa (migration 15)
 
 -- Termo padrão v2 (texto em apps/web/src/components/term-clauses.tsx). Quem já aceitou continua na versão que aceitou;
 -- adoções ainda sem aceite passam para a v2.

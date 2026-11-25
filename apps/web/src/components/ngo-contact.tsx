@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { WEEK_ORDER, WEEKDAY_LABEL, WEEKDAY_KEYS, openNow, parseOpeningHours, whatsappLink } from '@adotai/shared';
+import { WEEK_ORDER, WEEKDAY_LABEL, WEEKDAY_KEYS, openNow, parseOpeningHours, whatsappLink } from '@viralar/shared';
 import { getI18n } from '@/i18n/server';
 import { WhatsAppGlyph as WhatsAppIcon } from './whatsapp-glyph';
 
-/** "Agora" no fuso de Ribeirão Preto (o servidor da Vercel roda em UTC). */
+/** "Agora" no fuso de Franca (o servidor da Vercel roda em UTC). */
 function nowInBrazil() {
   return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
 }
@@ -26,8 +26,8 @@ export async function NgoContact({ ngo, loggedIn, animalName, next }: {
   if (!hours && !ngo.whatsapp) return null;
 
   const text = animalName
-    ? t('Olá! Vi o(a) {animal} no Adotaí e gostaria de saber mais.', { animal: animalName })
-    : t('Olá! Vi a {ngo} no Adotaí e gostaria de saber mais sobre adoção.', { ngo: ngo.name });
+    ? t('Olá! Vi o(a) {animal} no Vira Lar e gostaria de saber mais.', { animal: animalName })
+    : t('Olá! Vi a {ngo} no Vira Lar e gostaria de saber mais sobre adoção.', { ngo: ngo.name });
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-line ring-inset">

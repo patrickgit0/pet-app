@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { SIZE_LABEL, SPECIES_ORDER, SPECIES_PLURAL, formatPhone, type AnimalSize, type Species } from '@adotai/shared';
+import { SIZE_LABEL, SPECIES_ORDER, SPECIES_PLURAL, formatPhone, type AnimalSize, type Species } from '@viralar/shared';
 import { getI18n, pageTitle } from '@/i18n/server';
 import { createClient, getSession } from '@/lib/supabase/server';
 import { ConfirmSubmit } from '@/components/confirm';
@@ -119,7 +119,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
               <input name="phone" required inputMode="tel" placeholder="(16) 99999-0000" defaultValue={offer?.contact_phone ? formatPhone(offer.contact_phone.slice(2)) : ''} className="field" /></label>
             <label className="flex flex-col gap-1.5"><span className="label">{t('Conte um pouco (opcional)')}</span>
               <textarea name="notes" rows={3} maxLength={600} defaultValue={offer?.notes ?? ''} placeholder={t('Ex.: moro em casa com quintal telado, trabalho em home office, já cuidei de filhotes.')} className="field h-auto py-3" /></label>
-            <p className="text-xs text-muted">{t('Ao salvar, você autoriza ONGs verificadas do Adotaí a ver seu nome, bairro e celular para combinar o lar temporário. Você pode pausar ou apagar a oferta quando quiser.')}</p>
+            <p className="text-xs text-muted">{t('Ao salvar, você autoriza ONGs verificadas do Vira Lar a ver seu nome, bairro e celular para combinar o lar temporário. Você pode pausar ou apagar a oferta quando quiser.')}</p>
             <button className="btn-primary self-start">{offer ? t('Salvar alterações') : t('Quero ser lar temporário')}</button>
           </form>
         </>

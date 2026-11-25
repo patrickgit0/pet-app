@@ -2,7 +2,7 @@ import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
-import { REQUEST_STATUS_LABEL, animalPath, type RequestStatus } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, animalPath, type RequestStatus } from '@viralar/shared';
 import { createClient, getSession } from '@/lib/supabase/server';
 import { CalendarIcon } from '@/components/icons';
 import { photoUrl, tintFor } from '@/lib/utils';
@@ -41,7 +41,7 @@ const NEXT: Partial<Record<RequestStatus | 'adopted', string>> = {
   sent: 'A ONG vai analisar seu perfil. Você recebe um aviso quando ela responder.',
   reviewing: 'A ONG está analisando seu pedido. Ela pode propor uma visita pela conversa.',
   visit_scheduled: 'Confirme a visita na conversa e vá conhecer o animal.',
-  approved: 'Pedido aprovado! Combine a entrega com a ONG pela conversa. Ela registra a adoção no Adotaí.',
+  approved: 'Pedido aprovado! Combine a entrega com a ONG pela conversa. Ela registra a adoção no Vira Lar.',
   rejected: 'Este pedido não seguiu. Há outros animais esperando por você.',
   cancelled: 'Você cancelou este pedido.',
 };

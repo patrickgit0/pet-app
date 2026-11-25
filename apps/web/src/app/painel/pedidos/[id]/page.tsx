@@ -3,7 +3,7 @@ import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { HOME_LABEL, REQUEST_STATUS_LABEL, formatDistance, formatPhone, rpcErrorMessage, type RequestStatus } from '@adotai/shared';
+import { HOME_LABEL, REQUEST_STATUS_LABEL, formatDistance, formatPhone, rpcErrorMessage, type RequestStatus } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/server';
 import { getMyNgo } from '@/lib/ngo';
 import { CheckIcon } from '@/components/icons';

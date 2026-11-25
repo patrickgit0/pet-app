@@ -1,6 +1,6 @@
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
-import { formatRating } from '@adotai/shared';
+import { formatRating } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/server';
 import { initials } from '@/lib/utils';
 import { VerifiedIcon } from '@/components/icons';
@@ -19,7 +19,7 @@ export default async function Page() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-extrabold">{t('ONGs parceiras')}</h1>
-      <p className="mb-6 text-sm text-muted">{t('A nota é calculada pelo Adotaí com base em adoções bem-sucedidas, acompanhamento pós-adoção, avaliações, tempo de resposta e transparência.')}</p>
+      <p className="mb-6 text-sm text-muted">{t('A nota é calculada pelo Vira Lar com base em adoções bem-sucedidas, acompanhamento pós-adoção, avaliações, tempo de resposta e transparência.')}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {(ngos ?? []).map((n) => (
           <Link key={n.id} href={`/ongs/${n.slug}`} className="card flex gap-4 p-5 hover:shadow-md">

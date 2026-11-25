@@ -1,7 +1,7 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { REQUEST_STATUS_LABEL, animalPath, type RequestStatus } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, animalPath, type RequestStatus } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { BackIcon, PawIcon } from '@/components/icons';

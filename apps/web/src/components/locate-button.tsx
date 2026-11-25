@@ -3,7 +3,7 @@
 import { useI18n } from '@/i18n/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { formatCep, lookupCep } from '@adotai/shared';
+import { formatCep, lookupCep } from '@viralar/shared';
 import { PinIcon } from './icons';
 import { SEARCH_LOCATION_COOKIE } from '@/lib/cookie-names';
 

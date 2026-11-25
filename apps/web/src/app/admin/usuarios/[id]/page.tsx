@@ -1,7 +1,7 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { HOME_LABEL, REQUEST_STATUS_LABEL, formatPhone, type RequestStatus } from '@adotai/shared';
+import { HOME_LABEL, REQUEST_STATUS_LABEL, formatPhone, type RequestStatus } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { BackIcon } from '@/components/icons';
 import { Badge, fmtDate } from '../../ui';

@@ -1,4 +1,4 @@
-import { animalPath } from '@adotai/shared';
+import { animalPath } from '@viralar/shared';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';

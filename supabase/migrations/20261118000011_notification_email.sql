@@ -1,6 +1,6 @@
 -- Envio dos avisos por e-mail: a cada aviso novo o banco chama POST <site>/api/notifications/email (pg_net).
 -- Fica DESLIGADO até preencher as configurações (não ficam no repositório):
---   insert into private.settings values ('site_url', 'https://adotaiapp.vercel.app'), ('notify_secret', '<segredo>')
+--   insert into private.settings values ('site_url', 'https://viralarpet.vercel.app'), ('notify_secret', '<segredo>')
 --   on conflict (key) do update set value = excluded.value;
 -- e, na Vercel: NOTIFY_SECRET (o mesmo segredo), RESEND_API_KEY e EMAIL_FROM.
 

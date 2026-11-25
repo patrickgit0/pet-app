@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { slugify } from '@adotai/shared';
+import { slugify } from '@viralar/shared';
 import { getLang } from '@/i18n/server';
 import { loadCardAnimal, renderAnimalCard, type CardFormat } from '@/lib/animal-card';
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const res = new Response(img.body, { headers: new Headers(img.headers) });
   res.headers.set('Cache-Control', 'public, max-age=300');
   if (req.nextUrl.searchParams.get('baixar')) {
-    res.headers.set('Content-Disposition', `attachment; filename="adotai-${slugify(a.name)}-${format}.png"`);
+    res.headers.set('Content-Disposition', `attachment; filename="viralar-${slugify(a.name)}-${format}.png"`);
   }
   return res;
 }

@@ -1,4 +1,4 @@
--- Adotaí — schema base
+-- Vira Lar — schema base
 -- Regras de produto: privacidade do adotante, cadastro em 2 etapas, chat ligado a animal.
 
 create extension if not exists postgis with schema extensions;

@@ -45,7 +45,7 @@ async function main() {
   const port = 9333;
   const chrome = spawn(CHROME, [
     '--headless=new', '--hide-scrollbars', '--no-first-run', `--remote-debugging-port=${port}`,
-    `--user-data-dir=${join(tmpdir(), 'adotai-shots')}`, '--enable-unsafe-swiftshader', 'about:blank',
+    `--user-data-dir=${join(tmpdir(), 'viralar-shots')}`, '--enable-unsafe-swiftshader', 'about:blank',
   ], { stdio: 'ignore' });
   let wsUrl;
   for (let i = 0; i < 50 && !wsUrl; i++) {
@@ -66,7 +66,7 @@ async function main() {
   await send('Page.enable');
   await send('Network.enable');
 
-  async function shot(name, path, { w = 1440, h = 1000, mobile = false, as, base = SITE } = {}) {
+  async function shot(name, path, { w = 1440, h = 1000, mobile = false, as } = {}) {
     await send('Network.clearBrowserCookies');
     if (as) {
       const session = await login(as);
@@ -75,7 +75,7 @@ async function main() {
       }
     }
     await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: mobile ? 2 : 1, mobile });
-    await send('Page.navigate', { url: base + path });
+    await send('Page.navigate', { url: SITE + path });
     await wait(4500);
     const { data } = await send('Page.captureScreenshot', { format: 'png' });
     writeFileSync(join(OUT, `${name}.png`), Buffer.from(data, 'base64'));
@@ -93,15 +93,6 @@ async function main() {
   await shot('candidato', '/painel/pedidos', { as: 'ong1@adotai.dev', h: 700 });
   await shot('mensagens', '/mensagens', { as: 'adotante@adotai.dev', h: 700 });
   await shot('pos-adocao', '/painel/pos-adocao', { as: 'ong1@adotai.dev' });
-
-  // App mobile (Expo web em :8081, se estiver rodando: `npx expo start --web` em apps/mobile)
-  const APP = process.env.APP_URL ?? 'http://localhost:8081';
-  const appUp = await fetch(APP).then((r) => r.ok).catch(() => false);
-  if (appUp) {
-    const m = { w: 390, h: 844, mobile: true, base: APP };
-    if (pipoca) await shot('app-animal', `/animal/${pipoca}`, m);
-    await shot('app-criar-conta', '/criar-conta', m);
-  }
 
   ws.close();
   chrome.kill();

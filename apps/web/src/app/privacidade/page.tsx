@@ -23,13 +23,13 @@ export default async function Page() {
       <p className="mt-2 text-sm">Última atualização: 19 de novembro de 2026.</p>
 
       <p className="mt-4">
-        Esta política explica quais dados pessoais o Adotaí trata, para quê, com quem compartilha e como você exerce seus direitos
+        Esta política explica quais dados pessoais o Vira Lar trata, para quê, com quem compartilha e como você exerce seus direitos
         pela Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018).
       </p>
 
       <h2>Quem é o responsável</h2>
       <p>
-        O Adotaí é operado por <strong>{OPERATOR_NAME || '[nome do responsável pelo Adotaí]'}</strong>, controlador dos dados
+        O Vira Lar é operado por <strong>{OPERATOR_NAME || '[nome do responsável pelo Vira Lar]'}</strong>, controlador dos dados
         tratados na plataforma. Contato para privacidade: <Email missing="e-mail de contato a definir" />.
       </p>
       <p className="mt-2">
@@ -51,7 +51,7 @@ export default async function Page() {
       <h2>Para que usamos e com qual base legal</h2>
       <ul>
         <li><strong>Criar sua conta, mostrar anúncios, enviar pedidos, permitir o chat e o acompanhamento pós-adoção</strong> — execução do serviço que você pediu (LGPD, art. 7º, V).</li>
-        <li><strong>Verificar CPF e celular, evitar contas falsas e golpes, proteger os animais e moderar denúncias</strong> — legítimo interesse do Adotaí e dos animais, e prevenção à fraude (art. 7º, IX).</li>
+        <li><strong>Verificar CPF e celular, evitar contas falsas e golpes, proteger os animais e moderar denúncias</strong> — legítimo interesse do Vira Lar e dos animais, e prevenção à fraude (art. 7º, IX).</li>
         <li><strong>Calcular a nota das ONGs</strong> — legítimo interesse, usando só dados agregados das adoções, sem expor adotantes.</li>
         <li><strong>Guardar registros técnicos e atender autoridades</strong> — cumprimento de obrigação legal (art. 7º, II), como o Marco Civil da Internet.</li>
         <li><strong>Avisos por e-mail sobre seus pedidos e conversas</strong> — execução do serviço. Não enviamos propaganda.</li>
@@ -91,7 +91,7 @@ export default async function Page() {
       <ul>
         <li>Enquanto sua conta estiver ativa.</li>
         <li>
-          Se você excluir a conta e <strong>nunca adotou</strong> pelo Adotaí, apagamos sua conta e os dados ligados a ela.
+          Se você excluir a conta e <strong>nunca adotou</strong> pelo Vira Lar, apagamos sua conta e os dados ligados a ela.
           Se <strong>já adotou</strong>, apagamos CPF, celular, endereço, localização, favoritos, buscas salvas e oferta de lar temporário,
           trocamos seu nome por &quot;Conta excluída&quot; e mantemos só o registro da adoção, dos check-ins e das conversas com as ONGs, para o histórico
           delas e a segurança dos animais.
@@ -103,7 +103,7 @@ export default async function Page() {
       <ul>
         <li>Conexão sempre criptografada (HTTPS) e senhas guardadas cifradas.</li>
         <li>Regras de acesso dentro do próprio banco de dados: cada pessoa e cada ONG só consegue ler o que esta política permite.</li>
-        <li>Acesso administrativo restrito à equipe do Adotaí, sem visualização do CPF.</li>
+        <li>Acesso administrativo restrito à equipe do Vira Lar, sem visualização do CPF.</li>
         <li>Se acontecer um incidente de segurança que possa causar risco a você, avisaremos você e a Autoridade Nacional de Proteção de Dados (ANPD).</li>
       </ul>
 
@@ -126,7 +126,7 @@ export default async function Page() {
 
       <h2>Canal de privacidade</h2>
       <p>
-        Como agente de tratamento de pequeno porte (Resolução CD/ANPD nº 2/2022), o Adotaí não indicou um encarregado de dados, mas mantém
+        Como agente de tratamento de pequeno porte (Resolução CD/ANPD nº 2/2022), o Vira Lar não indicou um encarregado de dados, mas mantém
         este canal para titulares e para a ANPD: <Email missing="e-mail de contato a definir" />.
       </p>
 
@@ -146,13 +146,13 @@ function PrivacyEn() {
       <p className="mt-2 text-sm">Last updated: November 19, 2026. Courtesy translation; the Portuguese version prevails.</p>
 
       <p className="mt-4">
-        This policy explains what personal data Adotaí processes, why, who we share it with and how you exercise your rights under Brazil&apos;s
+        This policy explains what personal data Vira Lar processes, why, who we share it with and how you exercise your rights under Brazil&apos;s
         General Data Protection Law (LGPD, Law 13.709/2018).
       </p>
 
       <h2>Who is responsible</h2>
       <p>
-        Adotaí is operated by <strong>{OPERATOR_NAME || '[name of the person responsible for Adotaí]'}</strong>, the controller of the data processed
+        Vira Lar is operated by <strong>{OPERATOR_NAME || '[name of the person responsible for Vira Lar]'}</strong>, the controller of the data processed
         on the platform. Privacy contact: <Email missing="contact email to be defined" />.
       </p>
       <p className="mt-2">Shelters are also controllers of the adopter data they receive to review and follow up on adoptions, and must use it only for that.</p>
@@ -204,7 +204,7 @@ function PrivacyEn() {
       <ul>
         <li>While your account is active.</li>
         <li>
-          If you delete your account and <strong>never adopted</strong> through Adotaí, we delete the account and its data. If you <strong>have adopted</strong>,
+          If you delete your account and <strong>never adopted</strong> through Vira Lar, we delete the account and its data. If you <strong>have adopted</strong>,
           we delete CPF, phone, address, location, favorites, saved searches and foster offer, replace your name with &quot;Deleted account&quot; and keep only the
           adoption record, check-ins and conversations with shelters, for their history and the animals&apos; safety.
         </li>
@@ -215,7 +215,7 @@ function PrivacyEn() {
       <ul>
         <li>Always-encrypted connection (HTTPS) and encrypted passwords.</li>
         <li>Access rules inside the database itself: each person and shelter can only read what this policy allows.</li>
-        <li>Administrative access restricted to the Adotaí team, without viewing CPFs.</li>
+        <li>Administrative access restricted to the Vira Lar team, without viewing CPFs.</li>
         <li>If a security incident may put you at risk, we will notify you and the National Data Protection Authority (ANPD).</li>
       </ul>
 
@@ -237,7 +237,7 @@ function PrivacyEn() {
 
       <h2>Privacy channel</h2>
       <p>
-        As a small-sized processing agent (ANPD Resolution 2/2022), Adotaí has not appointed a data protection officer, but keeps this channel for data subjects
+        As a small-sized processing agent (ANPD Resolution 2/2022), Vira Lar has not appointed a data protection officer, but keeps this channel for data subjects
         and the ANPD: <Email missing="contact email to be defined" />.
       </p>
 

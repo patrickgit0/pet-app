@@ -19,7 +19,15 @@ const csp = [
 ].join('; ');
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@adotai/shared'],
+  transpilePackages: ['@viralar/shared'],
+  // Páginas locais antigas (piloto em Ribeirão Preto) apontam para as de Franca, sem quebrar links já compartilhados
+  async redirects() {
+    return ['cachorro', 'gato', 'filhotes', 'outros-animais'].map((s) => ({
+      source: `/adotar/${s}-em-ribeirao-preto`,
+      destination: `/adotar/${s}-em-franca`,
+      permanent: true,
+    }));
+  },
   async headers() {
     return [
       {

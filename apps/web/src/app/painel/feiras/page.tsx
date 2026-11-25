@@ -54,7 +54,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-extrabold">{t('Feiras de adoção')}</h1>
-        <p className="text-sm text-muted">{t('Divulgue suas feiras: elas aparecem na página da ONG e na busca do Adotaí.')}</p>
+        <p className="text-sm text-muted">{t('Divulgue suas feiras: elas aparecem na página da ONG e na busca do Vira Lar.')}</p>
       </div>
       {ok && <p role="status" className="rounded-xl bg-brand-soft p-3 text-sm font-semibold text-brand-dark">{t('Feira publicada!')}</p>}
       {erro && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{erro === 'horario' ? t('Confira a data e o horário: o fim precisa ser depois do início.') : t('Não foi possível salvar. Confira os campos.')}</p>}

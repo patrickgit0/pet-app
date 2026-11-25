@@ -38,7 +38,7 @@ export async function SiteHeader() {
       <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-x-7 gap-y-1 px-4 pt-3 sm:px-6 lg:flex-nowrap lg:py-3.5">
         <Link href="/" className="flex items-center gap-2 text-[22px] font-extrabold text-brand">
           <PawIcon size={28} />
-          Adotaí
+          Vira Lar
         </Link>
         <nav className="order-last -mx-4 flex w-[calc(100%+2rem)] items-center gap-1 overflow-x-auto px-2 text-sm font-semibold whitespace-nowrap [scrollbar-width:none] sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-4 lg:order-none lg:mx-0 lg:w-auto lg:flex-1 lg:gap-5 lg:px-0 [&>a]:px-2 [&>a]:py-3 lg:[&>a]:p-0">
           <Link href="/">{t('Adotar')}</Link>

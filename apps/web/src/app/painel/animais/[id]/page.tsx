@@ -2,7 +2,7 @@ import { getI18n } from '@/i18n/server';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ConfirmSubmit } from '@/components/confirm';
-import { animalPath, formatAge, sexLabel, SIZE_LABEL } from '@adotai/shared';
+import { animalPath, formatAge, sexLabel, SIZE_LABEL } from '@viralar/shared';
 import { getMyNgo } from '@/lib/ngo';
 import { NgoPostKit } from '@/components/share-animal';
 import { AnimalForm } from '../animal-form';
@@ -38,8 +38,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     t('{name} está procurando uma família!', { name: animal.name }),
     facts,
     animal.description ? animal.description.replace(/\s*\(Anúncio de exemplo\.\)\s*$/, '') : '',
-    t('Quer adotar? Converse com a {ngo} pelo Adotaí: {url}', { ngo: ngo!.name, url: '{url}' }),
-    '#adote #adocaoresponsavel #naocompreadote #ribeiraopreto',
+    t('Quer adotar? Converse com a {ngo} pelo Vira Lar: {url}', { ngo: ngo!.name, url: '{url}' }),
+    '#adote #adocaoresponsavel #naocompreadote #francasp',
   ].filter(Boolean).join('\n\n');
 
   return (

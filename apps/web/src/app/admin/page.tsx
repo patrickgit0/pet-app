@@ -1,7 +1,7 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
 import { getSession } from '@/lib/supabase/server';
-import { formatRating } from '@adotai/shared';
+import { formatRating } from '@viralar/shared';
 import { Badge, PageTitle } from './ui';
 
 type Dash = {

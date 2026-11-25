@@ -4,7 +4,7 @@ import { useConfirm } from '@/components/confirm';
 import { useI18n } from '@/i18n/client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { hoursOn, parseOpeningHours, visitSlots, type Database, type OpeningHours } from '@adotai/shared';
+import { hoursOn, parseOpeningHours, visitSlots, type Database, type OpeningHours } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/client';
 import { compressImage, extOf } from '@/lib/image';
 import { CalendarIcon, SendIcon } from '@/components/icons';

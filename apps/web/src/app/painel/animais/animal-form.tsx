@@ -1,14 +1,15 @@
 'use client';
 
 import { useI18n } from '@/i18n/client';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { ENERGY_LABEL, SIZE_LABEL, SPECIES_LABEL, SPECIES_ORDER, type Database, type AnimalSize, type EnergyLevel, type Species } from '@adotai/shared';
+import { ENERGY_LABEL, SIZE_LABEL, SPECIES_LABEL, SPECIES_ORDER, type Database, type AnimalSize, type EnergyLevel, type Species } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/client';
 import { photoUrl } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';
 import { compressImage, extOf } from '@/lib/image';
 import { useConfirm } from '@/components/confirm';
+import { useObjectUrl, useObjectUrls } from '@/lib/use-object-urls';
 
 type Animal = Database['public']['Tables']['animals']['Row'];
 type Photo = { id: string; storage_path: string; position: number };
@@ -31,11 +32,10 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
   const [species, setSpecies] = useState<Species>(animal?.species ?? 'dog');
   const [cardPath, setCardPath] = useState<string | null>(animal?.vaccination_card_path ?? null);
   const [cardFile, setCardFile] = useState<File | null>(null);
-  const cardPreview = useMemo(() => (cardFile ? URL.createObjectURL(cardFile) : null), [cardFile]);
-  useEffect(() => () => { if (cardPreview) URL.revokeObjectURL(cardPreview); }, [cardPreview]);
+  const cardPreview = useObjectUrl(cardFile);
+  const cardSrc = cardFile ? cardPreview : photoUrl(cardPath); // arquivo novo escolhido ou a carteirinha já salva
   const [confirm, confirmDialog] = useConfirm();
-  const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
-  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+  const previews = useObjectUrls(files);
   const addFiles = (list: FileList | null) => {
     const ok = Array.from(list ?? []).filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
     setFiles((cur) => [...cur, ...ok].slice(0, 10));
@@ -207,11 +207,13 @@ export function AnimalForm({ ngoId, animal, photos = [] }: { ngoId: string; anim
 
       <div className="flex flex-col gap-2">
         <span className="label">{t('Carteirinha de vacinação (opcional)')}</span>
-        {cardPreview || cardPath ? (
+        {cardFile || cardPath ? (
           <div className="flex items-center gap-3">
-            <a href={cardPreview ?? photoUrl(cardPath)!} target="_blank" rel="noopener noreferrer" className="block h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-field ring-1 ring-line">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cardPreview ?? photoUrl(cardPath)!} alt={t('Carteirinha de vacinação')} className="h-full w-full object-cover" />
+            <a href={cardSrc ?? undefined} target="_blank" rel="noopener noreferrer" className="block h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-field ring-1 ring-line">
+              {cardSrc && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={cardSrc} alt={t('Carteirinha de vacinação')} className="h-full w-full object-cover" />
+              )}
             </a>
             <div className="flex flex-col gap-2">
               <label className="btn-ghost min-h-10 cursor-pointer bg-white px-3 text-sm">

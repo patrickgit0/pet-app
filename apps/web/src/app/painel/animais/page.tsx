@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { ANIMAL_STATUS_LABEL, speciesText } from '@adotai/shared';
+import { ANIMAL_STATUS_LABEL, speciesText } from '@viralar/shared';
 import { getMyNgo } from '@/lib/ngo';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { PlusIcon } from '@/components/icons';

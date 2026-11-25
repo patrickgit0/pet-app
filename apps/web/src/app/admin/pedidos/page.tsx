@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { REQUEST_STATUS_LABEL, type RequestStatus, animalPath } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, type RequestStatus, animalPath } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { Badge, PageTitle, Pager, daysSince, fmtDate } from '../ui';
 

@@ -25,20 +25,69 @@ test('celular em E.164', () => {
   assert.equal(toE164Phone('123'), null);
 });
 
-test('lookupCep usa BrasilAPI e cai no Nominatim sem coordenadas', async () => {
-  const calls: string[] = [];
-  const fakeFetch = async (url: string) => {
-    calls.push(url);
-    if (url.includes('brasilapi')) {
-      return { ok: true, json: async () => ({ state: 'SP', city: 'Ribeirão Preto', neighborhood: 'Centro', street: 'Rua X', location: { coordinates: {} } }) };
+// BrasilAPI que devolve o CENTRO DA CIDADE como coordenada (caso real do CEP 14090-282, Rua Iguape)
+const CITY_CENTER = { latitude: '-21.1775', longitude: '-47.81028' };
+const STREET_POINT = [{ lat: '-21.2013', lon: '-47.7965' }];
+const HOOD_POINT = [{ lat: '-21.1990', lon: '-47.8000' }];
+
+function fakeServices(brasil: object | null, nominatim: (q: string) => unknown[]) {
+  const calls: { url: string; q?: string; lang?: string }[] = [];
+  const fetchImpl = async (url: string, init?: { headers?: Record<string, string> }) => {
+    if (url.includes('nominatim')) {
+      const q = decodeURIComponent(new URL(url).searchParams.get('q')!);
+      calls.push({ url, q, lang: init?.headers?.['Accept-Language'] });
+      return { ok: true, json: async () => nominatim(q) };
     }
-    return { ok: true, json: async () => [{ lat: '-21.17', lon: '-47.81' }] };
+    calls.push({ url });
+    if (url.includes('brasilapi')) return brasil ? { ok: true, json: async () => brasil } : { ok: false, json: async () => ({}) };
+    return { ok: false, json: async () => ({}) };
   };
-  const r = await lookupCep('14010-000', fakeFetch);
-  assert.equal(r?.city, 'Ribeirão Preto');
-  assert.equal(r?.lat, -21.17);
-  assert.equal(calls.length, 2);
-  assert.equal(await lookupCep('123', fakeFetch), null);
+  return { calls, fetchImpl };
+}
+
+test('lookupCep: ponto da rua no Nominatim (sem bairro) vence o centro da cidade da BrasilAPI', async () => {
+  const { calls, fetchImpl } = fakeServices(
+    { state: 'SP', city: 'Ribeirão Preto', neighborhood: 'Jardim Paulistano', street: 'Rua Iguape', location: { coordinates: CITY_CENTER } },
+    (q) => (q.includes('Jardim Paulistano') ? [] : STREET_POINT), // com o bairro, o OSM não acha a rua
+  );
+  const r = await lookupCep('14090-282', fetchImpl, { nominatimGapMs: 0 });
+  assert.equal(r?.street, 'Rua Iguape');
+  assert.equal(r?.neighborhood, 'Jardim Paulistano');
+  assert.deepEqual([r?.lat, r?.lng, r?.precision], [-21.2013, -47.7965, 'street']);
+  const nomi = calls.filter((c) => c.q);
+  assert.equal(nomi.length, 1);
+  assert.equal(nomi[0].q, 'Rua Iguape, Ribeirão Preto, SP, Brasil');
+  assert.equal(nomi[0].lang, 'pt-BR');
+});
+
+test('lookupCep: rua não encontrada usa o ponto da BrasilAPI', async () => {
+  const { fetchImpl } = fakeServices(
+    { state: 'SP', city: 'Franca', neighborhood: 'Centro', street: 'Rua Desconhecida', location: { coordinates: CITY_CENTER } },
+    () => [],
+  );
+  const r = await lookupCep('14400-000', fetchImpl, { nominatimGapMs: 0 });
+  assert.deepEqual([r?.lat, r?.lng, r?.precision], [-21.1775, -47.81028, 'cep']);
+});
+
+test('lookupCep: sem rua e sem ponto da BrasilAPI tenta bairro + cidade + UF', async () => {
+  const { calls, fetchImpl } = fakeServices(
+    { state: 'SP', city: 'Franca', neighborhood: 'Centro', street: 'Rua X', location: { coordinates: {} } },
+    (q) => (q.startsWith('Centro') ? HOOD_POINT : []),
+  );
+  const r = await lookupCep('14400-000', fetchImpl, { nominatimGapMs: 0 });
+  assert.deepEqual([r?.lat, r?.lng, r?.precision], [-21.199, -47.8, 'neighborhood']);
+  assert.deepEqual(calls.filter((c) => c.q).map((c) => c.q), ['Rua X, Franca, SP, Brasil', 'Centro, Franca, SP, Brasil']);
+});
+
+test('lookupCep: geocode false não chama o Nominatim; CEP inválido não chama nada', async () => {
+  const { calls, fetchImpl } = fakeServices(
+    { state: 'SP', city: 'Franca', neighborhood: 'Centro', street: 'Rua X', location: { coordinates: CITY_CENTER } },
+    () => STREET_POINT,
+  );
+  const r = await lookupCep('14400-000', fetchImpl, { geocode: false });
+  assert.equal(r?.precision, 'cep');
+  assert.equal(calls.filter((c) => c.q).length, 0);
+  assert.equal(await lookupCep('123', fetchImpl), null);
 });
 
 test('CNPJ', () => {

@@ -1,4 +1,4 @@
-import { ANIMAL_PHOTOS_BUCKET } from '@adotai/shared';
+import { ANIMAL_PHOTOS_BUCKET } from '@viralar/shared';
 
 export function photoUrl(path: string | null | undefined): string | null {
   if (!path) return null;

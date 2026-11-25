@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { animalPath } from '@adotai/shared';
+import { animalPath } from '@viralar/shared';
 import { LANDINGS, SITE_URL, publicClient } from '@/lib/site';
 
 export const revalidate = 3600; // regenera a cada hora

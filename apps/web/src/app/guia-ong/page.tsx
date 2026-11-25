@@ -8,8 +8,8 @@ import { getI18n } from '@/i18n/server';
 export async function generateMetadata(): Promise<Metadata> {
   const { lang } = await getI18n();
   return lang === 'en'
-    ? { title: 'Guide for NGOs', description: 'How to use Adotaí step by step: listings, requests, chat, adoption and follow-up.' }
-    : { title: 'Guia para ONGs', description: 'Como usar o Adotaí passo a passo: anúncios, pedidos, conversa, adoção e acompanhamento.' };
+    ? { title: 'Guide for NGOs', description: 'How to use Vira Lar step by step: listings, requests, chat, adoption and follow-up.' }
+    : { title: 'Guia para ONGs', description: 'Como usar o Vira Lar passo a passo: anúncios, pedidos, conversa, adoção e acompanhamento.' };
 }
 
 type Step = { title: string; where?: { href: string; label: string }; items: string[] };
@@ -21,7 +21,7 @@ type Content = {
 
 const PT: Content = {
   title: 'Guia para ONGs',
-  intro: 'Tudo o que sua ONG precisa saber para anunciar, escolher adotantes e acompanhar cada adoção no Adotaí.',
+  intro: 'Tudo o que sua ONG precisa saber para anunciar, escolher adotantes e acompanhar cada adoção no Vira Lar.',
   free: 'Gratuito para ONGs e adotantes. Leva uns 15 minutos para deixar tudo pronto.',
   start: 'Cadastrar minha ONG',
   panel: 'Ir para o painel',
@@ -32,7 +32,7 @@ const PT: Content = {
       where: { href: '/sou-ong', label: 'Sou ONG' },
       items: [
         'Crie a conta da pessoa responsável e preencha os dados da ONG (nome, CNPJ, endereço).',
-        'A equipe do Adotaí confere o cadastro. Enquanto isso, você já pode cadastrar animais.',
+        'A equipe do Vira Lar confere o cadastro. Enquanto isso, você já pode cadastrar animais.',
         'Depois da aprovação, a ONG ganha o selo "ONG verificada" e os anúncios aparecem na busca.',
       ],
     },
@@ -87,7 +87,7 @@ const PT: Content = {
       title: 'Acompanhe depois da adoção',
       where: { href: '/painel/pos-adocao', label: 'Painel → Pós-adoção' },
       items: [
-        'O Adotaí pede notícias ao adotante com 7, 30, 90 e 180 dias, com fotos. Vocês veem as respostas no painel.',
+        'O Vira Lar pede notícias ao adotante com 7, 30, 90 e 180 dias, com fotos. Vocês veem as respostas no painel.',
         'O filtro "Precisam de atenção" mostra check-ins atrasados e quem marcou "estou com dificuldade".',
         'Se o animal voltar, use "Registrar devolução": o anúncio volta como rascunho ou direto para a busca.',
         'Depois de 30 dias, o adotante pode avaliar a ONG (uma avaliação por adoção).',
@@ -113,7 +113,7 @@ const PT: Content = {
   rank: [
     ['30%', 'adoções que continuam bem depois de 90 dias'],
     ['20%', 'acompanhamento pós-adoção feito'],
-    ['20%', 'avaliações de quem adotou pelo Adotaí'],
+    ['20%', 'avaliações de quem adotou pelo Vira Lar'],
     ['15%', 'tempo de resposta aos pedidos e mensagens'],
     ['15%', 'transparência: anúncios com saúde e descrição preenchidas e atualizados nos últimos 60 dias'],
   ],
@@ -128,18 +128,18 @@ const PT: Content = {
   ],
   faqTitle: 'Perguntas frequentes',
   faq: [
-    ['Quanto custa?', 'Nada. O Adotaí é gratuito para ONGs e adotantes.'],
+    ['Quanto custa?', 'Nada. O Vira Lar é gratuito para ONGs e adotantes.'],
     ['Precisa de CNPJ?', 'Por enquanto, sim. Protetores independentes devem entrar numa próxima etapa.'],
     ['Posso usar o meu próprio termo de adoção?', 'Ainda não: todas as adoções usam o termo padrão da plataforma, que você pode ler em /termo-de-adocao.'],
     ['Posso cobrar taxa de adoção?', 'Pode, desde que esteja escrita na descrição do anúncio antes do pedido. É proibido vender animais.'],
-    ['Quem decide a adoção?', 'Sempre a ONG. O Adotaí só aproxima e organiza o processo.'],
+    ['Quem decide a adoção?', 'Sempre a ONG. O Vira Lar só aproxima e organiza o processo.'],
   ],
-  help: 'Dúvidas ou problemas? Fale com a equipe do Adotaí pelo contato que enviou este guia.',
+  help: 'Dúvidas ou problemas? Fale com a equipe do Vira Lar pelo contato que enviou este guia.',
 };
 
 const EN: Content = {
   title: 'Guide for NGOs',
-  intro: 'Everything your NGO needs to know to list animals, choose adopters and follow up on each adoption on Adotaí.',
+  intro: 'Everything your NGO needs to know to list animals, choose adopters and follow up on each adoption on Vira Lar.',
   free: 'Free for NGOs and adopters. It takes about 15 minutes to get set up.',
   start: 'Register my NGO',
   panel: 'Go to the dashboard',
@@ -150,7 +150,7 @@ const EN: Content = {
       where: { href: '/sou-ong', label: 'For NGOs' },
       items: [
         'Create the account of the person in charge and fill in the NGO details (name, CNPJ, address).',
-        'The Adotaí team reviews the registration. Meanwhile, you can already add animals.',
+        'The Vira Lar team reviews the registration. Meanwhile, you can already add animals.',
         'Once approved, the NGO gets the "Verified NGO" badge and its listings appear in search.',
       ],
     },
@@ -205,7 +205,7 @@ const EN: Content = {
       title: 'Follow up after the adoption',
       where: { href: '/painel/pos-adocao', label: 'Dashboard → After adoption' },
       items: [
-        'Adotaí asks the adopter for news at 7, 30, 90 and 180 days, with photos. You see the answers on the dashboard.',
+        'Vira Lar asks the adopter for news at 7, 30, 90 and 180 days, with photos. You see the answers on the dashboard.',
         'The "Need attention" filter shows late check-ins and adopters who reported difficulties.',
         'If the animal comes back, use "Register return": the listing goes back to draft or straight to search.',
         'After 30 days, the adopter can review the NGO (one review per adoption).',
@@ -231,7 +231,7 @@ const EN: Content = {
   rank: [
     ['30%', 'adoptions still going well after 90 days'],
     ['20%', 'post-adoption follow-up done'],
-    ['20%', 'reviews from people who adopted through Adotaí'],
+    ['20%', 'reviews from people who adopted through Vira Lar'],
     ['15%', 'response time to requests and messages'],
     ['15%', 'transparency: listings with health and description filled in and updated in the last 60 days'],
   ],
@@ -246,13 +246,13 @@ const EN: Content = {
   ],
   faqTitle: 'FAQ',
   faq: [
-    ['How much does it cost?', 'Nothing. Adotaí is free for NGOs and adopters.'],
+    ['How much does it cost?', 'Nothing. Vira Lar is free for NGOs and adopters.'],
     ['Is a CNPJ required?', 'For now, yes. Independent rescuers should come in a later stage.'],
     ['Can I use my own adoption agreement?', 'Not yet: all adoptions use the platform\'s standard agreement, available at /termo-de-adocao.'],
     ['Can I charge an adoption fee?', 'Yes, as long as it is written in the listing description before the request. Selling animals is forbidden.'],
-    ['Who decides the adoption?', 'Always the NGO. Adotaí only brings people together and organizes the process.'],
+    ['Who decides the adoption?', 'Always the NGO. Vira Lar only brings people together and organizes the process.'],
   ],
-  help: 'Questions or problems? Contact the Adotaí team through whoever sent you this guide.',
+  help: 'Questions or problems? Contact the Vira Lar team through whoever sent you this guide.',
 };
 
 export default async function Page() {

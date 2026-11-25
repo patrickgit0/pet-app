@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@adotai/shared';
+import type { Database } from '@viralar/shared';
 
 type Role = Database['public']['Enums']['user_role'];
 type AnimalStatus = Database['public']['Enums']['animal_status'];

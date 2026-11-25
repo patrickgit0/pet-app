@@ -3,7 +3,7 @@
 import { useI18n } from '@/i18n/client';
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCep, formatCpf, formatPhone, isValidCpf, lookupCep, rpcErrorMessage, toE164Phone, HOME_LABEL, type CepResult, type HomeType } from '@adotai/shared';
+import { formatCep, formatCpf, formatPhone, isValidCpf, lookupCep, rpcErrorMessage, toE164Phone, HOME_LABEL, type CepResult, type HomeType } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/client';
 import { CheckIcon } from '@/components/icons';
 
@@ -31,6 +31,8 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
 
   const [cep, setCep] = useState(formatCep(initial.cep));
   const [addr, setAddr] = useState<CepResult | null>(null);
+  // true quando o endereço veio de um CEP digitado agora (busca completa, com o ponto da rua)
+  const [addrPrecise, setAddrPrecise] = useState(false);
   const [cepMsg, setCepMsg] = useState<string | null>(initial.cep ? 'Confira o CEP para atualizar o bairro.' : null);
   const [street, setStreet] = useState(initial.street);
   const [complement, setComplement] = useState(initial.complement);
@@ -41,11 +43,12 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
   const [otherPets, setOtherPets] = useState(initial.otherPets);
   const [consent, setConsent] = useState(initial.consented);
 
-  // CEP já salvo: busca de novo em segundo plano para ter cidade/bairro/coordenadas na hora de salvar
+  // CEP já salvo: busca só cidade/bairro em segundo plano (sem Nominatim, que só roda com ação da pessoa).
+  // O ponto da rua é buscado ao salvar, se o CEP não tiver sido digitado de novo.
   useEffect(() => {
     if (!initial.cep) return;
     let alive = true;
-    lookupCep(initial.cep).then((r) => { if (alive && r) { setAddr(r); setCepMsg(null); } });
+    lookupCep(initial.cep, undefined, { geocode: false }).then((r) => { if (alive && r) { setAddr(r); setCepMsg(null); } });
     return () => { alive = false; };
   }, [initial.cep]);
 
@@ -53,12 +56,14 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
     const v = formatCep(value);
     setCep(v);
     setAddr(null);
+    setAddrPrecise(false);
     setCepMsg(null);
     if (v.replace(/\D/g, '').length === 8) {
       setCepMsg('Buscando…');
       const r = await lookupCep(v);
       if (!r) return setCepMsg('CEP não encontrado.');
       setAddr(r);
+      setAddrPrecise(true);
       setCepMsg(null);
       if (!street && r.street) setStreet(`${r.street}, `);
     }
@@ -90,10 +95,12 @@ export function ProfileForm({ initial, animalId, animalName }: { initial: Initia
       if (e1) return setError('Não foi possível salvar. Tente de novo.');
 
       if (adoptionTouched && initial.isAdopter && addr) {
+        // Clique em salvar: completa o ponto da rua se o endereço veio só do CEP já salvo
+        const a = addrPrecise ? addr : ((await lookupCep(cep)) ?? addr);
         const { error } = await supabase.rpc('complete_profile', {
           p_cpf: cpf, p_phone: toE164Phone(phone)!, p_cep: cep, p_street: street, p_complement: complement,
-          p_neighborhood: addr.neighborhood ?? '', p_city: addr.city, p_state: addr.state,
-          p_lat: addr.lat ?? undefined, p_lng: addr.lng ?? undefined,
+          p_neighborhood: a.neighborhood ?? '', p_city: a.city, p_state: a.state,
+          p_lat: a.lat ?? undefined, p_lng: a.lng ?? undefined,
           p_home_type: homeType!, p_has_yard: hasYard, p_has_children: hasChildren, p_other_pets: otherPets,
           p_lgpd_consent: consent,
         } as never);

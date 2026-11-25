@@ -3,8 +3,8 @@ import type { MetadataRoute } from 'next';
 /** Site instalável na tela inicial do celular (PWA). */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Adotaí — adoção de cães e gatos',
-    short_name: 'Adotaí',
+    name: 'Vira Lar — adoção de cães e gatos',
+    short_name: 'Vira Lar',
     description: 'Encontre cães e gatos para adoção perto de você, em ONGs verificadas.',
     start_url: '/',
     scope: '/',

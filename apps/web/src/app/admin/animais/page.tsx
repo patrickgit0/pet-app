@@ -1,7 +1,7 @@
 import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { ANIMAL_STATUS_LABEL, SIZE_LABEL, SPECIES_ORDER, SPECIES_PLURAL, animalPath, formatAge, sexLabel, speciesText, type AnimalStatus, type Species } from '@adotai/shared';
+import { ANIMAL_STATUS_LABEL, SIZE_LABEL, SPECIES_ORDER, SPECIES_PLURAL, animalPath, formatAge, sexLabel, speciesText, type AnimalStatus, type Species } from '@viralar/shared';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { PawIcon } from '@/components/icons';
 import { getSession } from '@/lib/supabase/server';

@@ -44,7 +44,7 @@ export function ReportButton({ type, id, loggedIn, className, label = 'Denunciar
         {state === 'done' ? (
           <div className="flex flex-col gap-4 p-5 sm:p-6">
             <h2 id={`report-${id}`} className="text-lg font-extrabold">{t('Denúncia enviada')}</h2>
-            <p className="text-sm text-ink-2">{t('Obrigado. A equipe do Adotaí vai analisar. Se houver risco a um animal, procure também a polícia ou a prefeitura.')}</p>
+            <p className="text-sm text-ink-2">{t('Obrigado. A equipe do Vira Lar vai analisar. Se houver risco a um animal, procure também a polícia ou a prefeitura.')}</p>
             <button type="button" onClick={() => ref.current?.close()} className="btn-primary self-end">{t('Fechar')}</button>
           </div>
         ) : (

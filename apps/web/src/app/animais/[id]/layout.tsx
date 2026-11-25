@@ -1,5 +1,5 @@
 import { notFound, permanentRedirect } from 'next/navigation';
-import { animalPath } from '@adotai/shared';
+import { animalPath } from '@viralar/shared';
 import { loadAnimal } from './load';
 
 /**

@@ -33,11 +33,11 @@ begin
 
   -- Adotante com perfil completo (CPF de teste válido)
   update public.profile_private set cpf = '38492017597', cpf_verified_at = now() - interval '50 days',
-    phone = '+5516988880001', phone_verified_at = now() - interval '50 days', cep = '14020260',
+    phone = '+5516988880001', phone_verified_at = now() - interval '50 days', cep = '14401000',
     street = 'Rua Fictícia, 250', complement = 'Casa 2', lgpd_consent_at = now() - interval '50 days'
   where id = v_adopter;
-  update public.profiles set neighborhood = 'Jardim Sumaré', city = 'Ribeirão Preto', state = 'SP',
-    location = extensions.st_setsrid(extensions.st_makepoint(-47.8000, -21.1950), 4326)::extensions.geography,
+  update public.profiles set neighborhood = 'Jardim Consolação', city = 'Franca', state = 'SP',
+    location = extensions.st_setsrid(extensions.st_makepoint(-47.3905, -20.5561), 4326)::extensions.geography,
     home_type = 'house', has_yard = true, has_children = true, other_pets = '1 gata castrada',
     routine_notes = 'Trabalho em casa três dias por semana.', profile_completed_at = now() - interval '50 days'
   where id = v_adopter;
@@ -45,9 +45,9 @@ begin
   -- ONG
   insert into public.ngos (id, name, slug, cnpj, description, email, phone, pix_key, city, state, neighborhood, address_text, location, verified_at, created_at)
   values (v_ngo, 'Amigos de Quatro Patas', 'amigos-de-quatro-patas', '45997418000153',
-    'ONG fictícia de demonstração do Adotaí. Resgatamos, castramos e acompanhamos cada adoção.',
-    'ong-demo@adotai.dev', '+5516999990001', 'ong-demo@adotai.dev', 'Ribeirão Preto', 'SP', 'Ribeirânia', 'Ribeirânia, Ribeirão Preto',
-    extensions.st_setsrid(extensions.st_makepoint(-47.7850, -21.1950), 4326)::extensions.geography, now() - interval '58 days', now() - interval '60 days');
+    'ONG fictícia de demonstração do Vira Lar. Resgatamos, castramos e acompanhamos cada adoção.',
+    'ong-demo@adotai.dev', '+5516999990001', 'ong-demo@adotai.dev', 'Franca', 'SP', 'Cidade Nova', 'Cidade Nova, Franca',
+    extensions.st_setsrid(extensions.st_makepoint(-47.3755, -20.5561), 4326)::extensions.geography, now() - interval '58 days', now() - interval '60 days');
   insert into public.ngo_members (ngo_id, user_id, role) values (v_ngo, v_ngo_user, 'owner');
   update public.profiles set role = 'ngo_member' where id = v_ngo_user;
 
@@ -60,14 +60,14 @@ begin
     now() - make_interval(days => a.days), now() - make_interval(days => a.days),
     extensions.st_setsrid(extensions.st_makepoint(a.lng, a.lat), 4326)::extensions.geography
   from (values
-    ('Bidu',    'dog', 'male',   'medium', 36, 'SRD',            'Companheiro e tranquilo, ótimo com crianças.', 'medium', true, true,  true,  null,  true,  null, 'adopted',   55, -47.7870, -21.1930),
-    ('Kiara',   'dog', 'female', 'large',  24, 'SRD',            'Energia de sobra e muito amorosa. Ideal para casa com quintal.', 'high', true, true,  true,  false, false, null, 'available', 30, -47.7820, -21.1980),
-    ('Paçoca',  'dog', 'male',   'small',  10, 'SRD',            'Filhote caramelo, esperto e brincalhão.', 'high', true, true,  true,  true,  true,  null, 'available', 12, -47.7900, -21.1900),
-    ('Duque',   'dog', 'male',   'large',  60, 'Labrador (mix)', 'Calmo, obediente e adora água.', 'medium', true, true,  true,  null,  false, null, 'available', 40, -47.7780, -21.1960),
-    ('Lola',    'dog', 'female', 'small',  84, 'Poodle (mix)',   'Idosa carinhosa, ideal para apartamento.', 'low', true, true,  false, true,  true,  'Ração para idosos', 'available', 65, -47.7950, -21.2000),
-    ('Sushi',   'cat', 'female', 'small',  14, 'SRD',            'Gata branca e preta, curiosa e sociável.', 'medium', true, true,  false, true,  true,  null, 'available', 8,  -47.7880, -21.1970),
-    ('Tom',     'cat', 'male',   'small',  48, 'SRD',            'Gato cinza, independente e muito limpo.', 'low', true, true,  false, true,  true,  null, 'available', 22, -47.7840, -21.1920),
-    ('Pantera', 'cat', 'female', 'small',   6, 'SRD',            'Filhote preta, brincalhona. Castração agendada.', 'high', false, true, true,  true,  true,  null, 'available', 4,  -47.7860, -21.2010)
+    ('Bidu',    'dog', 'male',   'medium', 36, 'SRD',            'Companheiro e tranquilo, ótimo com crianças.', 'medium', true, true,  true,  null,  true,  null, 'adopted',   55, -47.3775, -20.5541),
+    ('Kiara',   'dog', 'female', 'large',  24, 'SRD',            'Energia de sobra e muito amorosa. Ideal para casa com quintal.', 'high', true, true,  true,  false, false, null, 'available', 30, -47.3725, -20.5591),
+    ('Paçoca',  'dog', 'male',   'small',  10, 'SRD',            'Filhote caramelo, esperto e brincalhão.', 'high', true, true,  true,  true,  true,  null, 'available', 12, -47.3805, -20.5511),
+    ('Duque',   'dog', 'male',   'large',  60, 'Labrador (mix)', 'Calmo, obediente e adora água.', 'medium', true, true,  true,  null,  false, null, 'available', 40, -47.3685, -20.5571),
+    ('Lola',    'dog', 'female', 'small',  84, 'Poodle (mix)',   'Idosa carinhosa, ideal para apartamento.', 'low', true, true,  false, true,  true,  'Ração para idosos', 'available', 65, -47.3855, -20.5611),
+    ('Sushi',   'cat', 'female', 'small',  14, 'SRD',            'Gata branca e preta, curiosa e sociável.', 'medium', true, true,  false, true,  true,  null, 'available', 8,  -47.3785, -20.5581),
+    ('Tom',     'cat', 'male',   'small',  48, 'SRD',            'Gato cinza, independente e muito limpo.', 'low', true, true,  false, true,  true,  null, 'available', 22, -47.3745, -20.5531),
+    ('Pantera', 'cat', 'female', 'small',   6, 'SRD',            'Filhote preta, brincalhona. Castração agendada.', 'high', false, true, true,  true,  true,  null, 'available', 4,  -47.3765, -20.5621)
   ) as a(name, species, sex, size, months, breed, descr, energy, neutered, kids, dogs, cats, apt, special, status, days, lng, lat);
 
   select id into v_bidu from public.animals where ngo_id = v_ngo and name = 'Bidu';
@@ -99,7 +99,7 @@ begin
   insert into public.messages (conversation_id, sender_id, kind, body, visit_at, visit_place, visit_confirmed_at, created_at, read_at) values
     (v_conv, v_adopter,  'text', 'Oi! Gostaria de conhecer a Kiara, acho que ela e o Bidu iam se dar bem.', null, null, null, now() - interval '3 days', now() - interval '3 days'),
     (v_conv, v_ngo_user, 'text', 'Que legal! Ela é bem agitada, combina com quintal. Podemos marcar uma visita com o Bidu junto.', null, null, null, now() - interval '3 days' + interval '40 minutes', now() - interval '3 days'),
-    (v_conv, v_ngo_user, 'visit_proposal', 'Proposta de visita', date_trunc('day', now()) + interval '2 days 10 hours', 'Sede da ONG — Ribeirânia', now() - interval '2 days', now() - interval '2 days', now() - interval '2 days'),
+    (v_conv, v_ngo_user, 'visit_proposal', 'Proposta de visita', date_trunc('day', now()) + interval '2 days 10 hours', 'Sede da ONG — Cidade Nova', now() - interval '2 days', now() - interval '2 days', now() - interval '2 days'),
     (v_conv, v_adopter,  'text', 'Combinado, estaremos lá!', null, null, null, now() - interval '2 days' + interval '1 hour', null);
 
   -- 3) Conversa sobre o Paçoca (só dúvidas, sem pedido)

@@ -4,7 +4,7 @@ import { ReportButton } from '@/components/report-button';
 import { NgoContact } from '@/components/ngo-contact';
 import { getI18n } from '@/i18n/server';
 import { notFound } from 'next/navigation';
-import { formatRating } from '@adotai/shared';
+import { formatRating } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/server';
 import { initials, photoUrl, tintFor } from '@/lib/utils';
 import { EventCard } from '@/components/event-card';
@@ -89,7 +89,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {!!happy?.length && (
         <section>
           <h2 className="mb-1 text-lg font-extrabold">{t('Finais felizes')}</h2>
-          <p className="mb-3 text-sm text-muted">{t('Animais que já encontraram uma família pelo Adotaí.')}</p>
+          <p className="mb-3 text-sm text-muted">{t('Animais que já encontraram uma família pelo Vira Lar.')}</p>
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {happy.map((h, i) => (
               <li key={i} className="card overflow-hidden">

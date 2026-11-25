@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { REQUEST_STATUS_LABEL, animalPath } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, animalPath } from '@viralar/shared';
 import { createClient, getSession } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { ConfirmSubmit } from '@/components/confirm';

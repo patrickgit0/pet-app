@@ -1,4 +1,4 @@
-import type { Lang } from '@adotai/shared';
+import type { Lang } from '@viralar/shared';
 import { EN } from './en';
 
 export type { Lang };

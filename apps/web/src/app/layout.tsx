@@ -17,9 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
   return {
     metadataBase: new URL(SITE_URL),
-    appleWebApp: { capable: true, title: 'Adotaí', statusBarStyle: 'default' },
+    appleWebApp: { capable: true, title: 'Vira Lar', statusBarStyle: 'default' },
     icons: { apple: '/pwa-icon/192' },
-    title: { default: t('Adotaí — adote um cão ou gato perto de você'), template: '%s · Adotaí' },
+    title: { default: t('Vira Lar — adote um cão ou gato perto de você'), template: '%s · Vira Lar' },
     description: t('Encontre cães e gatos para adoção perto de você, em ONGs verificadas. Converse com a ONG, peça a adoção e receba acompanhamento depois.'),
   };
 }
@@ -34,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="flex-1 pb-16">{children}</div>
           <footer className="border-t border-line bg-white print:hidden">
             <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-muted sm:px-6">
-              <span>© {new Date().getFullYear()} Adotaí · Ribeirão Preto/SP</span>
+              <span>© {new Date().getFullYear()} Vira Lar · Franca/SP</span>
               <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <Link href="/privacidade">{t('Privacidade (LGPD)')}</Link>
                 <Link href="/termos">{t('Termos de uso')}</Link>
@@ -42,8 +42,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Link href="/sou-ong">{t('Sou ONG')}</Link>
                 <Link href="/guia-ong">{t('Guia para ONGs')}</Link>
                 <Link href="/lar-temporario">{t('Seja lar temporário')}</Link>
-                <Link href="/adotar/cachorro-em-ribeirao-preto">{t('Cães em Ribeirão Preto')}</Link>
-                <Link href="/adotar/gato-em-ribeirao-preto">{t('Gatos em Ribeirão Preto')}</Link>
+                <Link href="/adotar/cachorro-em-franca">{t('Cães em Franca')}</Link>
+                <Link href="/adotar/gato-em-franca">{t('Gatos em Franca')}</Link>
                 <LangSwitch />
               </nav>
             </div>

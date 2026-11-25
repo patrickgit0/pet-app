@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { REQUEST_STATUS_LABEL, type RequestStatus } from '@adotai/shared';
+import { REQUEST_STATUS_LABEL, type RequestStatus } from '@viralar/shared';
 import { getMyNgo } from '@/lib/ngo';
 
 const OPEN: RequestStatus[] = ['sent', 'reviewing', 'visit_scheduled'];

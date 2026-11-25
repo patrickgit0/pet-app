@@ -1,4 +1,4 @@
--- Adotaí — funções de negócio (RPC)
+-- Vira Lar — funções de negócio (RPC)
 -- Toda regra sensível passa por aqui, não pelo cliente.
 
 -- ---------------------------------------------------------------------------

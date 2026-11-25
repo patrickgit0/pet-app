@@ -14,7 +14,7 @@ export async function DonatePix({ ngo, message, title }: { ngo: { name: string; 
         dangerouslySetInnerHTML={{ __html: svg }} />
       <div className="flex min-w-0 flex-col gap-2 text-sm">
         <h2 className="text-base font-extrabold">{title ?? t('Ajude a {name} com um Pix', { name: ngo.name })}</h2>
-        <p className="text-ink-2">{t('O dinheiro vai direto para a ONG, sem taxa e sem passar pelo Adotaí. Escolha o valor no app do seu banco.')}</p>
+        <p className="text-ink-2">{t('O dinheiro vai direto para a ONG, sem taxa e sem passar pelo Vira Lar. Escolha o valor no app do seu banco.')}</p>
         <p className="break-all text-xs text-muted">{t('Chave:')} <strong className="select-all text-ink">{ngo.pix_key}</strong></p>
         <CopyButton text={payload} label="Copiar Pix copia e cola" className="btn-primary self-start" />
       </div>

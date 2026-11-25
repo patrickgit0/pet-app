@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { formatAge, sexLabel, SIZE_LABEL, speciesText, type Lang } from '@adotai/shared';
+import { formatAge, sexLabel, SIZE_LABEL, speciesText, type Lang } from '@viralar/shared';
 import { animalRef } from '@/lib/animal-ref';
 import { createClient } from '@/lib/supabase/server';
 import { makeT } from '@/i18n';
@@ -29,7 +29,7 @@ const ageMonths = (b: string | null) => {
   return (n.getFullYear() - d.getFullYear()) * 12 + (n.getMonth() - d.getMonth());
 };
 
-/** Desenha o card do animal (foto grande, nome, características, ONG, chamada "Adote no Adotaí"). */
+/** Desenha o card do animal (foto grande, nome, características, ONG, chamada "Adote no Vira Lar"). */
 export function renderAnimalCard(a: CardAnimal, format: CardFormat, lang: Lang, siteHost: string) {
   const t = makeT(lang);
   const [w, h] = CARD_SIZES[format];
@@ -65,7 +65,7 @@ export function renderAnimalCard(a: CardAnimal, format: CardFormat, lang: Lang, 
 
   const footer = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: BRAND, color: 'white', padding: wide ? '0px 56px' : `${34 * s}px ${48 * s}px`, height: wide ? 96 : 'auto', borderRadius: wide ? 0 : 32 * s, marginTop: wide ? 0 : 36 * s }}>
-      <div style={{ display: 'flex', fontSize: (wide ? 36 : 52) * s, fontWeight: 800 }}>Adotaí</div>
+      <div style={{ display: 'flex', fontSize: (wide ? 36 : 52) * s, fontWeight: 800 }}>Vira Lar</div>
       <div style={{ display: 'flex', fontSize: (wide ? 26 : 34) * s, fontWeight: 600 }}>{t('Adote em')} {siteHost}</div>
     </div>
   );

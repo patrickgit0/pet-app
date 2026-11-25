@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { rpcErrorMessage } from '@adotai/shared';
+import { rpcErrorMessage } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/server';
 
 async function requireUser(next: string) {

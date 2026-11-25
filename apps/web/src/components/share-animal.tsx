@@ -10,7 +10,7 @@ const fullUrl = (path: string) => `${window.location.origin}${path}`;
 export function ShareAnimal({ path, name }: { path: string; name: string }) {
   const { t } = useI18n();
   const [msg, setMsg] = useState<string | null>(null);
-  const text = () => t('Conheça {name}, para adoção no Adotaí:', { name });
+  const text = () => t('Conheça {name}, para adoção no Vira Lar:', { name });
 
   async function nativeShare() {
     if (navigator.share) {

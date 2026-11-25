@@ -6,6 +6,7 @@ import { useI18n } from '@/i18n/client';
 import { createClient } from '@/lib/supabase/client';
 import { compressImage, extOf } from '@/lib/image';
 import { useConfirm } from '@/components/confirm';
+import { useObjectUrls } from '@/lib/use-object-urls';
 
 const MAX_PHOTOS = 3;
 
@@ -15,6 +16,7 @@ export function CheckinForm({ checkinId, adoptionId, userId, title }: { checkinI
   const router = useRouter();
   const [confirm, dialog] = useConfirm();
   const [files, setFiles] = useState<File[]>([]);
+  const previews = useObjectUrls(files);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +65,7 @@ export function CheckinForm({ checkinId, adoptionId, userId, title }: { checkinI
             <button key={i} type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} aria-label={t('Remover foto')}
               className="relative h-16 w-16 overflow-hidden rounded-xl bg-ground">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={URL.createObjectURL(f)} alt="" className="h-full w-full object-cover" />
+              {previews[i] && <img src={previews[i]} alt="" className="h-full w-full object-cover" />}
               <span className="absolute top-0.5 right-0.5 rounded-full bg-ink/70 px-1.5 text-[10px] font-bold text-white">✕</span>
             </button>
           ))}

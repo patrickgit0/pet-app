@@ -3,7 +3,7 @@ import { getI18n, pageTitle } from '@/i18n/server';
 import { createClient } from '@/lib/supabase/server';
 import { EventCard } from '@/components/event-card';
 
-export const generateMetadata = pageTitle('Feiras de adoção em Ribeirão Preto');
+export const generateMetadata = pageTitle('Feiras de adoção em Franca');
 
 export default async function Page() {
   const supabase = await createClient();
@@ -14,7 +14,7 @@ export default async function Page() {
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-extrabold">{t('Feiras de adoção')}</h1>
-      <p className="text-ink-2">{t('Conheça os animais pessoalmente. As feiras são organizadas pelas ONGs do Adotaí.')}</p>
+      <p className="text-ink-2">{t('Conheça os animais pessoalmente. As feiras são organizadas pelas ONGs do Vira Lar.')}</p>
       {(events ?? []).map((e) => <EventCard key={e.id} e={e} />)}
       {!events?.length && (
         <p className="card p-8 text-center text-muted">

@@ -1,4 +1,4 @@
--- Adotaí — Storage e Realtime
+-- Vira Lar — Storage e Realtime
 
 -- Buckets: fotos de animais são públicas; fotos de check-in e anexos do chat são privados.
 insert into storage.buckets (id, name, public) values

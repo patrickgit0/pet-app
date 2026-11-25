@@ -16,7 +16,7 @@ export default async function Page() {
   return (
     <main className="mx-auto grid max-w-5xl gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-10 md:grid-cols-2">
       <section className="flex flex-col gap-4">
-        <h1 className="text-2xl font-extrabold sm:text-3xl">{t('Sua ONG no Adotaí')}</h1>
+        <h1 className="text-2xl font-extrabold sm:text-3xl">{t('Sua ONG no Vira Lar')}</h1>
         <p className="text-ink-2">{t('Divulgue seus animais para quem está perto, receba candidatos com CPF válido e acompanhe cada adoção depois da entrega. É gratuito.')}</p>
         <ul className="flex flex-col gap-2 text-sm">
           <li>✓ {t('Anúncios com fotos, saúde e temperamento')}</li>

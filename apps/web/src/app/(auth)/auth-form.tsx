@@ -3,16 +3,16 @@
 import { useI18n } from '@/i18n/client';
 import { useActionState, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { resendEmailCode, signIn, signUp, verifyEmailCode, type FormState } from './actions';
+import { resendConfirmation, signIn, signUp, type FormState } from './actions';
 
-export function AuthForm({ mode, next }: { mode: 'signin' | 'signup'; next?: string }) {
+export function AuthForm({ mode, next, notice }: { mode: 'signin' | 'signup'; next?: string; notice?: { tone: 'ok' | 'error'; text: string } }) {
   const [state, action, pending] = useActionState<FormState, FormData>(mode === 'signin' ? signIn : signUp, undefined);
   const [dismissed, setDismissed] = useState<FormState>(undefined); // "Trocar e-mail" volta ao formulário
   const isSignup = mode === 'signup';
   const { t } = useI18n();
 
   if (state?.verify && state !== dismissed) {
-    return <CodeStep email={state.verify} next={next} notice={state.ok} onChangeEmail={() => setDismissed(state)} />;
+    return <CheckEmailStep email={state.verify} next={next} notice={state.ok} onChangeEmail={() => setDismissed(state)} />;
   }
 
   return (
@@ -20,6 +20,12 @@ export function AuthForm({ mode, next }: { mode: 'signin' | 'signup'; next?: str
       <h1 className="text-2xl font-extrabold">{isSignup ? t('Criar conta') : t('Entrar')}</h1>
       <p className="text-sm text-muted">{isSignup ? t('Encontre seu novo melhor amigo. Leva menos de um minuto.') : t('Bom te ver de novo.')}</p>
       <input type="hidden" name="next" value={next ?? ''} />
+      {notice && !state && (
+        <p role={notice.tone === 'error' ? 'alert' : 'status'}
+          className={`rounded-xl p-3 text-sm font-semibold ${notice.tone === 'error' ? 'bg-red-50 text-red-700' : 'bg-brand-soft text-brand-dark'}`}>
+          {t(notice.text)}
+        </p>
+      )}
       {isSignup && (
         <label className="flex flex-col gap-1.5">
           <span className="label">{t('Nome completo')}</span>
@@ -52,48 +58,48 @@ export function AuthForm({ mode, next }: { mode: 'signin' | 'signup'; next?: str
   );
 }
 
-/** Passo do código: 6 dígitos enviados por e-mail, com reenvio após 60 s. */
-function CodeStep({ email, next, notice, onChangeEmail }: { email: string; next?: string; notice?: string; onChangeEmail: () => void }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(verifyEmailCode, undefined);
+/** Aguardando a confirmação: o link foi enviado por e-mail. Reenvio liberado após 60 s. */
+function CheckEmailStep({ email, next, notice, onChangeEmail }: { email: string; next?: string; notice?: string; onChangeEmail: () => void }) {
   const [wait, setWait] = useState(60);
+  const [busy, setBusy] = useState(false);
   const { t } = useI18n();
   const [msg, setMsg] = useState<string | null>(notice ?? null);
 
   useEffect(() => {
     if (wait <= 0) return;
-    const t = setTimeout(() => setWait((w) => w - 1), 1000);
-    return () => clearTimeout(t);
+    const id = setTimeout(() => setWait((w) => w - 1), 1000);
+    return () => clearTimeout(id);
   }, [wait]);
 
   async function resend() {
     setMsg(null);
-    const r = await resendEmailCode(email);
-    setMsg(r.error ?? t('Enviamos um novo código.'));
+    setBusy(true);
+    const r = await resendConfirmation(email, next);
+    setBusy(false);
+    setMsg(r.error ?? 'Enviamos um novo link.');
     if (!r.error) setWait(60);
   }
 
   return (
-    <form action={action} className="card mx-auto mt-6 flex w-full max-w-md flex-col gap-4 p-5 sm:mt-12 sm:p-7">
+    <div className="card mx-auto mt-6 flex w-full max-w-md flex-col gap-4 p-5 text-center sm:mt-12 sm:p-7">
+      <span aria-hidden className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-2xl">✉️</span>
       <h1 className="text-2xl font-extrabold">{t('Confirme seu e-mail')}</h1>
       <p className="text-sm text-muted">
-        {t('Enviamos um código de 6 números para')} <strong className="text-ink">{email}</strong>. {t('Pode levar um minutinho; confira também o spam.')}
+        {t('Enviamos um link de confirmação para')} <strong className="text-ink">{email}</strong>.{' '}
+        {t('Abra o e-mail e clique no link para ativar sua conta.')}
       </p>
-      <input type="hidden" name="email" value={email} />
-      <input type="hidden" name="next" value={next ?? ''} />
-      <label className="flex flex-col gap-1.5">
-        <span className="label">{t('Código')}</span>
-        <input name="code" required autoFocus inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}"
-          placeholder="000000" className="field h-14 text-center text-2xl font-bold tracking-[0.5em]" />
-      </label>
-      {state?.error && <p role="alert" className="text-sm font-semibold text-red-700">{t(state.error)}</p>}
-      {msg && <p role="status" className="text-sm font-semibold text-brand-dark">{t(msg)}</p>}
-      <button disabled={pending} className="btn-primary h-12 text-base">{pending ? t('Confirmando…') : t('Confirmar')}</button>
+      <p role="status" className="flex items-center justify-center gap-2 rounded-xl bg-accent-soft p-3 text-sm font-semibold text-accent-ink">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden />
+        {t('Aguardando a confirmação no seu e-mail…')}
+      </p>
+      <p className="text-xs text-muted">{t('Pode levar um minutinho; confira também o spam e a aba Promoções.')}</p>
+      {msg && <p className="text-sm font-semibold text-brand-dark">{t(msg)}</p>}
       <div className="flex items-center justify-between text-sm">
         <button type="button" onClick={onChangeEmail} className="font-semibold text-muted hover:text-ink">{t('Trocar e-mail')}</button>
-        <button type="button" onClick={resend} disabled={wait > 0} className="font-bold text-brand disabled:font-semibold disabled:text-muted">
-          {wait > 0 ? t('Reenviar em {s}s', { s: wait }) : t('Reenviar código')}
+        <button type="button" onClick={resend} disabled={wait > 0 || busy} className="font-bold text-brand disabled:font-semibold disabled:text-muted">
+          {wait > 0 ? t('Reenviar em {s}s', { s: wait }) : t('Reenviar e-mail')}
         </button>
       </div>
-    </form>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
--- Adotaí — Row Level Security
+-- Vira Lar — Row Level Security
 -- Princípio: tudo fechado por padrão; cada tabela abre só o necessário.
 
 -- ---------------------------------------------------------------------------

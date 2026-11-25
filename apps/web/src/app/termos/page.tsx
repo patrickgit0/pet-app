@@ -21,14 +21,14 @@ export default async function Page() {
       <p className="mt-2 text-sm">Última atualização: 19 de novembro de 2026.</p>
 
       <p className="mt-4">
-        Estes termos são as regras para usar o Adotaí, operado por <strong>{OPERATOR_NAME || '[nome do responsável pelo Adotaí]'}</strong>.
+        Estes termos são as regras para usar o Vira Lar, operado por <strong>{OPERATOR_NAME || '[nome do responsável pelo Vira Lar]'}</strong>.
         Ao criar uma conta, você concorda com eles e com a <a className={A} href="/privacidade">Política de Privacidade</a>.
       </p>
 
-      <h2>O que é o Adotaí</h2>
+      <h2>O que é o Vira Lar</h2>
       <p>
-        O Adotaí é uma plataforma gratuita que aproxima organizações de proteção animal (ONGs com CNPJ) de pessoas que querem adotar.
-        O Adotaí não é dono dos animais, não faz resgates, não vende animais e não decide as adoções: quem analisa os pedidos, escolhe o
+        O Vira Lar é uma plataforma gratuita que aproxima organizações de proteção animal (ONGs com CNPJ) de pessoas que querem adotar.
+        O Vira Lar não é dono dos animais, não faz resgates, não vende animais e não decide as adoções: quem analisa os pedidos, escolhe o
         adotante e entrega o animal é a ONG responsável.
       </p>
 
@@ -43,7 +43,7 @@ export default async function Page() {
       <h2>Regras para todos</h2>
       <ul>
         <li>É proibido vender animais ou cobrar qualquer valor além da taxa de adoção escrita no anúncio.</li>
-        <li>É proibido usar o Adotaí para golpes, assédio, ofensas, discriminação, spam ou para pedir dados pessoais sem necessidade.</li>
+        <li>É proibido usar o Vira Lar para golpes, assédio, ofensas, discriminação, spam ou para pedir dados pessoais sem necessidade.</li>
         <li>É proibido publicar conteúdo ilegal, violento, enganoso ou que exponha dados de outras pessoas.</li>
         <li>Fotos e textos publicados devem ser seus ou autorizados.</li>
         <li>É proibido tentar acessar dados de outras pessoas, copiar o site em massa ou atrapalhar o funcionamento do serviço.</li>
@@ -51,11 +51,11 @@ export default async function Page() {
 
       <h2>Regras para ONGs</h2>
       <ul>
-        <li>Só ONGs com CNPJ podem anunciar. A equipe do Adotaí verifica o cadastro e pode pedir documentos.</li>
+        <li>Só ONGs com CNPJ podem anunciar. A equipe do Vira Lar verifica o cadastro e pode pedir documentos.</li>
         <li>A ONG responde pelos anúncios, pelas informações de saúde e comportamento dos animais, pela análise dos pedidos e pela entrega.</li>
         <li>Os dados dos adotantes só podem ser usados para avaliar e acompanhar a adoção, nunca para outros fins, e devem ser protegidos pela ONG.</li>
-        <li>Toda adoção feita pelo Adotaí usa o <a className={A} href="/termo-de-adocao">Termo de adoção</a> padrão da plataforma.</li>
-        <li>Doações por Pix vão direto para a ONG. O Adotaí não recebe, não guarda e não intermedeia esses valores.</li>
+        <li>Toda adoção feita pelo Vira Lar usa o <a className={A} href="/termo-de-adocao">Termo de adoção</a> padrão da plataforma.</li>
+        <li>Doações por Pix vão direto para a ONG. O Vira Lar não recebe, não guarda e não intermedeia esses valores.</li>
         <li>Feiras de adoção cadastradas são organizadas e de responsabilidade da ONG.</li>
       </ul>
 
@@ -63,12 +63,12 @@ export default async function Page() {
       <ul>
         <li>Ao adotar, você aceita o <a className={A} href="/termo-de-adocao">Termo de adoção responsável</a> com a ONG.</li>
         <li>Responder aos check-ins de acompanhamento faz parte do compromisso com a ONG e com o animal.</li>
-        <li>Combinações de lar temporário são feitas diretamente entre você e a ONG. O Adotaí só mostra sua oferta às ONGs verificadas.</li>
+        <li>Combinações de lar temporário são feitas diretamente entre você e a ONG. O Vira Lar só mostra sua oferta às ONGs verificadas.</li>
       </ul>
 
       <h2>Conteúdo que você publica</h2>
       <p>
-        Você continua dono das fotos e textos que publica. Ao publicá-los, autoriza o Adotaí, de graça e enquanto o conteúdo estiver no site, a
+        Você continua dono das fotos e textos que publica. Ao publicá-los, autoriza o Vira Lar, de graça e enquanto o conteúdo estiver no site, a
         exibi-los na plataforma e a usá-los para divulgar os animais (por exemplo, nas imagens de &quot;Divulgar&quot; e nas prévias de links).
       </p>
 
@@ -82,18 +82,18 @@ export default async function Page() {
 
       <h2>Responsabilidades</h2>
       <ul>
-        <li>O Adotaí cuida para que o serviço funcione bem e com segurança, mas pode ter interrupções para manutenção ou por falhas de terceiros.</li>
+        <li>O Vira Lar cuida para que o serviço funcione bem e com segurança, mas pode ter interrupções para manutenção ou por falhas de terceiros.</li>
         <li>
-          Como não participa das adoções, o Adotaí não responde pelo que é combinado entre ONG e adotante, pelas informações publicadas pelas ONGs
+          Como não participa das adoções, o Vira Lar não responde pelo que é combinado entre ONG e adotante, pelas informações publicadas pelas ONGs
           nem pelo comportamento de usuários fora da plataforma. Isso não exclui direitos que a lei garante a você.
         </li>
-        <li>Pelo conteúdo publicado por usuários, o Adotaí segue o Marco Civil da Internet (Lei 12.965/2014) e remove o que for ilegal ou contrário a estes termos quando souber.</li>
+        <li>Pelo conteúdo publicado por usuários, o Vira Lar segue o Marco Civil da Internet (Lei 12.965/2014) e remove o que for ilegal ou contrário a estes termos quando souber.</li>
       </ul>
 
       <h2>Mudanças</h2>
       <p>
         Podemos atualizar estes termos. A data no topo mostra a versão atual. Mudanças importantes serão avisadas no site com antecedência,
-        e continuar usando o Adotaí depois disso significa concordar com a nova versão.
+        e continuar usando o Vira Lar depois disso significa concordar com a nova versão.
       </p>
 
       <h2>Lei e foro</h2>
@@ -112,14 +112,14 @@ function TermsEn() {
       <p className="mt-2 text-sm">Last updated: November 19, 2026. Courtesy translation; the Portuguese version prevails.</p>
 
       <p className="mt-4">
-        These terms are the rules for using Adotaí, operated by <strong>{OPERATOR_NAME || '[name of the person responsible for Adotaí]'}</strong>.
+        These terms are the rules for using Vira Lar, operated by <strong>{OPERATOR_NAME || '[name of the person responsible for Vira Lar]'}</strong>.
         By creating an account, you agree to them and to the <a className={A} href="/privacidade">Privacy Policy</a>.
       </p>
 
-      <h2>What Adotaí is</h2>
+      <h2>What Vira Lar is</h2>
       <p>
-        Adotaí is a free platform that connects animal welfare organizations (registered shelters with a CNPJ) with people who want to adopt.
-        Adotaí does not own the animals, does not rescue them, does not sell animals and does not decide adoptions: the responsible shelter reviews
+        Vira Lar is a free platform that connects animal welfare organizations (registered shelters with a CNPJ) with people who want to adopt.
+        Vira Lar does not own the animals, does not rescue them, does not sell animals and does not decide adoptions: the responsible shelter reviews
         the requests, chooses the adopter and hands over the animal.
       </p>
 
@@ -134,7 +134,7 @@ function TermsEn() {
       <h2>Rules for everyone</h2>
       <ul>
         <li>Selling animals or charging anything beyond the adoption fee written on the listing is forbidden.</li>
-        <li>Using Adotaí for scams, harassment, insults, discrimination, spam or to request unnecessary personal data is forbidden.</li>
+        <li>Using Vira Lar for scams, harassment, insults, discrimination, spam or to request unnecessary personal data is forbidden.</li>
         <li>Posting illegal, violent or misleading content, or content exposing other people&apos;s data, is forbidden.</li>
         <li>Photos and texts you post must be yours or authorized.</li>
         <li>Trying to access other people&apos;s data, scraping the site or disrupting the service is forbidden.</li>
@@ -142,11 +142,11 @@ function TermsEn() {
 
       <h2>Rules for shelters</h2>
       <ul>
-        <li>Only shelters with a CNPJ can post. The Adotaí team reviews the registration and may ask for documents.</li>
+        <li>Only shelters with a CNPJ can post. The Vira Lar team reviews the registration and may ask for documents.</li>
         <li>The shelter is responsible for its listings, the health and behavior information of the animals, reviewing requests and the hand-over.</li>
         <li>Adopter data may only be used to evaluate and follow up on the adoption, never for other purposes, and must be protected by the shelter.</li>
-        <li>Every adoption through Adotaí uses the platform&apos;s standard <a className={A} href="/termo-de-adocao">Adoption agreement</a>.</li>
-        <li>Pix donations go straight to the shelter. Adotaí does not receive, hold or intermediate these amounts.</li>
+        <li>Every adoption through Vira Lar uses the platform&apos;s standard <a className={A} href="/termo-de-adocao">Adoption agreement</a>.</li>
+        <li>Pix donations go straight to the shelter. Vira Lar does not receive, hold or intermediate these amounts.</li>
         <li>Adoption fairs listed are organized by and the responsibility of the shelter.</li>
       </ul>
 
@@ -154,12 +154,12 @@ function TermsEn() {
       <ul>
         <li>When adopting, you accept the <a className={A} href="/termo-de-adocao">Responsible adoption agreement</a> with the shelter.</li>
         <li>Answering follow-up check-ins is part of your commitment to the shelter and the animal.</li>
-        <li>Foster arrangements are made directly between you and the shelter. Adotaí only shows your offer to verified shelters.</li>
+        <li>Foster arrangements are made directly between you and the shelter. Vira Lar only shows your offer to verified shelters.</li>
       </ul>
 
       <h2>Content you post</h2>
       <p>
-        You keep ownership of the photos and texts you post. By posting them, you allow Adotaí, free of charge and while the content is on the site,
+        You keep ownership of the photos and texts you post. By posting them, you allow Vira Lar, free of charge and while the content is on the site,
         to display them on the platform and use them to promote the animals (for example, in &quot;Promote&quot; images and link previews).
       </p>
 
@@ -172,16 +172,16 @@ function TermsEn() {
 
       <h2>Liability</h2>
       <ul>
-        <li>Adotaí works to keep the service running well and securely, but it may be interrupted for maintenance or third-party failures.</li>
+        <li>Vira Lar works to keep the service running well and securely, but it may be interrupted for maintenance or third-party failures.</li>
         <li>
-          Since it does not take part in adoptions, Adotaí is not liable for what is agreed between shelter and adopter, for information posted by shelters
+          Since it does not take part in adoptions, Vira Lar is not liable for what is agreed between shelter and adopter, for information posted by shelters
           or for users&apos; behavior outside the platform. This does not remove rights the law guarantees you.
         </li>
-        <li>For user-generated content, Adotaí follows Brazil&apos;s Internet Civil Framework (Law 12.965/2014) and removes illegal content or content against these terms once aware of it.</li>
+        <li>For user-generated content, Vira Lar follows Brazil&apos;s Internet Civil Framework (Law 12.965/2014) and removes illegal content or content against these terms once aware of it.</li>
       </ul>
 
       <h2>Changes</h2>
-      <p>We may update these terms. The date at the top shows the current version. Important changes will be announced on the site in advance, and continuing to use Adotaí afterwards means agreeing to the new version.</p>
+      <p>We may update these terms. The date at the top shows the current version. Important changes will be announced on the site in advance, and continuing to use Vira Lar afterwards means agreeing to the new version.</p>
 
       <h2>Law and venue</h2>
       <p>These terms are governed by Brazilian law. Disputes will be settled in the courts of the user&apos;s domicile. Before that, talk to us: <Contact missing="contact email to be defined" />.</p>

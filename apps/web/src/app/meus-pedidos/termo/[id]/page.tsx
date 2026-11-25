@@ -1,8 +1,10 @@
 import { getI18n, pageTitle } from '@/i18n/server';
 import { notFound } from 'next/navigation';
-import { formatCnpj, speciesText } from '@adotai/shared';
+import { formatCnpj, speciesText } from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { TermClauses } from '@/components/term-clauses';
+import { PawIcon } from '@/components/icons';
+import { SITE_URL } from '@/lib/site';
 import { PrintButton } from './print-button';
 
 export const generateMetadata = pageTitle('Termo de adoção');
@@ -25,6 +27,19 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <p className="text-sm text-muted">{t('Use "Salvar como PDF" na janela de impressão.')}</p>
         <PrintButton />
       </div>
+      {/* Identidade do site: aparece na tela e no PDF (o cabeçalho do site some na impressão) */}
+      <header className="mb-6 flex items-center justify-between gap-4 border-b-2 border-brand pb-4 [print-color-adjust:exact] [-webkit-print-color-adjust:exact]">
+        <div className="flex items-center gap-3">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-white">
+            <PawIcon size={30} />
+          </span>
+          <div>
+            <p className="text-2xl leading-none font-extrabold text-brand">Vira Lar</p>
+            <p className="mt-1 text-xs text-muted">{t('Adoção responsável de cães, gatos e outros animais')}</p>
+          </div>
+        </div>
+        <p className="text-right text-xs text-muted">{SITE_URL.replace(/^https?:\/\//, '')}</p>
+      </header>
       <h1 className="text-3xl font-extrabold text-ink">{t('Termo de adoção responsável')}</h1>
       <dl className="mt-4 grid gap-x-6 gap-y-2 rounded-xl border border-line p-4 text-sm sm:grid-cols-2">
         <div><dt className="text-xs text-muted">{t('Adotante')}</dt><dd className="font-semibold text-ink">{a.profiles?.full_name}</dd></div>
@@ -34,7 +49,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <div className="sm:col-span-2"><dt className="text-xs text-muted">{t('Aceite digital')}</dt><dd className="font-semibold text-ink">{dt(a.term_accepted_at)} · {t('versão {v}', { v: a.term_version ?? 'padrao-v1' })} · {t('código {c}', { c: a.id.slice(0, 8).toUpperCase() })}</dd></div>
       </dl>
       <TermClauses lang={lang === 'en' ? 'en' : 'pt'} version={a.term_version} />
-      <p className="mt-8 text-xs text-muted">{t('Aceite feito pelo adotante na própria conta no Adotaí, com data e hora registradas.')}</p>
+      <p className="mt-8 text-xs text-muted">{t('Aceite feito pelo adotante na própria conta no Vira Lar, com data e hora registradas.')}</p>
     </main>
   );
 }

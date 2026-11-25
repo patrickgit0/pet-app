@@ -3,7 +3,7 @@
 import { useI18n } from '@/i18n/client';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCep, formatCnpj, isValidCnpj, lookupCep, type CepResult } from '@adotai/shared';
+import { formatCep, formatCnpj, isValidCnpj, lookupCep, type CepResult } from '@viralar/shared';
 import { createClient } from '@/lib/supabase/client';
 
 const slugify = (s: string) =>

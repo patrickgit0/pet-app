@@ -1,4 +1,4 @@
-import { isValidCpf } from '@adotai/shared';
+import { isValidCpf } from '@viralar/shared';
 
 /**
  * Pix "copia e cola" estático (BR Code, padrão EMV do Banco Central), sem valor fixo: a pessoa digita o valor no banco.

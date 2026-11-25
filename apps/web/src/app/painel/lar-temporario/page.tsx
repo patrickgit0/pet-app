@@ -1,4 +1,4 @@
-import { SIZE_LABEL, SPECIES_PLURAL, formatPhone } from '@adotai/shared';
+import { SIZE_LABEL, SPECIES_PLURAL, formatPhone } from '@viralar/shared';
 import { getI18n, pageTitle } from '@/i18n/server';
 import { getMyNgo } from '@/lib/ngo';
 import { WhatsAppGlyph } from '@/components/whatsapp-glyph';
@@ -13,7 +13,7 @@ export default async function Page() {
     return (
       <div className="flex flex-col gap-3">
         <h1 className="text-2xl font-extrabold">{t('Lar temporário')}</h1>
-        <p className="card p-6 text-sm text-muted">{t('A lista de voluntários de lar temporário aparece depois que a ONG for verificada pela equipe do Adotaí.')}</p>
+        <p className="card p-6 text-sm text-muted">{t('A lista de voluntários de lar temporário aparece depois que a ONG for verificada pela equipe do Vira Lar.')}</p>
       </div>
     );
   }
@@ -26,7 +26,7 @@ export default async function Page() {
       </div>
       <ul className="grid gap-3 sm:grid-cols-2">
         {(offers ?? []).map((o) => {
-          const msg = t('Olá, {name}! Somos da {ngo} e vimos no Adotaí que você se ofereceu como lar temporário. Podemos conversar?', { name: o.full_name.split(' ')[0], ngo: ngo!.name });
+          const msg = t('Olá, {name}! Somos da {ngo} e vimos no Vira Lar que você se ofereceu como lar temporário. Podemos conversar?', { name: o.full_name.split(' ')[0], ngo: ngo!.name });
           return (
             <li key={o.user_id} className="card flex flex-col gap-2 p-4 text-sm">
               <strong className="text-base">{o.full_name}</strong>

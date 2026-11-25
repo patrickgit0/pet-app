@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import {
   AGE_GROUPS, PILOT_CITY, RADIUS_OPTIONS_KM, SIZE_LABEL, SORT_OPTIONS,
   type AnimalSize, type Species, animalPath, SPECIES_ORDER, SPECIES_PLURAL,
-} from '@adotai/shared';
+} from '@viralar/shared';
 import { getSession } from '@/lib/supabase/server';
 import { readSearchLocation } from '@/lib/search-location';
 import { AnimalCard } from '@/components/animal-card';

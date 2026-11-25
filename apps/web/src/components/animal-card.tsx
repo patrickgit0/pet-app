@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { formatAge, formatDistance, formatRating, sexLabel, SIZE_LABEL, type AnimalSex, type AnimalSize, animalPath } from '@adotai/shared';
+import { formatAge, formatDistance, formatRating, sexLabel, SIZE_LABEL, type AnimalSex, type AnimalSize, animalPath } from '@viralar/shared';
 import { photoUrl, tintFor } from '@/lib/utils';
 import { PawIcon, VerifiedIcon } from './icons';
 

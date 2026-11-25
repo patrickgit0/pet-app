@@ -1,6 +1,6 @@
 import { getI18n } from '@/i18n/server';
 import Link from 'next/link';
-import { formatRating, REQUEST_STATUS_LABEL } from '@adotai/shared';
+import { formatRating, REQUEST_STATUS_LABEL } from '@viralar/shared';
 import { getMyNgo } from '@/lib/ngo';
 import { PlusIcon } from '@/components/icons';
 

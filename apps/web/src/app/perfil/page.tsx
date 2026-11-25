@@ -3,7 +3,7 @@ import { LangSwitch } from '@/components/lang-switch';
 import { getI18n, pageTitle } from '@/i18n/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { HOME_LABEL, formatPhone } from '@adotai/shared';
+import { HOME_LABEL, formatPhone } from '@viralar/shared';
 import { getSession, createClient } from '@/lib/supabase/server';
 import { signOut } from '@/app/(auth)/actions';
 import { CheckIcon } from '@/components/icons';
@@ -84,10 +84,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
       <details className="px-1 text-sm">
         <summary className="cursor-pointer py-2 font-semibold text-muted">{t('Privacidade e exclusão de conta')}</summary>
         <p className="mt-2 text-muted">
-          {t('Você pode excluir sua conta a qualquer momento. Se já adotou pelo Adotaí, mantemos só o registro mínimo da adoção (sem CPF, celular ou endereço) para o histórico da ONG.')}{' '}
+          {t('Você pode excluir sua conta a qualquer momento. Se já adotou pelo Vira Lar, mantemos só o registro mínimo da adoção (sem CPF, celular ou endereço) para o histórico da ONG.')}{' '}
           <Link href="/privacidade" className="font-semibold text-brand underline">{t('Política de Privacidade')}</Link>
         </p>
-        <p className="mt-3 text-muted">{t('Você também pode baixar uma cópia de tudo o que o Adotaí guarda sobre você (arquivo JSON).')}</p>
+        <p className="mt-3 text-muted">{t('Você também pode baixar uma cópia de tudo o que o Vira Lar guarda sobre você (arquivo JSON).')}</p>
         <a href="/api/meus-dados" download className="btn-ghost mt-2 min-h-10 bg-white px-3 text-sm">{t('Baixar meus dados')}</a>
         <form action={deleteAccount} className="mt-3">
           <ConfirmSubmit title="Excluir sua conta?" message="Seus dados (CPF, celular, endereço, mensagens, favoritos e pedidos) serão apagados. Isso não pode ser desfeito." confirmLabel="Excluir conta" tone="danger" className="btn text-red-700 ring-[1.5px] ring-red-200 ring-inset hover:bg-red-50">{t('Excluir minha conta')}</ConfirmSubmit>

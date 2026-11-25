@@ -20,7 +20,7 @@ test.describe('Visitante (sem login)', () => {
   });
 
   test('páginas de SEO, feiras, lar temporário e LGPD respondem', async ({ page, request }) => {
-    for (const path of ['/adotar/cachorro-em-ribeirao-preto', '/feiras', '/lar-temporario', '/termos', '/privacidade', '/termo-de-adocao', '/ongs', '/guia-ong']) {
+    for (const path of ['/adotar/cachorro-em-franca', '/feiras', '/lar-temporario', '/termos', '/privacidade', '/termo-de-adocao', '/ongs', '/guia-ong']) {
       const res = await page.goto(path);
       expect(res?.status(), path).toBe(200);
     }

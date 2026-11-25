@@ -4,7 +4,7 @@ import { useI18n } from '@/i18n/client';
 import { useEffect, useRef } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { MAP_STYLE_URL } from '@adotai/shared';
+import { MAP_STYLE_URL } from '@viralar/shared';
 
 // O worker do MapLibre é servido de /public (copiado no build): o bundler do Next quebra o caminho padrão.
 maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');

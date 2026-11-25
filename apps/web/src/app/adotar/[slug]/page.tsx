@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { PILOT_CITY } from '@adotai/shared';
+import { PILOT_CITY } from '@viralar/shared';
 import { getI18n } from '@/i18n/server';
 import { createClient } from '@/lib/supabase/server';
 import { LANDINGS, SITE_URL, type LandingSlug } from '@/lib/site';
@@ -21,16 +21,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { t } = await getI18n();
   return {
     title: t(l.title),
-    description: t('{title}: animais de ONGs verificadas, com foto, idade e porte. Converse com a ONG e peça a adoção pelo Adotaí, de graça.', { title: t(l.title) }),
+    description: t('{title}: animais de ONGs verificadas, com foto, idade e porte. Converse com a ONG e peça a adoção pelo Vira Lar, de graça.', { title: t(l.title) }),
     alternates: { canonical: `/adotar/${(await params).slug}` },
   };
 }
 
 const FAQ = [
-  ['Quanto custa adotar?', 'Usar o Adotaí é gratuito. Algumas ONGs pedem uma taxa para ajudar com vacinas e castração: pergunte na conversa antes de enviar o pedido.'],
+  ['Quanto custa adotar?', 'Usar o Vira Lar é gratuito. Algumas ONGs pedem uma taxa para ajudar com vacinas e castração: pergunte na conversa antes de enviar o pedido.'],
   ['Como funciona a adoção?', 'Você cria uma conta, conversa com a ONG pelo site e envia o pedido de adoção. A ONG analisa seu perfil, pode marcar uma visita e, se aprovar, combina a entrega com você.'],
   ['Preciso ter casa com quintal?', 'Não. Cada anúncio mostra se o animal se adapta a apartamento, crianças e outros animais. Use os filtros para encontrar o que combina com a sua rotina.'],
-  ['E depois da adoção?', 'O Adotaí acompanha os primeiros meses com check-ins rápidos (7, 30, 90 e 180 dias). Se algo não estiver bem, você pede ajuda à ONG pelo próprio site.'],
+  ['E depois da adoção?', 'O Vira Lar acompanha os primeiros meses com check-ins rápidos (7, 30, 90 e 180 dias). Se algo não estiver bem, você pede ajuda à ONG pelo próprio site.'],
 ] as const;
 
 export default async function Landing({ params }: Params) {
@@ -51,7 +51,7 @@ export default async function Landing({ params }: Params) {
     '@context': 'https://schema.org',
     '@graph': [
       { '@type': 'BreadcrumbList', itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Adotaí', item: SITE_URL },
+        { '@type': 'ListItem', position: 1, name: 'Vira Lar', item: SITE_URL },
         { '@type': 'ListItem', position: 2, name: t(l.title), item: `${SITE_URL}/adotar/${slug}` },
       ] },
       { '@type': 'FAQPage', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: t(q), acceptedAnswer: { '@type': 'Answer', text: t(a) } })) },
@@ -64,7 +64,7 @@ export default async function Landing({ params }: Params) {
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-extrabold sm:text-3xl">{t(l.h1)}</h1>
         <p className="max-w-2xl text-ink-2">
-          {t('{n} animais esperando por um lar em Ribeirão Preto e região, todos de ONGs cadastradas com CNPJ. Veja fotos, converse com a ONG e peça a adoção sem sair de casa.', { n: total })}
+          {t('{n} animais esperando por um lar em Franca e região, todos de ONGs cadastradas com CNPJ. Veja fotos, converse com a ONG e peça a adoção sem sair de casa.', { n: total })}
         </p>
         <Link href={searchHref} className="btn-primary mt-2 self-start">{t('Ver todos com filtros e mapa')}</Link>
       </header>

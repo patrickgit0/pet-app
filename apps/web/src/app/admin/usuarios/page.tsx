@@ -2,7 +2,7 @@ import { ConfirmSubmit } from '@/components/confirm';
 import { getI18n } from '@/i18n/server';
 import { getSession } from '@/lib/supabase/server';
 import Link from 'next/link';
-import type { Database } from '@adotai/shared';
+import type { Database } from '@viralar/shared';
 import { setUserRole } from '../actions';
 import { Badge, PageTitle, Pager, SearchBar, fmtDate } from '../ui';
 
