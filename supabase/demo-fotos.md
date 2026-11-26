@@ -1,7 +1,7 @@
 # Fotos dos anúncios de demonstração
 
 Fotos das contas fictícias de produção (ONG Exemplo Vira Lar e Amigos de Quatro Patas), enviadas em 18/11/2026.
-Todas vêm do Wikimedia Commons com licença **CC0** (domínio público, uso livre sem atribuição obrigatória).
+Todas, exceto o Slink (anúncio de teste com foto própria do autor), vêm do Wikimedia Commons com licença **CC0** (domínio público, uso livre sem atribuição obrigatória).
 Apagar junto com os dados de demonstração antes do lançamento.
 
 | Animal | Arquivo original | Licença |
@@ -22,3 +22,4 @@ Apagar junto com os dados de demonstração antes do lançamento.
 | Sushi | [A black and white kitten 3.jpg](https://commons.wikimedia.org/wiki/File:A_black_and_white_kitten_3.jpg) | CC0 |
 | Tom | [Kitten sleeping.jpg](https://commons.wikimedia.org/wiki/File:Kitten_sleeping.jpg) | CC0 |
 | Pantera | [A curious kitten (Pixabay).jpg](https://commons.wikimedia.org/wiki/File:A_curious_kitten_(Pixabay).jpg) | CC0 |
+| Slink | Foto própria do autor (anúncio de teste cadastrado pelo site) | Uso autorizado pelo autor |
