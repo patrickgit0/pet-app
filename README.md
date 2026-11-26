@@ -44,7 +44,7 @@ O Vira Lar junta três coisas que hoje ficam separadas:
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/animal-web.png" alt="Página do animal" /><br/><sub><b>Página do animal</b> — saúde, convivência, ONG com nota e tempo de resposta.</sub></td>
-    <td width="50%"><img src="docs/screenshots/completar-perfil.png" alt="Completar perfil" /><br/><sub><b>Completar perfil</b> — CPF, celular e CEP que preenche cidade e bairro.</sub></td>
+    <td width="50%"><img src="docs/screenshots/completar-perfil.png" alt="Perfil do adotante" /><br/><sub><b>Perfil do adotante</b> — CPF mascarado, celular, CEP que preenche cidade e bairro e dados da moradia.</sub></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/painel-ong.png" alt="Painel da ONG" /><br/><sub><b>Painel da ONG</b> — indicadores, candidatos e alertas de pós-adoção.</sub></td>

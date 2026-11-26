@@ -25,7 +25,7 @@ test('celular em E.164', () => {
   assert.equal(toE164Phone('123'), null);
 });
 
-// BrasilAPI que devolve o CENTRO DA CIDADE como coordenada (caso real do CEP 14090-282, Rua Iguape)
+// BrasilAPI que devolve o CENTRO DA CIDADE como coordenada (acontece com alguns CEPs)
 const CITY_CENTER = { latitude: '-21.1775', longitude: '-47.81028' };
 const STREET_POINT = [{ lat: '-21.2013', lon: '-47.7965' }];
 const HOOD_POINT = [{ lat: '-21.1990', lon: '-47.8000' }];
@@ -47,16 +47,16 @@ function fakeServices(brasil: object | null, nominatim: (q: string) => unknown[]
 
 test('lookupCep: ponto da rua no Nominatim (sem bairro) vence o centro da cidade da BrasilAPI', async () => {
   const { calls, fetchImpl } = fakeServices(
-    { state: 'SP', city: 'Ribeirão Preto', neighborhood: 'Jardim Paulistano', street: 'Rua Iguape', location: { coordinates: CITY_CENTER } },
-    (q) => (q.includes('Jardim Paulistano') ? [] : STREET_POINT), // com o bairro, o OSM não acha a rua
+    { state: 'SP', city: 'Franca', neighborhood: 'Jardim Consolação', street: 'Rua das Flores', location: { coordinates: CITY_CENTER } },
+    (q) => (q.includes('Jardim Consolação') ? [] : STREET_POINT), // com o bairro, o OSM não acha a rua
   );
-  const r = await lookupCep('14090-282', fetchImpl, { nominatimGapMs: 0 });
-  assert.equal(r?.street, 'Rua Iguape');
-  assert.equal(r?.neighborhood, 'Jardim Paulistano');
+  const r = await lookupCep('14401-000', fetchImpl, { nominatimGapMs: 0 });
+  assert.equal(r?.street, 'Rua das Flores');
+  assert.equal(r?.neighborhood, 'Jardim Consolação');
   assert.deepEqual([r?.lat, r?.lng, r?.precision], [-21.2013, -47.7965, 'street']);
   const nomi = calls.filter((c) => c.q);
   assert.equal(nomi.length, 1);
-  assert.equal(nomi[0].q, 'Rua Iguape, Ribeirão Preto, SP, Brasil');
+  assert.equal(nomi[0].q, 'Rua das Flores, Franca, SP, Brasil');
   assert.equal(nomi[0].lang, 'pt-BR');
 });
 

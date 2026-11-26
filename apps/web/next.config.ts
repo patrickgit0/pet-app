@@ -20,7 +20,7 @@ const csp = [
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@viralar/shared'],
-  // Páginas locais antigas (piloto em Ribeirão Preto) apontam para as de Franca, sem quebrar links já compartilhados
+  // Endereços antigos das páginas locais apontam para as de Franca, sem quebrar links já compartilhados
   async redirects() {
     return ['cachorro', 'gato', 'filhotes', 'outros-animais'].map((s) => ({
       source: `/adotar/${s}-em-ribeirao-preto`,
